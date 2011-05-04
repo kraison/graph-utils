@@ -1,0 +1,39 @@
+(in-package #:cl-user)
+
+(defpackage #:graph
+  (:use #:cl #:cl-ppcre)
+  (:export #:make-graph
+	   #:copy-graph
+	   #:graph=
+	   #:graph?
+	   #:directed?
+	   #:undirected?
+	   #:add-node
+	   #:adjust-adjacency-matrix
+	   #:lookup-node
+	   #:map-nodes
+	   #:list-nodes
+	   #:node-count
+	   #:neighbors
+	   #:edges
+	   #:edge-exists?
+	   #:add-edge
+	   #:delete-edge
+	   #:map-edges
+	   #:list-edges
+	   #:edge-count
+	   #:edge-weight
+	   #:density
+	   #:degree-distribution
+	   #:find-shortest-path
+	   #:calculate-shortest-paths
+	   #:distance-map
+	   #:find-components
+	   #:score-edges
+	   #:cluster
+	   #:minimal-cut
+	   #:visualize
+	   #:generate-random-graph))
+
+	  
+
