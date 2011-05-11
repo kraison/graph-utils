@@ -20,7 +20,8 @@
     (maphash #'(lambda (node id)
 		 (declare (ignore node))
 		 (let ((degree 0))
-		   (loop for i from 0 to (1- (array-dimension (matrix graph) 0)) do
+		   (loop for i from 0 to (1- (array-dimension (matrix graph) 0)) 
+		      do
 			(when (not (zerop (aref (matrix graph) id i)))
 			  (incf degree)))
 		   (if (assoc degree dist)
@@ -30,10 +31,11 @@
     (sort dist #'< :key 'car)))
 
 (defun reconstruct-path (prev end)
-  "Helper function for find-shortest-path;  walks the shortest path and returns it as a list of edges as
-pairs of nodes."
+  "Helper function for find-shortest-path;  walks the shortest path and returns it
+as a list of edges as pairs of nodes."
   (when (cdr (assoc end prev))
-    (cons (list (cdr (assoc end prev)) end) (reconstruct-path prev (cdr (assoc end prev))))))
+    (cons (list (cdr (assoc end prev)) end)
+	  (reconstruct-path prev (cdr (assoc end prev))))))
 
 (defmethod find-shortest-path ((graph graph) (n1 integer) (n2 integer))
   "Dijkstra's algorithm for finding the shortest path between two nodes."
@@ -59,7 +61,9 @@ pairs of nodes."
 			 (cdr (assoc neighbor previous)) (car next))))))))))
 
 (defmethod find-shortest-path ((graph graph) (n1 string) (n2 string))
-  (find-shortest-path graph (gethash n1 (nodes graph)) (gethash n2 (nodes graph))))
+  (find-shortest-path graph 
+		      (gethash n1 (nodes graph)) 
+		      (gethash n2 (nodes graph))))
 
 (defmethod distance-map ((graph graph) (id integer) &key expand-ids?)
   "Generate a sorted distance map for the given node."
@@ -130,7 +134,8 @@ pairs of nodes."
 	  f)
 	file)))
 
-(defmethod generate-random-graph ((model (eql :erdos-renyi)) (size integer) &key p)
+(defmethod generate-random-graph ((model (eql :erdos-renyi)) (size integer) 
+				  &key p)
   (let ((graph (make-graph)))
     (dotimes (i size)
       (add-node graph i :no-expand? t))
@@ -141,8 +146,8 @@ pairs of nodes."
 	     (add-edge graph i j))))
     graph))
 
-(defmethod generate-random-graph ((model (eql :barabasi-albert)) (size integer) &key
-				  &allow-other-keys)
+(defmethod generate-random-graph ((model (eql :barabasi-albert)) (size integer) 
+				  &key &allow-other-keys)
   (when (< size 4)
     (error "Cannot generate a barabasi-albert graph of size less than 4"))
   (let ((graph (make-graph)))
@@ -158,31 +163,37 @@ pairs of nodes."
 	 (loop for j from 0 to (1- i) do
 	      (when (and (/= i j)
 			 (<= (random 1.0) 
-			     (/ (1+ (degree graph i)) (+ (edge-count graph) (1+ i)))))
+			     (/ (1+ (degree graph i)) 
+				(+ (edge-count graph) (1+ i)))))
 		(add-edge graph i j))))
     graph))
 
 (defmethod calculate-shortest-paths ((graph graph))
   (let ((paths nil))
     (loop for i from 0 to (1- (array-dimension (matrix graph) 0)) do
-	 (loop for j from (if (directed? graph) 0 i) to (1- (array-dimension (matrix graph) 1)) do
+	 (loop for j from (if (directed? graph) 0 i) to 
+	      (1- (array-dimension (matrix graph) 1)) 
+	    do
 	      (unless (= i j)
 		(push (list i j (find-shortest-path graph i j)) paths))))
-  paths))
+    paths))
 
 
-(defmethod cluster ((graph graph) (method (eql :edge-betweenness)) &key (edge-removal-count 0))
+(defmethod cluster ((graph graph) (method (eql :edge-betweenness))
+		    &key (edge-removal-count 0))
   (let* ((shortest-paths (calculate-shortest-paths graph))
 	 (between-table (sort
-			 (map-edges #'(lambda (i j)
-					(let ((coord (list i j)))
-					  (list coord
-						(reduce #'+ (mapcar #'(lambda (p) 
-									(count coord
-									       (rest (third p)) 
-									       :test 'equal))
-								    shortest-paths)))))
-				   graph :collect? t)
+			 (map-edges 
+			  #'(lambda (i j)
+			      (let ((coord (list i j)))
+				(list coord
+				      (reduce #'+ (mapcar 
+						   #'(lambda (p) 
+						       (count coord
+							      (rest (third p)) 
+							      :test 'equal))
+						   shortest-paths)))))
+			  graph :collect? t)
 			 #'> :key #'second))
 	 (removed-edges nil))
     (dotimes (i edge-removal-count)
@@ -209,7 +220,8 @@ pairs of nodes."
 	(sort span-map #'> :key #'second)
 	span-map)))
 
-(defmethod cluster ((graph graph) (method (eql :edge-span)) &key (edge-removal-count 0))
+(defmethod cluster ((graph graph) (method (eql :edge-span)) 
+		    &key (edge-removal-count 0))
   (let ((span-map (score-edges graph :sort? t)) (removed-edges nil))
     (dotimes (i edge-removal-count)
       (let ((edge (pop span-map)))
@@ -229,7 +241,60 @@ pairs of nodes."
 			  (>= (length (find-components g)) 2))
 		      g)
 		     (t
-		      (push (first (cluster graph :edge-span :edge-removal-count 1)) removed-edges)
+		      (push (first (cluster graph :edge-span 
+						  :edge-removal-count 1)) 
+			    removed-edges)
 		      (cut graph)))))
       (cut graph))
     (nreverse removed-edges)))
+
+(defmethod compute-hub-authority-values ((graph graph) &key (k 2) normalize?)
+  (let ((hub-values (map-nodes #'(lambda (name id)
+				   (declare (ignore id))
+				   (cons name 1)) 
+			       graph :collect? t))
+	(auth-values (map-nodes #'(lambda (name id) 
+				    (declare (ignore id))
+				    (cons name 1)) 
+				graph :collect? t)))
+    (dotimes (i k)
+      (map-nodes #'(lambda (name id)
+		     (let ((inbound-edges (inbound-edges graph id)))
+		       ;;(format t "~A inbound:  ~A~%" name inbound-edges)
+		       (setf (cdr (assoc name auth-values :test 'equal))
+			     (reduce #'+ 
+				     (mapcar #'(lambda (n)
+						 (cdr (assoc (lookup-node graph n)
+							     hub-values 
+							     :test 'equal)))
+					     inbound-edges)))))
+		 graph)
+      (map-nodes #'(lambda (name id)
+		     (let ((outbound-edges (outbound-edges graph id)))
+		       ;;(format t "~A outbound:  ~A~%" name outbound-edges)
+		       (setf (cdr (assoc name hub-values :test 'equal))
+			     (reduce #'+ 
+				     (mapcar #'(lambda (n)
+						 (cdr (assoc (lookup-node graph n)
+							     auth-values 
+							     :test 'equal)))
+					     outbound-edges)))))
+		 graph))
+    (multiple-value-bind (h a)
+	(if normalize?
+	    (let ((hub-sum (reduce #'+ hub-values :key #'cdr))
+		  (auth-sum (reduce #'+ auth-values :key #'cdr)))
+	      ;;(format t "hub-sum: ~A, auth-sum: ~A~%" hub-sum auth-sum)
+	      (values (mapcar #'(lambda (pair)
+				  (cons (car pair)
+					(/ (cdr pair) hub-sum)))
+			      hub-values)
+		      (mapcar #'(lambda (pair)
+				  (cons (car pair)
+					(/ (cdr pair) auth-sum)))
+			      auth-values)))
+	    (values hub-values auth-values))
+      (values (sort h #'> :key #'cdr)
+	      (sort a #'> :key #'cdr)))))
+
+

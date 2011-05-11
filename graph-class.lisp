@@ -1,7 +1,7 @@
 (in-package #:graph)
 
 (defclass graph ()
-  ((nodes     :accessor nodes     :initarg :nodes     :initform (make-hash-table :test 'eql))
+  ((nodes     :accessor nodes     :initarg :nodes     :initform (make-hash-table :test 'equal))
    (ids       :accessor ids       :initarg :ids       :initform (make-hash-table))
    (last-id   :accessor last-id   :initarg :id        :initform -1)
    (edges     :accessor edges     :initarg :edges     :initform 0)
@@ -112,6 +112,30 @@
 (defmethod neighbors ((graph graph) (node string))
   "Return a list of ids for this node's neighbors."
   (neighbors graph (gethash node (nodes graph))))
+
+(defmethod inbound-edges ((graph graph) (node string))
+  (inbound-edges graph (gethash node (nodes graph))))
+
+(defmethod inbound-edges ((graph graph) (node integer))
+  (if (directed? graph)
+      (let ((neighbors nil))
+	(loop for i from 0 to (1- (array-dimension (matrix graph) 1)) do
+	     (when (> (aref (matrix graph) i node) 0)
+	       (pushnew i neighbors)))
+	(nreverse neighbors))
+      (error "inbound-edges does not makes sense in an undirected graph.")))
+
+(defmethod outbound-edges ((graph graph) (node string))
+  (outbound-edges graph (gethash node (nodes graph))))
+
+(defmethod outbound-edges ((graph graph) (node integer))
+  (if (directed? graph)
+      (let ((neighbors nil))
+	(loop for i from 0 to (1- (array-dimension (matrix graph) 0)) do
+	     (when (> (aref (matrix graph) node i) 0)
+	       (pushnew i neighbors)))
+	(nreverse neighbors))
+      (error "inbound-edges does not makes sense in an undirected graph.")))
 
 (defmethod edge-exists? ((graph graph) (n1 integer) (n2 integer))
   "Is there an edge between n1 and n2?"
