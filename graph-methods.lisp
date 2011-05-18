@@ -297,4 +297,5 @@ as a list of edges as pairs of nodes."
       (values (sort h #'> :key #'cdr)
 	      (sort a #'> :key #'cdr)))))
 
-
+(defmethod compute-page-rank ((graph graph) &key (k 2) (scaling-factor 0))
+  )
