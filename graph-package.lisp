@@ -33,7 +33,8 @@
 	   #:cluster
 	   #:minimal-cut
 	   #:visualize
-	   #:generate-random-graph))
-
-	  
-
+	   #:generate-random-graph
+	   #:parse-pajek
+	   #:compute-page-rank-distribution
+	   #:compute-page-rank
+	   #:compute-hub-authority-values))

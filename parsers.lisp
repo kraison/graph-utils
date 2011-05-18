@@ -1,6 +1,6 @@
 (in-package #:graph-utils)
 
-(defun parse-data (file)
+(defun parse-pajek (file)
   "Parse a .net file and make a graph out of it."
   (let ((graph (make-graph :directed? nil))
         (vertices? nil)
@@ -16,7 +16,7 @@
               ((scan "^\*[Aa]rcs" line)
                (adjust-adjacency-matrix graph)
                (setq arcs? t vertices? nil))
-              ((scan "^\*[Ee]dgeslist" line)
+              ((scan "^\*[Ee]dge" line)
                (adjust-adjacency-matrix graph)
 	       (setf (directed? graph) t)
                (setq arcs? t vertices? nil))

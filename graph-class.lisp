@@ -8,7 +8,7 @@
    (directed? :accessor directed? :initarg :directed? :initform nil)
    (matrix    :accessor matrix    :initarg :matrix    :initform (make-array '(0 0)
 								     :adjustable t
-								     :element-type 'integer
+								     :element-type 'number
 								     :initial-element 0))))
 
 (defgeneric graph? (thing)
@@ -22,8 +22,10 @@
 	      (if directed? "directed" "undirected") 
 	      (hash-table-count ids)))))
 
-(defun make-graph (&key directed?)
-  (make-instance 'graph :directed? directed?))
+(defun make-graph (&key directed? (comparator #'equal))
+  (make-instance 'graph 
+		 :directed? directed?
+		 :nodes (make-hash-table :test comparator)))
 
 (defmethod graph= ((g1 graph) (g2 graph))
   ;; FIXME: need to compare nodes and ids
@@ -66,7 +68,7 @@
 	(setf (gethash value (nodes graph)) id
 	      (gethash id (ids graph)) value))))
 
-(defmethod lookup-node ((graph graph) (value string))
+(defmethod lookup-node ((graph graph) value)
   "Lookup a node's id"
   (gethash value (nodes graph)))
 
@@ -109,11 +111,11 @@
 	     (pushnew i neighbors))))
     (reverse neighbors)))
 
-(defmethod neighbors ((graph graph) (node string))
+(defmethod neighbors ((graph graph) node)
   "Return a list of ids for this node's neighbors."
   (neighbors graph (gethash node (nodes graph))))
 
-(defmethod inbound-edges ((graph graph) (node string))
+(defmethod inbound-edges ((graph graph) node)
   (inbound-edges graph (gethash node (nodes graph))))
 
 (defmethod inbound-edges ((graph graph) (node integer))
@@ -125,7 +127,7 @@
 	(nreverse neighbors))
       (error "inbound-edges does not makes sense in an undirected graph.")))
 
-(defmethod outbound-edges ((graph graph) (node string))
+(defmethod outbound-edges ((graph graph) node)
   (outbound-edges graph (gethash node (nodes graph))))
 
 (defmethod outbound-edges ((graph graph) (node integer))
@@ -141,7 +143,7 @@
   "Is there an edge between n1 and n2?"
   (when (> (aref (matrix graph) n1 n2) 0) (aref (matrix graph) n1 n2)))
 
-(defmethod edge-exists? ((graph graph) (n1 string) (n2 string))
+(defmethod edge-exists? ((graph graph) n1 n2)
   "Is there an edge between n1 and n2?"
   (edge-exists? graph (gethash n1 (nodes graph)) (gethash n2 (nodes graph))))
 
@@ -155,7 +157,7 @@
     (when (undirected? graph)
       (setf (aref (matrix graph) n2 n1) weight))))
 
-(defmethod add-edge ((graph graph) (n1 string) (n2 string) &key (weight 1))
+(defmethod add-edge ((graph graph) n1 n2 &key (weight 1))
   "Add an edge between n1 and n2."
   (add-edge graph (gethash n1 (nodes graph)) (gethash n2 (nodes graph)) :weight weight))
 
@@ -167,7 +169,7 @@
     (when (undirected? graph)
       (setf (aref (matrix graph) n2 n1) 0))))
 
-(defmethod delete-edge ((graph graph) (n1 string) (n2 string))
+(defmethod delete-edge ((graph graph) n1 n2)
   (delete-edge graph (gethash n1 (nodes graph)) (gethash n2 (nodes graph))))
 
 (defmethod map-edges ((fn function) (graph graph) &key collect? remove-nulls?)
@@ -190,7 +192,7 @@
 (defmethod edge-weight ((graph graph) (n1 integer) (n2 integer))
   (aref (matrix graph) n1 n2))
 
-(defmethod edge-weight ((graph graph) (n1 string) (n2 string))
+(defmethod edge-weight ((graph graph) n1 n2)
   (edge-weight graph (gethash n1 (nodes graph)) (gethash n2 (nodes graph))))
 
 (defmethod edge-count ((graph graph))
