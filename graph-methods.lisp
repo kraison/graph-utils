@@ -1,4 +1,4 @@
-(in-package #:graph)
+(in-package #:graph-utils)
 
 (defmethod density ((graph graph))
   "Calculate the graph's density."

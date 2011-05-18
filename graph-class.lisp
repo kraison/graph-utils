@@ -1,4 +1,4 @@
-(in-package #:graph)
+(in-package #:graph-utils)
 
 (defclass graph ()
   ((nodes     :accessor nodes     :initarg :nodes     :initform (make-hash-table :test 'equal))

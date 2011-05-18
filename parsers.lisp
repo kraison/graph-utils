@@ -10,14 +10,19 @@
       (do ((line (read-line in nil :eof) (read-line in nil :eof)))
           ((eql line :eof))
         (setq line (regex-replace "^\\s+" line ""))
-        (cond ((scan "^\*Vertices" line) 
+        (cond ((scan "^\*[Vv]ertices" line) 
 	       ;; FIXME: parse the vertex count for later verification
 	       (setq vertices? t arcs? nil))
-              ((scan "^\*(Arcs|Edges)" line)
+              ((scan "^\*[Aa]rcs" line)
                (adjust-adjacency-matrix graph)
+               (setq arcs? t vertices? nil))
+              ((scan "^\*[Ee]dgeslist" line)
+               (adjust-adjacency-matrix graph)
+	       (setf (directed? graph) t)
                (setq arcs? t vertices? nil))
               (vertices?
                (destructuring-bind (id value &optional n1 n2 n3) 
+		   ;; FIXME: need better splitting;  spaces in names!
 		   (split "\\s+" line)
                  (declare (ignore n1 n2 n3))
                  (setq value (regex-replace-all "\"" value ""))
@@ -28,5 +33,9 @@
 		 (dolist (d destinations)
 		   (add-edge graph 
 			     (or (gethash source index) source)
-			     (or (gethash d index) d))))))))
+			     (or (gethash d index) d))
+		   (when (not (directed? graph))
+		     (add-edge graph 
+			       (or (gethash d index) d)
+			       (or (gethash source index) source)))))))))
     graph))

@@ -1,6 +1,6 @@
 (in-package #:cl-user)
 
-(defpackage #:graph
+(defpackage #:graph-utils
   (:use #:cl #:cl-ppcre)
   (:export #:make-graph
 	   #:copy-graph
