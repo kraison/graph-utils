@@ -25,6 +25,7 @@
 	   #:edge-weight
 	   #:density
 	   #:degree-distribution
+	   #:in-degree-distribution
 	   #:find-shortest-path
 	   #:calculate-shortest-paths
 	   #:distance-map
@@ -37,5 +38,6 @@
 	   #:compute-page-rank-distribution
 	   #:compute-page-rank
 	   #:compute-hub-authority-values
+	   #:compute-center-nodes
 	   #:parse-pajek
 	   #:parse-gml))

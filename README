@@ -1,0 +1,4 @@
+graph-utils:  a graph analysis library for Common Lisp
+by: Kevin Raison
+dependencies: cl-ppcre, dso-lex, cl-yacc
+

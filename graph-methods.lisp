@@ -36,7 +36,7 @@
 	     (when (> (aref (matrix graph) node i) 0)
 	       (incf degree)))
 	degree)
-      (error "Cannot calculate in-degree on an undirected graph")))
+      (error "Cannot calculate out-degree on an undirected graph")))
 
 (defmethod degree-distribution ((graph graph))
   "Generate the degree distribution for the graph. For a directed graph, returns the out-degree 
@@ -47,6 +47,24 @@ distribution."
 		 (let ((degree 0))
 		   (loop for i from 0 to (1- (array-dimension (matrix graph) 0)) do
 			(when (not (zerop (aref (matrix graph) id i)))
+			  (incf degree)))
+		   (if (assoc degree dist)
+		       (incf (cdr (assoc degree dist)))
+		       (push (cons degree 1) dist))))
+	     (nodes graph))
+    (sort dist #'< :key 'car)))
+
+(defmethod in-degree-distribution ((graph graph))
+  "Generate the degree distribution for the graph. For a directed graph, returns the out-degree 
+distribution."
+  (unless (directed? graph)
+    (error "Cannot compute in-degree-distribution on an undirected graph"))
+  (let ((dist nil))
+    (maphash #'(lambda (node id)
+		 (declare (ignore node))
+		 (let ((degree 0))
+		   (loop for i from 0 to (1- (array-dimension (matrix graph) 1)) do
+			(when (not (zerop (aref (matrix graph) i id)))
 			  (incf degree)))
 		   (if (assoc degree dist)
 		       (incf (cdr (assoc degree dist)))
@@ -221,7 +239,7 @@ as a list of edges as pairs of nodes."
 	    do
 	      (unless (= i j)
 		(push (list i j (find-shortest-path graph i j)) paths))))
-    paths))
+    (nreverse paths)))
 
 
 (defmethod cluster ((graph graph) (method (eql :edge-betweenness))
@@ -359,6 +377,7 @@ as a list of edges as pairs of nodes."
 		  bin-map)))))
 
 (defmethod compute-hub-authority-values ((graph graph) &key (k 2) normalize?)
+  "Return (values hubs authorities) for all nods in the graph."
   (let ((hub-values (map-nodes #'(lambda (name id)
 				   (declare (ignore id))
 				   (cons name 1)) 
@@ -389,9 +408,7 @@ as a list of edges as pairs of nodes."
 							     auth-values 
 							     :test 'equal)))
 					     outbound-neighbors)))))
-		 graph)
-      (format t "~2d Auth: ~A~%" i auth-values)
-      (format t "~2d Hubs: ~A~%~%" i hub-values))
+		 graph))
     (multiple-value-bind (h a)
 	(if normalize?
 	    (let ((hub-sum (reduce #'+ hub-values :key #'cdr))
@@ -410,6 +427,7 @@ as a list of edges as pairs of nodes."
 	      (sort a #'> :key #'cdr)))))
 
 (defmethod compute-center-nodes ((graph graph))
+  "Return the center nodes of the graph."
   (let ((max-paths nil))
     (dolist (v1 (list-nodes graph))
       (push (cons v1 most-negative-fixnum) max-paths)
