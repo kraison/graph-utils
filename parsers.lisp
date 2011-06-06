@@ -141,11 +141,11 @@
 		   (setq vertex-count (parse-integer count))))
 	       (setq vertices? t arcs? nil))
               ((scan "^\*[Aa]rcs" line)
+	       (setf (directed? graph) t)
 	       (check-nodes graph vertex-count)
                (setq arcs? t vertices? nil))
               ((scan "^\*[Ee]dge" line)
 	       (check-nodes graph vertex-count)
-	       (setf (directed? graph) t)
                (setq arcs? t vertices? nil))
               (vertices?
 	       (do-register-groups (id value rest)
@@ -155,13 +155,9 @@
                  (setf (gethash id index) value)
                  (add-node graph value :no-expand? t)))
               (arcs?
-               (destructuring-bind (source &rest destinations) (split "\\s+" line)
-		 (dolist (d destinations)
-		   (add-edge graph 
-			     (or (gethash source index) source)
-			     (or (gethash d index) d))
-		   (when (not (directed? graph))
-		     (add-edge graph 
-			       (or (gethash d index) d)
-			       (or (gethash source index) source)))))))))
+               (destructuring-bind (source destination &optional value) (split "\\s+" line)
+		 (add-edge graph 
+			   (or (gethash source index) source)
+			   (or (gethash destination index) destination)
+			   :weight (if (scan "^[0-9]+$" value) (parse-integer value) 1)))))))
     graph))
