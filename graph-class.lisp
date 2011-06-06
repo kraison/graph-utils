@@ -1,40 +1,62 @@
 (in-package #:graph-utils)
 
 (defclass graph ()
-  ((nodes     :accessor nodes     :initarg :nodes     :initform (make-hash-table :test 'equal))
-   (ids       :accessor ids       :initarg :ids       :initform (make-hash-table))
-   (last-id   :accessor last-id   :initarg :id        :initform -1)
-   (edges     :accessor edges     :initarg :edges     :initform 0)
-   (directed? :accessor directed? :initarg :directed? :initform nil)
-   (matrix    :accessor matrix    :initarg :matrix    :initform (make-array '(0 0)
+  ((nodes      :accessor nodes      :initarg :nodes      :initform (make-hash-table :test 'equal))
+   (ids        :accessor ids        :initarg :ids        :initform (make-hash-table))
+   (s-point    :accessor s-point    :initarg :s-point    :initform 0)
+   (last-id    :accessor last-id    :initarg :id         :initform -1)
+   (edges      :accessor edges      :initarg :edges      :initform 0)
+   (directed?  :accessor directed?  :initarg :directed?  :initform nil)
+   (comparator :accessor comparator :initarg :comparator :initform 'equal)
+   (matrix     :accessor matrix     :initarg :matrix     :initform (make-array '(0 0)
 								     :adjustable t
 								     :element-type 'number
 								     :initial-element 0))))
 
 (defgeneric graph? (thing)
+  (:documentation "graph predicate")
   (:method ((graph graph)) t)
   (:method (thing) nil))
 
 (defmethod print-object ((graph graph) stream)
+  "Print a graph"
   (print-unreadable-object (graph stream :type t)
     (with-slots (ids directed?) graph
       (format stream "~A (~A vertices)" 
 	      (if directed? "directed" "undirected") 
 	      (hash-table-count ids)))))
 
-(defun make-graph (&key directed? (comparator #'equal))
+(defun make-graph (&key directed? (node-comparator #'equal) (saturation-point 0))
+  "Create a new graph object"
   (make-instance 'graph 
 		 :directed? directed?
-		 :nodes (make-hash-table :test comparator)))
+		 :comparator node-comparator
+		 :s-point saturation-point
+		 :nodes (make-hash-table :test node-comparator)))
 
-(defmethod graph= ((g1 graph) (g2 graph))
-  ;; FIXME: need to compare nodes and ids
-  (and (equalp (matrix g1) (matrix g2))
-       (= (last-id g1) (last-id g2))
+(defmethod graph-equal ((g1 graph) (g2 graph))
+  "In-depth graph equality check."
+  (and (= (last-id g1) (last-id g2))
+       (eql (comparator g1) (comparator g2))
        (eql (directed? g1) (directed? g2))
-       (= (edges g1) (edges g2))))
+       (= (s-point g1) (s-point g2))
+       (= (edges g1) (edges g2))
+       (= (hash-table-count (nodes g1)) (hash-table-count (nodes g2)))
+       (= (hash-table-count (ids g1)) (hash-table-count (ids g2)))
+       (maphash #'(lambda (k v1)
+		    (let ((v2 (gethash k (nodes g2))))
+		      (unless (and (integerp v2) (= v1 v2))
+			(return-from graph-equal nil))))
+		(nodes g1))
+       (maphash #'(lambda (k v1)
+		    (let ((v2 (gethash k (nodes g2))))
+		      (unless (and (integerp v2) (funcall (comparator g1) v1 v2))
+			(return-from graph-equal nil))))
+		(ids g1))
+       (equalp (matrix g1) (matrix g2))))
 
 (defmethod copy-graph ((graph graph))
+  "Make a deep copy of a graph."
   (let ((new-graph (make-instance 'graph
 				  :matrix (make-array (list (array-dimension (matrix graph) 0)
 							    (array-dimension (matrix graph) 1)))
@@ -52,7 +74,7 @@
   (null (directed? graph)))
 
 (defmethod adjust-adjacency-matrix ((graph graph))
-  "Grow the adjacency-matrix of the graph tp match the number of nodes."
+  "Grow the adjacency-matrix of the graph to match the number of nodes."
   (adjust-array (matrix graph) (list (1+ (last-id graph)) (1+ (last-id graph))))
   #+allegro (loop for i from 0 to (1- (array-dimension (matrix graph) 0)) do
 		 (loop for j from 0 to (1- (array-dimension (matrix graph) 1)) do
@@ -60,7 +82,9 @@
 			(setf (aref (matrix graph) i j) 0)))))
 
 (defmethod add-node ((graph graph) value &key no-expand?)
-  "Add a node to the graph.  If no-expand? it true, do not grow the adjacency-matrix."
+  "Add a node to the graph.  If no-expand? it true, do not grow the adjacency-matrix. It is
+recommended that when adding nodes in bulk, you use no-expand? and call adjust-adjacency-matrix
+afert all nodes have been added."
   (or (gethash value (nodes graph))
       (let ((id (incf (last-id graph))))
 	(unless no-expand?
@@ -99,8 +123,9 @@
   "Return the node count."
   (hash-table-count (nodes graph)))
 
-(defmethod neighbors ((graph graph) (node integer))
-  "Return a list of ids for this node's neighbors."
+(defmethod neighbors ((graph graph) (node integer) &key (return-ids? t))
+  "Return a list of ids for this node's neighbors. Returns inbound and outbound 
+neighbors for a directed graph."
   (let ((neighbors nil))
     (loop for i from 0 to (1- (array-dimension (matrix graph) 1)) do
 	 (when (> (aref (matrix graph) node i) 0)
@@ -109,35 +134,41 @@
       (loop for i from 0 to (1- (array-dimension (matrix graph) 1)) do
 	   (when (> (aref (matrix graph) i node) 0)
 	     (pushnew i neighbors))))
-    (reverse neighbors)))
+    (if return-ids?
+	(nreverse neighbors)
+	(mapcar #'lookup-node (nreverse neighbors)))))
 
-(defmethod neighbors ((graph graph) node)
+(defmethod neighbors ((graph graph) node &key (return-ids? t))
   "Return a list of ids for this node's neighbors."
-  (neighbors graph (gethash node (nodes graph))))
+  (neighbors graph (gethash node (nodes graph)) :return-ids? return-ids?))
 
-(defmethod inbound-edges ((graph graph) node)
-  (inbound-edges graph (gethash node (nodes graph))))
+(defmethod inbound-neighbors ((graph graph) node &key (return-ids? t))
+  (inbound-neighbors graph (gethash node (nodes graph)) :return-ids? return-ids?))
 
-(defmethod inbound-edges ((graph graph) (node integer))
+(defmethod inbound-neighbors ((graph graph) (node integer) &key (return-ids? t))
   (if (directed? graph)
       (let ((neighbors nil))
 	(loop for i from 0 to (1- (array-dimension (matrix graph) 1)) do
 	     (when (> (aref (matrix graph) i node) 0)
 	       (pushnew i neighbors)))
-	(nreverse neighbors))
-      (error "inbound-edges does not makes sense in an undirected graph.")))
+	(if return-ids?
+	    (nreverse neighbors)
+	    (mapcar #'lookup-node (nreverse neighbors))))
+      (error "inbound-neighbors does not makes sense in an undirected graph.")))
 
-(defmethod outbound-edges ((graph graph) node)
-  (outbound-edges graph (gethash node (nodes graph))))
+(defmethod outbound-neighbors ((graph graph) node &key (return-ids? t))
+  (outbound-neighbors graph (gethash node (nodes graph)) :return-ids? return-ids?))
 
-(defmethod outbound-edges ((graph graph) (node integer))
+(defmethod outbound-neighbors ((graph graph) (node integer) &key (return-ids? t))
   (if (directed? graph)
       (let ((neighbors nil))
 	(loop for i from 0 to (1- (array-dimension (matrix graph) 0)) do
 	     (when (> (aref (matrix graph) node i) 0)
 	       (pushnew i neighbors)))
-	(nreverse neighbors))
-      (error "inbound-edges does not makes sense in an undirected graph.")))
+	(if return-ids?
+	    (nreverse neighbors)
+	    (mapcar #'lookup-node (nreverse neighbors))))
+      (error "inbound-neighbors does not makes sense in an undirected graph.")))
 
 (defmethod edge-exists? ((graph graph) (n1 integer) (n2 integer))
   "Is there an edge between n1 and n2?"
@@ -162,10 +193,11 @@
   (add-edge graph (gethash n1 (nodes graph)) (gethash n2 (nodes graph)) :weight weight))
 
 (defmethod delete-edge ((graph graph) (n1 integer) (n2 integer))
+  "Remove an edge from the graph."
   (unless (= n1 n2)
     (when (> (aref (matrix graph) n1 n2) 0)
-      (decf (edges graph)))
-    (setf (aref (matrix graph) n1 n2) 0)
+      (decf (edges graph))
+      (setf (aref (matrix graph) n1 n2) 0))
     (when (undirected? graph)
       (setf (aref (matrix graph) n2 n1) 0))))
 

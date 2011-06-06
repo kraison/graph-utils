@@ -1,7 +1,7 @@
 (in-package #:cl-user)
 
 (defpackage #:graph-utils
-  (:use #:cl #:cl-ppcre)
+  (:use #:cl #:cl-ppcre #:dso-lex #:yacc)
   (:export #:make-graph
 	   #:copy-graph
 	   #:graph=
@@ -34,7 +34,8 @@
 	   #:minimal-cut
 	   #:visualize
 	   #:generate-random-graph
-	   #:parse-pajek
 	   #:compute-page-rank-distribution
 	   #:compute-page-rank
-	   #:compute-hub-authority-values))
+	   #:compute-hub-authority-values
+	   #:parse-pajek
+	   #:parse-gml))

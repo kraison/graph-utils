@@ -7,21 +7,45 @@
       (/ (* (node-count graph) (- (node-count graph) 1)) 2))
    'float))
 
+(defmethod degree ((graph graph) node)
+  (degree graph (gethash node (nodes graph))))
+
 (defmethod degree ((graph graph) (node integer))
-  (let ((degree 0))
-    (loop for i from 0 to (1- (array-dimension (matrix graph) 0)) do
-	 (when (and (not (= i node)) (not (zerop (aref (matrix graph) node i))))
-	   (incf degree)))
-    degree))
+  "Calculate the degree of a node."
+  (if (undirected? graph)
+      (let ((degree 0))
+	(loop for i from 0 to (1- (array-dimension (matrix graph) 0)) do
+	     (when (and (not (= i node)) (not (zerop (aref (matrix graph) node i))))
+	       (incf degree)))
+	degree)
+      (error "Cannot calculate the degree in a directed graph.  Use in-degree or out-degree instead.")))
+
+(defmethod in-degree ((graph graph) (node integer))
+  (if (directed? graph)
+      (let ((degree 0))
+	(loop for i from 0 to (1- (array-dimension (matrix graph) 1)) do
+	     (when (> (aref (matrix graph) i node) 0)
+	       (incf degree)))
+	degree)
+      (error "Cannot calculate in-degree on an undirected graph")))
+
+(defmethod out-degree ((graph graph) (node integer))
+  (if (directed? graph)
+      (let ((degree 0))
+	(loop for i from 0 to (1- (array-dimension (matrix graph) 0)) do
+	     (when (> (aref (matrix graph) node i) 0)
+	       (incf degree)))
+	degree)
+      (error "Cannot calculate in-degree on an undirected graph")))
 
 (defmethod degree-distribution ((graph graph))
-  "Generate the degree distribution for the graph."
+  "Generate the degree distribution for the graph. For a directed graph, returns the out-degree 
+distribution."
   (let ((dist nil))
     (maphash #'(lambda (node id)
 		 (declare (ignore node))
 		 (let ((degree 0))
-		   (loop for i from 0 to (1- (array-dimension (matrix graph) 0)) 
-		      do
+		   (loop for i from 0 to (1- (array-dimension (matrix graph) 0)) do
 			(when (not (zerop (aref (matrix graph) id i)))
 			  (incf degree)))
 		   (if (assoc degree dist)
@@ -54,13 +78,15 @@ as a list of edges as pairs of nodes."
 	       (return-from find-shortest-path 
 		 (reverse (reconstruct-path previous n2))))
 	     (setq nodes (remove (car next) nodes))
-	     (dolist (neighbor (neighbors graph (car next)))
+	     (dolist (neighbor (if (directed? graph)
+				   (outbound-neighbors graph (car next))
+				   (neighbors graph (car next))))
 	       (let ((distance (1+ (cdr (assoc (car next) distances)))))
 		 (when (< distance (cdr (assoc neighbor distances)))
 		   (setf (cdr (assoc neighbor distances)) distance
 			 (cdr (assoc neighbor previous)) (car next))))))))))
 
-(defmethod find-shortest-path ((graph graph) (n1 string) (n2 string))
+(defmethod find-shortest-path ((graph graph) n1 n2)
   (find-shortest-path graph 
 		      (gethash n1 (nodes graph)) 
 		      (gethash n2 (nodes graph))))
@@ -68,7 +94,9 @@ as a list of edges as pairs of nodes."
 (defmethod distance-map ((graph graph) (id integer) &key expand-ids?)
   "Generate a sorted distance map for the given node."
   (let ((map (list (cons id 0))) (queue nil))
-    (dolist (neighbor (neighbors graph id))
+    (dolist (neighbor (if (directed? graph)
+			  (outbound-neighbors graph id)
+			  (neighbors graph id)))
       (let ((pair (cons neighbor 1)))
 	(push pair map)
 	(push pair queue)))
@@ -98,7 +126,6 @@ as a list of edges as pairs of nodes."
 	     (setq nodes (remove (car pair) nodes))
 	     (push (gethash (car pair) (ids graph)) component))
 	   (when component
-	     ;;(format t "Component is ~A~%" component)
 	     (push component components))))
     (sort components #'> :key #'length)))
 
@@ -114,7 +141,7 @@ as a list of edges as pairs of nodes."
       (format out "  node [ color = black, fillcolor = while, style = filled ];~%")
       (map-nodes #'(lambda (name id)
 		     (let ((neighbors (if (directed? graph)
-					  (outbound-edges graph id)
+					  (outbound-neighbors graph id)
 					  (neighbors graph id))))
 		       (dolist (n neighbors)
 			 (unless (if (directed? graph)
@@ -154,26 +181,36 @@ as a list of edges as pairs of nodes."
 	     (add-edge graph i j))))
     graph))
 
-(defmethod generate-random-graph ((model (eql :barabasi-albert)) (size integer) 
-				  &key &allow-other-keys)
+(defmethod generate-random-graph ((model (eql :barabasi-albert)) (size integer)
+				  &key (saturation-point 0) &allow-other-keys)
   (when (< size 4)
     (error "Cannot generate a barabasi-albert graph of size less than 4"))
-  (let ((graph (make-graph)))
+  (let ((graph (make-graph :saturation-point saturation-point))
+	(degree-table (make-array size :element-type 'integer :initial-element 0)))
     (dotimes (i 3)
       (add-node graph i))
     (dotimes (i 3)
       (loop for j from (1+ i) to 2 do
+	   (incf (aref degree-table i))
+	   (incf (aref degree-table j))
 	   (add-edge graph i j)))
     (loop for i from 3 to (1- size) do
 	 (add-node graph i :no-expand? t))
     (adjust-adjacency-matrix graph)
     (loop for i from 3 to (1- size) do
 	 (loop for j from 0 to (1- i) do
-	      (when (and (/= i j)
-			 (<= (random 1.0) 
-			     (/ (1+ (degree graph i)) 
-				(+ (edge-count graph) (1+ i)))))
-		(add-edge graph i j))))
+	      (when (/= i j)
+		(when (not (and (> (s-point graph) 0) 
+				(>= (aref degree-table j) (s-point graph))))
+		  (when (<= (random 1.0) 
+			    ;; This is the traditional barabasi-albert calculation:
+			    ;; (/ (aref degree-table j) (edge-count graph)))
+			    ;; This is what we used for Lab 2:
+			    (/ (1+ (aref degree-table j))
+			       (+ (edge-count graph) (node-count graph))))
+		      (incf (aref degree-table i))
+		      (incf (aref degree-table j))
+		      (add-edge graph i j))))))
     graph))
 
 (defmethod calculate-shortest-paths ((graph graph))
@@ -256,17 +293,20 @@ as a list of edges as pairs of nodes."
       (cut graph))
     (nreverse removed-edges)))
 
-(defmethod compute-page-rank ((graph graph) &key (k 2) (scaling-factor 1))
+(defmethod compute-page-rank ((graph graph) &key (k 2) (scaling-factor 1) initial-values)
   (assert (and (numberp scaling-factor) (>= scaling-factor 0) (<= scaling-factor 1)))
   (assert (directed? graph))
   (assert (> k 0))
-  (let* ((node-count (array-dimension (matrix graph) 0))
-	 (page-rank (make-array node-count :element-type 'number :initial-element (/ 1 node-count))))
+  (let* ((node-count (node-count graph))
+	 (page-rank (or (and (arrayp initial-values) 
+			     (= (length initial-values) (node-count graph)) 
+			     initial-values)
+			(make-array node-count :element-type 'number :initial-element (/ 1 node-count)))))
     (dotimes (step k)
       ;;(format t "page-rank is ~A~%" page-rank)
       (let ((rank-received (make-array node-count :element-type 'number :initial-element 0)))
 	(dotimes (source node-count)
-	  (let* ((out-links (outbound-edges graph source))
+	  (let* ((out-links (outbound-neighbors graph source))
 		 (count (length out-links)))
 	    ;;(format t "~A (~A) has ~A outbound links~%" source (lookup-node graph source) count)
 	    (if (= count 0)
@@ -329,27 +369,29 @@ as a list of edges as pairs of nodes."
 				graph :collect? t)))
     (dotimes (i k)
       (map-nodes #'(lambda (name id)
-		     (let ((inbound-edges (inbound-edges graph id)))
-		       ;;(format t "~A inbound:  ~A~%" name inbound-edges)
+		     (let ((inbound-neighbors (inbound-neighbors graph id)))
+		       ;;(format t "~A inbound:  ~A~%" name inbound-neighbors)
 		       (setf (cdr (assoc name auth-values :test 'equal))
 			     (reduce #'+ 
 				     (mapcar #'(lambda (n)
 						 (cdr (assoc (lookup-node graph n)
 							     hub-values 
 							     :test 'equal)))
-					     inbound-edges)))))
+					     inbound-neighbors)))))
 		 graph)
       (map-nodes #'(lambda (name id)
-		     (let ((outbound-edges (outbound-edges graph id)))
-		       ;;(format t "~A outbound:  ~A~%" name outbound-edges)
+		     (let ((outbound-neighbors (outbound-neighbors graph id)))
+		       ;;(format t "~A outbound:  ~A~%" name outbound-neighbors)
 		       (setf (cdr (assoc name hub-values :test 'equal))
 			     (reduce #'+ 
 				     (mapcar #'(lambda (n)
 						 (cdr (assoc (lookup-node graph n)
 							     auth-values 
 							     :test 'equal)))
-					     outbound-edges)))))
-		 graph))
+					     outbound-neighbors)))))
+		 graph)
+      (format t "~2d Auth: ~A~%" i auth-values)
+      (format t "~2d Hubs: ~A~%~%" i hub-values))
     (multiple-value-bind (h a)
 	(if normalize?
 	    (let ((hub-sum (reduce #'+ hub-values :key #'cdr))
@@ -366,4 +408,22 @@ as a list of edges as pairs of nodes."
 	    (values hub-values auth-values))
       (values (sort h #'> :key #'cdr)
 	      (sort a #'> :key #'cdr)))))
+
+(defmethod compute-center-nodes ((graph graph))
+  (let ((max-paths nil))
+    (dolist (v1 (list-nodes graph))
+      (push (cons v1 most-negative-fixnum) max-paths)
+      (dolist (v2 (list-nodes graph))
+	(unless (eql v1 v2)
+	  (let ((path-length (length (find-shortest-path graph v1 v2))))
+	    (when (> path-length (cdr (assoc v1 max-paths)))
+	      (setf (cdr (assoc v1 max-paths)) path-length))))))
+    (let ((sorted-max-paths (sort max-paths #'< :key #'cdr)))
+      (mapcar #'car
+	      (remove-if-not #'(lambda (n)
+				 (= (cdr n) 
+				    (cdr (first sorted-max-paths))))
+			     sorted-max-paths)))))
+
+
 
