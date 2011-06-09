@@ -2,3 +2,26 @@ graph-utils:  a graph analysis library for Common Lisp
 by: Kevin Raison
 dependencies: cl-ppcre, dso-lex, cl-yacc
 
+Implements the following functionality:
+
+    1.  Create directed and undirected graphs with a single edge type
+    2.  Compare graphs using graph= method
+    3.  Bulk-add function for adding lots of nodes and growing the adjacency matrix in one operation, thus speeding up the node addition process quite a bit
+    4.  Neighbors, outbound-edges and inbound-edges methods for listing a node's neighbors in directed and undirected graphs
+    5.  Edge deletion and creation methods
+    6.  Functions for mapping over all nodes and edges
+    7.  Denisty calculation
+    8.  Node degree & degree distribution calculation
+    9.  An implementation of Dijkstra's algorithm
+    10. Distance map calculation
+    11. Methods to find all components in a graph
+    12. Graph visualization using the Graphviz library
+    13. Random graph generation using the two methods specified in our labs
+    14. Clustering algorithms based on edge betweenness and edge span
+    15. Page rank and page rank distribution calculation
+    16. Hubs and authorities calculation
+    17. Graph center calculator
+    17. GML and Pajek .net graph file format parsers
+
+TODO:
+Get rid of the adjacency matrix and add typed edges.

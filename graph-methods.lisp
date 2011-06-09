@@ -147,6 +147,13 @@ as a list of edges as pairs of nodes."
 	     (push component components))))
     (sort components #'> :key #'length)))
 
+(defun which (program)
+  (cl-ppcre:regex-replace-all 
+   "\\s+$"
+   (with-output-to-string (out) 
+     (sb-ext:run-program "/usr/bin/which" (list program) :output out))
+   ""))
+
 (defmethod visualize ((graph graph) &key (file "/var/tmp/graph.dot") render? colors)
   "Save a dot file of this graph."
   (let ((memory (make-hash-table :test 'equalp)) 
@@ -182,8 +189,11 @@ as a list of edges as pairs of nodes."
 		 graph)
       (format out "}~%"))
     (if render?
-	(let ((f (regex-replace "\.[a-z]+$" file "\.png")))
-	  (sb-ext:run-program "/usr/bin/dot" (list "-Tpng" "-o" f file))
+	(let ((f (regex-replace "\.[a-z]+$" file "\.png"))
+	      (program (or (which "sfdp") (which "fdp"))))
+	  (if program
+	      (sb-ext:run-program program (list "-Tpng" "-o" f file))
+	      (format t "Unable to create PNG of graph ~A.  Graphviz not in your path.~%" graph))
 	  f)
 	file)))
 
