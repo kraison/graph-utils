@@ -190,7 +190,7 @@ as a list of edges as pairs of nodes."
       (format out "}~%"))
     (if render?
 	(let ((f (regex-replace "\.[a-z]+$" file "\.png"))
-	      (program (or (which "sfdp") (which "fdp"))))
+	      (program (or (which "fdp") (which "dot"))))
 	  (if program
 	      (sb-ext:run-program program (list "-Tpng" "-o" f file))
 	      (format t "Unable to create PNG of graph ~A.  Graphviz not in your path.~%" graph))
