@@ -1,5 +1,7 @@
 (in-package #:graph-utils)
 
+(declaim (optimize (speed 3) (space 2)))
+
 (defun snip (s) (subseq s 1 (1- (length s))))
 (defun un-squote (s) (regex-replace-all "''" (snip s) "'"))
 (defun un-dquote (s) (regex-replace-all "\"\"" (snip s) "\""))

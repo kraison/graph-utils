@@ -1,5 +1,7 @@
 (in-package #:graph-utils)
 
+(declaim (optimize (speed 3) (space 2)))
+
 (defmethod density ((graph graph))
   "Calculate the graph's density."
   (coerce
@@ -94,7 +96,7 @@ as a list of edges as pairs of nodes."
 	       (return nil))
 	     (when (= (car next) n2)
 	       (return-from find-shortest-path 
-		 (reverse (reconstruct-path previous n2))))
+		 (nreverse (reconstruct-path previous n2))))
 	     (setq nodes (remove (car next) nodes))
 	     (dolist (neighbor (if (directed? graph)
 				   (outbound-neighbors graph (car next))
@@ -150,8 +152,7 @@ as a list of edges as pairs of nodes."
 (defun which (program)
   (cl-ppcre:regex-replace-all 
    "\\s+$"
-   (with-output-to-string (out) 
-     (sb-ext:run-program "/usr/bin/which" (list program) :output out))
+   (trivial-shell:shell-command (format nil "/usr/bin/which ~A" program))
    ""))
 
 (defmethod visualize ((graph graph) &key (file "/var/tmp/graph.dot") render? colors)
@@ -192,7 +193,7 @@ as a list of edges as pairs of nodes."
 	(let ((f (regex-replace "\.[a-z]+$" file "\.png"))
 	      (program (or (which "fdp") (which "dot"))))
 	  (if program
-	      (sb-ext:run-program program (list "-Tpng" "-o" f file))
+	      (trivial-shell:shell-command (format nil "~A -Tpng -o ~A ~A" program f file))
 	      (format t "Unable to create PNG of graph ~A.  Graphviz not in your path.~%" graph))
 	  f)
 	file)))

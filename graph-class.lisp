@@ -1,5 +1,7 @@
 (in-package #:graph-utils)
 
+(declaim (optimize (speed 3) (space 2)))
+
 (defclass graph ()
   ((nodes      :accessor nodes      :initarg :nodes      :initform (make-hash-table :test 'equal))
    (ids        :accessor ids        :initarg :ids        :initform (make-hash-table))
@@ -109,7 +111,7 @@ afert all nodes have been added."
 		     (funcall fn node-name node-id)))
 	     (nodes graph))
     (when collect?
-      (reverse (if remove-nulls? (remove-if #'null r) r)))))
+      (nreverse (if remove-nulls? (remove-if #'null r) r)))))
 
 (defmethod list-nodes ((graph graph))
   "List all node values."
@@ -213,7 +215,7 @@ neighbors for a directed graph."
 		(if collect?
 		    (push (funcall fn i j) r)
 		    (funcall fn i j)))))
-    (reverse (if remove-nulls? (remove-if #'null r) r))))
+    (nreverse (if remove-nulls? (remove-if #'null r) r))))
 
 (defmethod list-edges ((graph graph))
   "Return all edges as pairs of nodes."
