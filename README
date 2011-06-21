@@ -16,7 +16,7 @@ Implements the following functionality:
     10. Distance map calculation
     11. Methods to find all components in a graph
     12. Graph visualization using the Graphviz library
-    13. Random graph generation using the two methods specified in our labs
+    13. Random graph generation using the erdos-renyi and barabasi-albert algorithms
     14. Clustering algorithms based on edge betweenness and edge span
     15. Page rank and page rank distribution calculation
     16. Hubs and authorities calculation
