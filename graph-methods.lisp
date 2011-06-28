@@ -307,7 +307,7 @@ as a list of edges as pairs of nodes."
 				(second edge)))
 		      removed-edges))))
 
-(defmethod minimal-cut ((graph graph))
+(defmethod minimal-cut! ((graph graph))
   (let ((removed-edges nil))
     (labels ((cut (g)
 	       (cond ((or (< (node-count g) 2)
@@ -321,6 +321,10 @@ as a list of edges as pairs of nodes."
 		      (cut graph)))))
       (cut graph))
     (nreverse removed-edges)))
+
+(defmethod minimal-cut ((graph graph))
+  (let ((g (copy-graph graph)))
+    (values (minimal-cut! g) g)))
 
 (defmethod compute-page-rank ((graph graph) &key (k 2) (scaling-factor 1) initial-values)
   (assert (and (numberp scaling-factor) (>= scaling-factor 0) (<= scaling-factor 1)))

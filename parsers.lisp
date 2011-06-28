@@ -104,7 +104,7 @@
     (dolist (edge (nreverse edges))
       (let ((n1 (lookup-node graph (gethash (first edge) id-table)))
 	    (n2 (lookup-node graph (gethash (second edge) id-table)))
-	    (w (if (third edge) (parse-integer (third edge)) 1)))
+	    (w (if (third edge) (parse-number:parse-number (third edge)) 1)))
 	(add-edge graph n1 n2 :weight w)))
     graph))
 
@@ -161,5 +161,5 @@
 		 (add-edge graph 
 			   (or (gethash source index) source)
 			   (or (gethash destination index) destination)
-			   :weight (if (scan "^[0-9]+$" value) (parse-integer value) 1)))))))
+			   :weight (if (scan "^[0-9\.]+$" value) (parse-number:parse-number value) 1)))))))
     graph))

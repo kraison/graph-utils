@@ -33,6 +33,7 @@
 	   #:score-edges
 	   #:cluster
 	   #:minimal-cut
+	   #:minimal-cut!
 	   #:visualize
 	   #:generate-random-graph
 	   #:compute-page-rank-distribution
