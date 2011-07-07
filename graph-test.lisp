@@ -45,7 +45,7 @@
 	(format out "  Minimal cut (removed edges):~%~{    ~A~%~}~%" 
 		(mapcar #'(lambda (e)
 			    (format nil "~A -> ~A" (first e) (second e)))
-			(minimal-cut graph)))
+			(minimal-cut! graph)))
 	(visualize graph :file (format nil "~A-cut.dot" stem) :render? t)))))
 
 (graph-test)
