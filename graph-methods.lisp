@@ -199,7 +199,10 @@ which will render the graph using the appropriate Graphviz tool."
 			 (:spring       (or (which "fdp") (which "neato")))
 			 (otherwise     (or (which "fdp") (which "dot"))))))
 	  (if program
-	      (trivial-shell:shell-command (format nil "~A -Tpng -o ~A ~A" program f file))
+	      (multiple-value-bind (output error-output exit-status)
+		  (trivial-shell:shell-command (format nil "~A -Tpng -o ~A ~A" program f file))
+		(unless (= 0 exit-status)
+		  (error "~A exited with status ~A: ~A ~A~%" program exit-status output error-output)))
 	      (format t "Unable to create PNG of graph ~A.  Graphviz not in your path.~%" graph))
 	  f)
 	file)))
