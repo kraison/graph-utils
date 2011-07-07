@@ -9,19 +9,6 @@
       (/ (* (node-count graph) (- (node-count graph) 1)) 2))
    'float))
 
-(defmethod degree ((graph graph) node)
-  (degree graph (gethash node (nodes graph))))
-
-(defmethod degree ((graph graph) (node integer))
-  "Calculate the degree of a node."
-  (if (undirected? graph)
-      (let ((degree 0))
-	(loop for i from 0 to (1- (array-dimension (matrix graph) 0)) do
-	     (when (and (not (= i node)) (not (zerop (aref (matrix graph) node i))))
-	       (incf degree)))
-	degree)
-      (error "Cannot calculate the degree in a directed graph.  Use in-degree or out-degree instead.")))
-
 (defmethod in-degree ((graph graph) (node integer))
   (if (directed? graph)
       (let ((degree 0))
@@ -207,32 +194,40 @@ which will render the graph using the appropriate Graphviz tool."
 	  f)
 	file)))
 
-#|
-(defmethod generate-random-graph ((model (eql :rooted-tree)) (size integer)
-				  &key directed? component-size density name-fn &allow-other-keys)
-  (let* ((graph (make-graph :directed? directed?))
-	 (next-node-id 1))
+(defmethod generate-random-graph ((model (eql :meta)) (size integer)
+				  &key degree (name-fn #'princ-to-string) 
+				  &allow-other-keys)
+  "Generate a random graph of SIZE nodes with average degree as close to DEGREE as possible."
+  (let* ((graph (make-graph)) (queue nil))
     (dotimes (i size)
-      (add-node graph (funcall name-fn) :no-expand? t))
+      (push i queue)
+      (add-node graph (funcall name-fn i) :no-expand? t))
     (adjust-adjacency-matrix graph)
-    (labels ((make-component (anchor)
-	       (let ((start-node next-node-id))
-		 (loop for i from next-node-id to (+ next-node-id component-size) do
-		      (when (= next-node-id size)
-			(return-from make-component))
-		      (add-edge graph anchor next-node-id)
-		      (incf next-node-id))
-		 (loop for i from start-node to (+ start-node component-size) do
-		      (make-component i)))))
-      (make-component 0))
-    graph))
-|#
+    (labels ((random-node ()
+	       (let ((node (and (> (length queue) 0) (elt queue (random (length queue))))))
+		 (when node
+		   (if (>= (degree graph node) degree)
+		       (progn
+			 (setq queue (remove node queue))
+			 (random-node))
+		       node)))))
+      (map-nodes #'(lambda (name id)
+		     (declare (ignore name))
+		     (let ((difference (- degree (degree graph id))))
+		       (if (> difference 0)
+			   (dotimes (i difference)
+			     (let ((end-point (random-node)))
+			       (when end-point
+				 (add-edge graph id end-point))
+			       (setq queue (remove id queue)))))))
+		 graph)
+      graph)))
 
 (defmethod generate-random-graph ((model (eql :erdos-renyi)) (size integer) 
-				  &key p)
+				  &key p (name-fn #'princ-to-string))
   (let ((graph (make-graph)))
     (dotimes (i size)
-      (add-node graph i :no-expand? t))
+      (add-node graph (funcall name-fn i) :no-expand? t))
     (adjust-adjacency-matrix graph)
     (dotimes (i size)
       (loop for j from (1+ i) to (1- size) do
@@ -241,20 +236,21 @@ which will render the graph using the appropriate Graphviz tool."
     graph))
 
 (defmethod generate-random-graph ((model (eql :barabasi-albert)) (size integer)
-				  &key (saturation-point 0) &allow-other-keys)
+				  &key (saturation-point 0) (name-fn #'princ-to-string)
+				  &allow-other-keys)
   (when (< size 4)
     (error "Cannot generate a barabasi-albert graph of size less than 4"))
   (let ((graph (make-graph :saturation-point saturation-point))
 	(degree-table (make-array size :element-type 'integer :initial-element 0)))
     (dotimes (i 3)
-      (add-node graph i))
+      (add-node graph (funcall name-fn i)))
     (dotimes (i 3)
       (loop for j from (1+ i) to 2 do
 	   (incf (aref degree-table i))
 	   (incf (aref degree-table j))
 	   (add-edge graph i j)))
     (loop for i from 3 to (1- size) do
-	 (add-node graph i :no-expand? t))
+	 (add-node graph (funcall name-fn i) :no-expand? t))
     (adjust-adjacency-matrix graph)
     (loop for i from 3 to (1- size) do
 	 (loop for j from 0 to (1- i) do

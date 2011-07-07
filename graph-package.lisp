@@ -24,6 +24,9 @@
 	   #:edge-count
 	   #:edge-weight
 	   #:density
+	   #:degree
+	   #:in-degree
+	   #:out-degree
 	   #:degree-distribution
 	   #:in-degree-distribution
 	   #:find-shortest-path

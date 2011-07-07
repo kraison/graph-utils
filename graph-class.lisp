@@ -10,6 +10,7 @@
    (edges      :accessor edges      :initarg :edges      :initform 0)
    (directed?  :accessor directed?  :initarg :directed?  :initform nil)
    (comparator :accessor comparator :initarg :comparator :initform 'equal)
+   (degree-table :accessor degree-table :initarg :degree-table :initform (make-hash-table))
    (matrix     :accessor matrix     :initarg :matrix     :initform (make-array '(0 0)
 								     :adjustable t
 								     :element-type 'number
@@ -91,7 +92,8 @@ afert all nodes have been added."
       (let ((id (incf (last-id graph))))
 	(unless no-expand?
 	  (adjust-array (matrix graph) (list (1+ id) (1+ id))))
-	(setf (gethash value (nodes graph)) id
+	(setf (gethash id (degree-table graph)) 0
+	      (gethash value (nodes graph)) id
 	      (gethash id (ids graph)) value))))
 
 (defmethod lookup-node ((graph graph) value)
@@ -185,7 +187,10 @@ neighbors for a directed graph."
   (unless (= n1 n2)
     (if (> (aref (matrix graph) n1 n2) 0)
 	(format t "INFO: Already have an edge at ~A - ~A~%" n1 n2)
-	(incf (edges graph)))
+	(progn
+	  (incf (gethash n1 (degree-table graph)))
+	  (incf (gethash n2 (degree-table graph)))
+	  (incf (edges graph))))
     (setf (aref (matrix graph) n1 n2) weight)    
     (when (undirected? graph)
       (setf (aref (matrix graph) n2 n1) weight))))
@@ -198,6 +203,8 @@ neighbors for a directed graph."
   "Remove an edge from the graph."
   (unless (= n1 n2)
     (when (> (aref (matrix graph) n1 n2) 0)
+      (decf (gethash n1 (degree-table graph)))
+      (decf (gethash n2 (degree-table graph)))
       (decf (edges graph))
       (setf (aref (matrix graph) n1 n2) 0))
     (when (undirected? graph)
@@ -237,4 +244,13 @@ neighbors for a directed graph."
   (let ((count 0))
     (map-edges #'(lambda (n1 n2) (declare (ignore n1 n2)) (incf count)) graph)
     count))
+
+(defmethod degree ((graph graph) node)
+  (degree graph (gethash node (nodes graph))))
+
+(defmethod degree ((graph graph) (node integer))
+  "Calculate the degree of a node."
+  (if (undirected? graph)
+      (gethash node (degree-table graph))
+      (error "Cannot calculate the degree in a directed graph.  Use in-degree or out-degree instead.")))
 
