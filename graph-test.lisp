@@ -3,8 +3,8 @@
 (use-package :graph-utils)
 
 (defun graph-test ()
-  (dolist (file '("data/Dining.net" "data/karate.gml" "data/dolphins.gml" "data/adjnoun.gml" 
-		  "data/football.gml"))
+  (dolist (file '("data/Dining.net" "data/karate.gml"))
+    ;;"data/dolphins.gml" "data/adjnoun.gml" "data/football.gml"))
     (format t "Doing graph ~A~%" file)
     (let ((graph (if (cl-ppcre:scan "gml$" file) (parse-gml file) (parse-pajek file)))
 	  (stem (cl-ppcre:regex-replace-all "(\.(net|gml))$" file "")))
