@@ -16,6 +16,10 @@
 								     :element-type 'number
 								     :initial-element 0))))
 
+;(defclass directed-graph (graph)
+;  ((in-degree-table  :accessor in-degree-table  :initarg :in-degree-table  :initform (make-hash-table))
+;   (out-degree-table :accessor out-degree-table :initarg :out-degree-table :initform (make-hash-table))))
+
 (defgeneric graph? (thing)
   (:documentation "graph predicate")
   (:method ((graph graph)) t)
@@ -46,17 +50,18 @@
        (= (edges g1) (edges g2))
        (= (hash-table-count (nodes g1)) (hash-table-count (nodes g2)))
        (= (hash-table-count (ids g1)) (hash-table-count (ids g2)))
-       (maphash #'(lambda (k v1)
-		    (let ((v2 (gethash k (nodes g2))))
-		      (unless (and (integerp v2) (= v1 v2))
-			(return-from graph-equal nil))))
-		(nodes g1))
-       (maphash #'(lambda (k v1)
-		    (let ((v2 (gethash k (nodes g2))))
-		      (unless (and (integerp v2) (funcall (comparator g1) v1 v2))
-			(return-from graph-equal nil))))
-		(ids g1))
-       (equalp (matrix g1) (matrix g2))))
+       (progn
+	 (maphash #'(lambda (k v1)
+		      (let ((v2 (gethash k (nodes g2))))
+			(unless (and (integerp v2) (= v1 v2))
+			  (return-from graph-equal nil))))
+		  (nodes g1))
+	 (maphash #'(lambda (k v1)
+		      (let ((v2 (gethash k (nodes g2))))
+			(unless (and (integerp v2) (funcall (comparator g1) v1 v2))
+			  (return-from graph-equal nil))))
+		  (ids g1))
+	 (equalp (matrix g1) (matrix g2)))))
 
 (defmethod copy-graph ((graph graph))
   "Make a deep copy of a graph."
@@ -68,6 +73,7 @@
 				  :id (last-id graph))))
     (maphash #'(lambda (k v) (setf (gethash k (nodes new-graph)) v)) (nodes graph))
     (maphash #'(lambda (k v) (setf (gethash k (ids new-graph)) v)) (ids graph))
+    (maphash #'(lambda (k v) (setf (gethash k (degree-table new-graph)) v)) (degree-table graph))
     (loop for i from 0 to (1- (array-dimension (matrix graph) 0)) do
 	 (loop for j from 0 to (1- (array-dimension (matrix graph) 1)) do
 	      (setf (aref (matrix new-graph) i j) (aref (matrix graph) i j))))
@@ -188,8 +194,11 @@ neighbors for a directed graph."
     (if (> (aref (matrix graph) n1 n2) 0)
 	(format t "INFO: Already have an edge at ~A - ~A~%" n1 n2)
 	(progn
-	  (incf (gethash n1 (degree-table graph)))
-	  (incf (gethash n2 (degree-table graph)))
+	  (if (directed? graph)
+	      () ;; FIXME: add in-degree / out-degree tables?
+	      (progn
+		(incf (gethash n1 (degree-table graph)))
+		(incf (gethash n2 (degree-table graph)))))
 	  (incf (edges graph))))
     (setf (aref (matrix graph) n1 n2) weight)    
     (when (undirected? graph)
@@ -203,8 +212,11 @@ neighbors for a directed graph."
   "Remove an edge from the graph."
   (unless (= n1 n2)
     (when (> (aref (matrix graph) n1 n2) 0)
-      (decf (gethash n1 (degree-table graph)))
-      (decf (gethash n2 (degree-table graph)))
+      (if (directed? graph)
+	  () ;; FIXME: add in-degree / out-degree tables?
+	  (progn
+	    (decf (gethash n1 (degree-table graph)))
+	    (decf (gethash n2 (degree-table graph)))))
       (decf (edges graph))
       (setf (aref (matrix graph) n1 n2) 0))
     (when (undirected? graph)
