@@ -1,0 +1,4 @@
+TODO:
+1.  Get rid of the adjacency matrix and add typed edges.
+2.  Create a directed graph subclass and update methods for it.
+3.  Optimize!

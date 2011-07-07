@@ -23,5 +23,3 @@ Implements the following functionality:
     17. Graph center calculator
     17. GML and Pajek .net graph file format parsers
 
-TODO:
-Get rid of the adjacency matrix and add typed edges.
