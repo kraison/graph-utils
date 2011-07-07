@@ -185,7 +185,7 @@ as a list of edges as pairs of nodes."
 		       (format out "  \"~A\" [fillcolor=\"#~A\"];~%" 
 			       name 
 			       (if (hash-table-p colors)
-				   (gethash id colors)
+				   (gethash name colors)
 				   "ffff00"))))
 		 graph)
       (format out "}~%"))
@@ -255,6 +255,9 @@ as a list of edges as pairs of nodes."
 
 (defmethod cluster ((graph graph) (method (eql :edge-betweenness))
 		    &key (edge-removal-count 0))
+  "The clustering algorithm here is based on a metric called 'edge betweenness'. It counts how many
+shortest paths in the network include a given edge. An edge with high betweenness is one that is
+likely to separate dense areas of the graph."
   (let* ((shortest-paths (calculate-shortest-paths graph))
 	 (between-table (sort
 			 (map-edges 
@@ -296,6 +299,9 @@ as a list of edges as pairs of nodes."
 
 (defmethod cluster ((graph graph) (method (eql :edge-span)) 
 		    &key (edge-removal-count 0))
+  "Recall that the span of an edge is the distance between the two endpoints of the edge
+after the edge is removed. An edge with high span is one that links vertices that would otherwise
+be far apart. This method scores the edges and clusters based on span."
   (let ((span-map (score-edges graph :sort? t)) (removed-edges nil))
     (dotimes (i edge-removal-count)
       (let ((edge (pop span-map)))
