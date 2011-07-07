@@ -13,4 +13,6 @@
   :components ((:file "graph-package")
 	       (:file "graph-class" :depends-on ("graph-package"))
 	       (:file "graph-methods" :depends-on ("graph-class"))
+	       (:file "graph-generation" :depends-on ("graph-methods"))
+	       (:file "graph-visualization" :depends-on ("graph-methods"))
 	       (:file "parsers" :depends-on ("graph-methods"))))
