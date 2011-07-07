@@ -156,7 +156,8 @@ as a list of edges as pairs of nodes."
    ""))
 
 (defmethod visualize ((graph graph) &key (file "/var/tmp/graph.dot") render? colors)
-  "Save a dot file of this graph."
+  "Save a dot file of this graph. Render can be one of (:heirarchical :circular :radial :spring),
+which will render the graph using the appropriate Graphviz tool."
   (let ((memory (make-hash-table :test 'equalp)) 
 	(connector (if (directed? graph) "->" "--")))
     (with-open-file (out file
@@ -191,12 +192,38 @@ as a list of edges as pairs of nodes."
       (format out "}~%"))
     (if render?
 	(let ((f (regex-replace "\.[a-z]+$" file "\.png"))
-	      (program (or (which "fdp") (which "dot"))))
+	      (program (case render?
+			 (:hierarchical (which "dot"))
+			 (:circular     (which "circo"))
+			 (:radial       (which "twopi"))
+			 (:spring       (or (which "fdp") (which "neato")))
+			 (otherwise     (or (which "fdp") (which "dot"))))))
 	  (if program
 	      (trivial-shell:shell-command (format nil "~A -Tpng -o ~A ~A" program f file))
 	      (format t "Unable to create PNG of graph ~A.  Graphviz not in your path.~%" graph))
 	  f)
 	file)))
+
+#|
+(defmethod generate-random-graph ((model (eql :rooted-tree)) (size integer)
+				  &key directed? component-size density name-fn &allow-other-keys)
+  (let* ((graph (make-graph :directed? directed?))
+	 (next-node-id 1))
+    (dotimes (i size)
+      (add-node graph (funcall name-fn) :no-expand? t))
+    (adjust-adjacency-matrix graph)
+    (labels ((make-component (anchor)
+	       (let ((start-node next-node-id))
+		 (loop for i from next-node-id to (+ next-node-id component-size) do
+		      (when (= next-node-id size)
+			(return-from make-component))
+		      (add-edge graph anchor next-node-id)
+		      (incf next-node-id))
+		 (loop for i from start-node to (+ start-node component-size) do
+		      (make-component i)))))
+      (make-component 0))
+    graph))
+|#
 
 (defmethod generate-random-graph ((model (eql :erdos-renyi)) (size integer) 
 				  &key p)
