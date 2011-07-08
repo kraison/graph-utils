@@ -274,6 +274,12 @@ neighbors for a directed graph."
     ;;(format t "Edge: ~A - ~A~%" n1 n2)
     (list n1 n2)))		 
 
+(defmethod swap-edges ((graph graph) e1 e2)
+  (apply #'delete-edge (cons graph e1))
+  (apply #'delete-edge (cons graph e2))
+  (add-edge graph (first e1) (first e2))
+  (add-edge graph (second e1) (second e2)))
+
 (defmethod degree ((graph graph) node)
   (degree graph (gethash node (nodes graph))))
 

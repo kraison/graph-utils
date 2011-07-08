@@ -17,7 +17,8 @@
 (defmethod generate-random-graph ((model (eql :meta)) (size integer)
 				  &key degree (name-fn #'princ-to-string) (swaps 20)
 				  &allow-other-keys)
-  "Generate a random graph of SIZE nodes with average degree as close to DEGREE as possible."
+  "Generate a random graph of SIZE nodes with average degree as close to DEGREE as possible.
+Method based on http://www-rp.lip6.fr/~latapy/Publis/random.pdf"
   (unless (and (integerp degree) (plusp degree))
     (error "DEGREE must be a positive integer"))
   (let* ((graph (make-graph)) (queue nil))
@@ -27,12 +28,10 @@
     (adjust-adjacency-matrix graph)
     (labels ((random-node ()
 	       (setq queue (sort queue #'< :key #'(lambda (id) (degree graph id))))
-	       ;;(let ((node (and (> (length queue) 0) (elt queue (random (length queue))))))
 	       (let ((node (first queue)))
 		 (when node
 		   (if (>= (degree graph node) degree)
 		       (progn
-			 ;;(setq queue (remove node queue))
 			 (pop queue)
 			 (random-node))
 		       node)))))
@@ -58,12 +57,6 @@
 	  (unless (= 1 (length (find-components graph)))
 	    (error "Edge swap of ~A and ~A disconnected the graph" edge1 edge2))))
       graph)))
-
-(defmethod swap-edges ((graph graph) e1 e2)
-  (apply #'delete-edge (cons graph e1))
-  (apply #'delete-edge (cons graph e2))
-  (add-edge graph (first e1) (first e2))
-  (add-edge graph (second e1) (second e2)))
 
 (defmethod generate-random-graph ((model (eql :erdos-renyi)) (size integer) 
 				  &key p (name-fn #'princ-to-string))
