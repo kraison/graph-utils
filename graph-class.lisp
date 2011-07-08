@@ -16,14 +16,21 @@
 								     :element-type 'number
 								     :initial-element 0))))
 
-;(defclass directed-graph (graph)
-;  ((in-degree-table  :accessor in-degree-table  :initarg :in-degree-table  :initform (make-hash-table))
-;   (out-degree-table :accessor out-degree-table :initarg :out-degree-table :initform (make-hash-table))))
-
 (defgeneric graph? (thing)
   (:documentation "graph predicate")
   (:method ((graph graph)) t)
   (:method (thing) nil))
+
+#|
+(defclass directed-graph (graph)
+  ((in-degree-table  :accessor in-degree-table  :initarg :in-degree-table  :initform (make-hash-table))
+   (out-degree-table :accessor out-degree-table :initarg :out-degree-table :initform (make-hash-table))))
+
+(defgeneric directed? (thing)
+  (:documentation "directed graph predicate")
+  (:method ((graph directed-graph)) t)
+  (:method (thing) nil))  
+|#
 
 (defmethod print-object ((graph graph) stream)
   "Print a graph"
@@ -57,8 +64,8 @@
 			  (return-from graph-equal nil))))
 		  (nodes g1))
 	 (maphash #'(lambda (k v1)
-		      (let ((v2 (gethash k (nodes g2))))
-			(unless (and (integerp v2) (funcall (comparator g1) v1 v2))
+		      (let ((v2 (gethash k (ids g2))))
+			(unless (funcall (comparator g1) v1 v2)
 			  (return-from graph-equal nil))))
 		  (ids g1))
 	 (equalp (matrix g1) (matrix g2)))))
@@ -192,7 +199,8 @@ neighbors for a directed graph."
   "Add an edge between n1 and n2."
   (unless (= n1 n2)
     (if (> (aref (matrix graph) n1 n2) 0)
-	(format t "INFO: Already have an edge at ~A - ~A~%" n1 n2)
+	;;(format t "INFO: Already have an edge at ~A - ~A~%" n1 n2)
+	()
 	(progn
 	  (if (directed? graph)
 	      () ;; FIXME: add in-degree / out-degree tables?
@@ -256,6 +264,15 @@ neighbors for a directed graph."
   (let ((count 0))
     (map-edges #'(lambda (n1 n2) (declare (ignore n1 n2)) (incf count)) graph)
     count))
+
+(defmethod random-edge ((graph graph))
+  (let (n1 n2 (w 0))
+    (loop until (> w 0) do
+	 (setq n1 (random (array-dimension (matrix graph) 0))
+	       n2 (random (array-dimension (matrix graph) 1)))
+	 (setq w (aref (matrix graph) n1 n2)))
+    ;;(format t "Edge: ~A - ~A~%" n1 n2)
+    (list n1 n2)))		 
 
 (defmethod degree ((graph graph) node)
   (degree graph (gethash node (nodes graph))))

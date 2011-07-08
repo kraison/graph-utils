@@ -9,6 +9,13 @@
       (/ (* (node-count graph) (- (node-count graph) 1)) 2))
    'float))
 
+(defmethod zero-degree-nodes ((graph graph))
+  (map-nodes #'(lambda (name id)
+		 (declare (ignore name))
+		 (when (= (degree graph id) 0)
+		   id))
+	     graph :collect? t :remove-nulls? t))
+
 (defmethod in-degree ((graph graph) (node integer))
   (if (directed? graph)
       (let ((degree 0))

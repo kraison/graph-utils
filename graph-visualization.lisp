@@ -1,4 +1,4 @@
-(in-package #:graph-visualization)
+(in-package #:graph-utils)
 
 (defun which (program)
   (cl-ppcre:regex-replace-all 
