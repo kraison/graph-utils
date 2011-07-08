@@ -1,5 +1,7 @@
 TODO:
-1.  Get rid of the adjacency matrix and add typed edges.
-2.  Create a directed graph subclass and update methods for it.
-3.  Add a node class to make life easier.
-4.  Optimize!
+-  Get rid of the adjacency matrix and add typed edges.
+-  Add a node class to make life easier.
+-  Optimize!
+
+DONE:
+-  Create a directed graph subclass and update methods for it.

@@ -8,7 +8,6 @@
    (s-point    :accessor s-point    :initarg :s-point    :initform 0)
    (last-id    :accessor last-id    :initarg :id         :initform -1)
    (edges      :accessor edges      :initarg :edges      :initform 0)
-   (directed?  :accessor directed?  :initarg :directed?  :initform nil)
    (comparator :accessor comparator :initarg :comparator :initform 'equal)
    (degree-table :accessor degree-table :initarg :degree-table :initform (make-hash-table))
    (matrix     :accessor matrix     :initarg :matrix     :initform (make-array '(0 0)
@@ -18,32 +17,28 @@
 
 (defgeneric graph? (thing)
   (:documentation "graph predicate")
-  (:method ((graph graph)) t)
+  (:method ((thing graph)) t)
   (:method (thing) nil))
 
-#|
 (defclass directed-graph (graph)
   ((in-degree-table  :accessor in-degree-table  :initarg :in-degree-table  :initform (make-hash-table))
    (out-degree-table :accessor out-degree-table :initarg :out-degree-table :initform (make-hash-table))))
 
 (defgeneric directed? (thing)
   (:documentation "directed graph predicate")
-  (:method ((graph directed-graph)) t)
-  (:method (thing) nil))  
-|#
+  (:method ((thing directed-graph)) t)
+  (:method (thing) nil))
 
 (defmethod print-object ((graph graph) stream)
   "Print a graph"
   (print-unreadable-object (graph stream :type t)
-    (with-slots (ids directed?) graph
-      (format stream "~A (~A vertices)" 
-	      (if directed? "directed" "undirected") 
-	      (hash-table-count ids)))))
+    (format stream "~A (~A vertices & ~A edges)"
+	    (if (directed? graph) "directed" "undirected") 
+	    (hash-table-count (ids graph)) (edge-count graph))))
 
 (defun make-graph (&key directed? (node-comparator #'equal) (saturation-point 0))
   "Create a new graph object"
-  (make-instance 'graph 
-		 :directed? directed?
+  (make-instance (if directed? 'directed-graph 'graph)
 		 :comparator node-comparator
 		 :s-point saturation-point
 		 :nodes (make-hash-table :test node-comparator)))
@@ -72,10 +67,9 @@
 
 (defmethod copy-graph ((graph graph))
   "Make a deep copy of a graph."
-  (let ((new-graph (make-instance 'graph
+  (let ((new-graph (make-instance (if (directed? graph) 'directed-graph 'graph)
 				  :matrix (make-array (list (array-dimension (matrix graph) 0)
 							    (array-dimension (matrix graph) 1)))
-				  :directed? (directed? graph)
 				  :edges (edges graph)
 				  :id (last-id graph))))
     (maphash #'(lambda (k v) (setf (gethash k (nodes new-graph)) v)) (nodes graph))
@@ -105,9 +99,13 @@ afert all nodes have been added."
       (let ((id (incf (last-id graph))))
 	(unless no-expand?
 	  (adjust-array (matrix graph) (list (1+ id) (1+ id))))
+	(when (directed? graph)
+	  (setf (gethash id (in-degree-table graph)) 0
+		(gethash id (out-degree-table graph)) 0))
 	(setf (gethash id (degree-table graph)) 0
 	      (gethash value (nodes graph)) id
-	      (gethash id (ids graph)) value))))
+	      (gethash id (ids graph)) value)
+	id)))
 
 (defmethod lookup-node ((graph graph) value)
   "Lookup a node's id"
@@ -159,33 +157,29 @@ neighbors for a directed graph."
   "Return a list of ids for this node's neighbors."
   (neighbors graph (gethash node (nodes graph)) :return-ids? return-ids?))
 
-(defmethod inbound-neighbors ((graph graph) node &key (return-ids? t))
+(defmethod inbound-neighbors ((graph directed-graph) node &key (return-ids? t))
   (inbound-neighbors graph (gethash node (nodes graph)) :return-ids? return-ids?))
 
-(defmethod inbound-neighbors ((graph graph) (node integer) &key (return-ids? t))
-  (if (directed? graph)
-      (let ((neighbors nil))
-	(loop for i from 0 to (1- (array-dimension (matrix graph) 1)) do
-	     (when (> (aref (matrix graph) i node) 0)
-	       (pushnew i neighbors)))
-	(if return-ids?
-	    (nreverse neighbors)
-	    (mapcar #'lookup-node (nreverse neighbors))))
-      (error "inbound-neighbors does not makes sense in an undirected graph.")))
+(defmethod inbound-neighbors ((graph directed-graph) (node integer) &key (return-ids? t))
+  (let ((neighbors nil))
+    (loop for i from 0 to (1- (array-dimension (matrix graph) 1)) do
+	 (when (> (aref (matrix graph) i node) 0)
+	   (pushnew i neighbors)))
+    (if return-ids?
+	(nreverse neighbors)
+	(mapcar #'lookup-node (nreverse neighbors)))))
 
-(defmethod outbound-neighbors ((graph graph) node &key (return-ids? t))
+(defmethod outbound-neighbors ((graph directed-graph) node &key (return-ids? t))
   (outbound-neighbors graph (gethash node (nodes graph)) :return-ids? return-ids?))
 
-(defmethod outbound-neighbors ((graph graph) (node integer) &key (return-ids? t))
-  (if (directed? graph)
-      (let ((neighbors nil))
-	(loop for i from 0 to (1- (array-dimension (matrix graph) 0)) do
-	     (when (> (aref (matrix graph) node i) 0)
-	       (pushnew i neighbors)))
-	(if return-ids?
-	    (nreverse neighbors)
-	    (mapcar #'lookup-node (nreverse neighbors))))
-      (error "inbound-neighbors does not makes sense in an undirected graph.")))
+(defmethod outbound-neighbors ((graph directed-graph) (node integer) &key (return-ids? t))
+  (let ((neighbors nil))
+    (loop for i from 0 to (1- (array-dimension (matrix graph) 0)) do
+	 (when (> (aref (matrix graph) node i) 0)
+	   (pushnew i neighbors)))
+    (if return-ids?
+	(nreverse neighbors)
+	(mapcar #'lookup-node (nreverse neighbors)))))
 
 (defmethod edge-exists? ((graph graph) (n1 integer) (n2 integer))
   "Is there an edge between n1 and n2?"
@@ -198,21 +192,28 @@ neighbors for a directed graph."
 (defmethod add-edge ((graph graph) (n1 integer) (n2 integer) &key (weight 1))
   "Add an edge between n1 and n2."
   (unless (= n1 n2)
-    (if (> (aref (matrix graph) n1 n2) 0)
-	;;(format t "INFO: Already have an edge at ~A - ~A~%" n1 n2)
-	()
-	(progn
-	  (if (directed? graph)
-	      () ;; FIXME: add in-degree / out-degree tables?
-	      (progn
-		(incf (gethash n1 (degree-table graph)))
-		(incf (gethash n2 (degree-table graph)))))
-	  (incf (edges graph))))
-    (setf (aref (matrix graph) n1 n2) weight)    
-    (when (undirected? graph)
-      (setf (aref (matrix graph) n2 n1) weight))))
+    (unless (> (aref (matrix graph) n1 n2) 0)
+      (incf (gethash n1 (degree-table graph)))
+      (incf (gethash n2 (degree-table graph)))
+      (incf (edges graph)))
+    (setf (aref (matrix graph) n1 n2) weight)
+    (setf (aref (matrix graph) n2 n1) weight))
+  (list n1 n2))
 
 (defmethod add-edge ((graph graph) n1 n2 &key (weight 1))
+  "Add an edge between n1 and n2."
+  (add-edge graph (gethash n1 (nodes graph)) (gethash n2 (nodes graph)) :weight weight))
+
+(defmethod add-edge ((graph directed-graph) (n1 integer) (n2 integer) &key (weight 1))
+  (unless (= n1 n2)
+    (unless (> (aref (matrix graph) n1 n2) 0)
+      (incf (gethash n1 (out-degree-table graph)))
+      (incf (gethash n2 (in-degree-table graph)))
+      (incf (edges graph)))
+    (setf (aref (matrix graph) n1 n2) weight)
+    (list n1 n2)))
+
+(defmethod add-edge ((graph directed-graph) n1 n2 &key (weight 1))
   "Add an edge between n1 and n2."
   (add-edge graph (gethash n1 (nodes graph)) (gethash n2 (nodes graph)) :weight weight))
 
@@ -220,15 +221,20 @@ neighbors for a directed graph."
   "Remove an edge from the graph."
   (unless (= n1 n2)
     (when (> (aref (matrix graph) n1 n2) 0)
-      (if (directed? graph)
-	  () ;; FIXME: add in-degree / out-degree tables?
-	  (progn
-	    (decf (gethash n1 (degree-table graph)))
-	    (decf (gethash n2 (degree-table graph)))))
+      (decf (gethash n1 (degree-table graph)))
+      (decf (gethash n2 (degree-table graph)))
       (decf (edges graph))
       (setf (aref (matrix graph) n1 n2) 0))
-    (when (undirected? graph)
-      (setf (aref (matrix graph) n2 n1) 0))))
+    (setf (aref (matrix graph) n2 n1) 0)))
+
+(defmethod delete-edge ((graph directed-graph) (n1 integer) (n2 integer))
+  "Remove an edge from the graph."
+  (unless (= n1 n2)
+    (when (> (aref (matrix graph) n1 n2) 0)
+      (decf (gethash n1 (out-degree-table graph)))
+      (decf (gethash n2 (in-degree-table graph)))
+      (decf (edges graph))
+      (setf (aref (matrix graph) n1 n2) 0))))
 
 (defmethod delete-edge ((graph graph) n1 n2)
   (delete-edge graph (gethash n1 (nodes graph)) (gethash n2 (nodes graph))))
@@ -271,8 +277,7 @@ neighbors for a directed graph."
 	 (setq n1 (random (array-dimension (matrix graph) 0))
 	       n2 (random (array-dimension (matrix graph) 1)))
 	 (setq w (aref (matrix graph) n1 n2)))
-    ;;(format t "Edge: ~A - ~A~%" n1 n2)
-    (list n1 n2)))		 
+    (list n1 n2)))
 
 (defmethod swap-edges ((graph graph) e1 e2)
   (apply #'delete-edge (cons graph e1))

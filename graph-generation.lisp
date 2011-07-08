@@ -7,20 +7,27 @@
 		   id))
 	     graph :collect? t :remove-nulls? t))
 
-(defun my-test (size degree)
-  (let ((g (generate-random-graph :meta size :degree degree
-				  :name-fn #'(lambda (i) (format nil "C-~A" i)))))
-    ;;(check-degree g degree)
-    (visualize g :file "meta.dot" :render? :hierarchical)
-    g))
+(defun generate-hierarchical-graph (layers components-per-layer)
+  (let ((graph (make-graph)))
+    (let ((root (add-node graph "root")))
+      (labels ((make-layer (parent layer)
+		 (unless (> layer layers)
+		   (let ((nodes nil))
+		     (dotimes (component components-per-layer)
+		       (let ((node (add-node graph (format nil "C-~A-~A-~A" parent layer component))))
+			 (push node nodes)
+			 (add-edge graph parent node)))
+		     (dolist (node nodes)
+		       (make-layer node (1+ layer)))))))
+	(make-layer root 1)))
+    graph))
 
-(defmethod generate-random-graph ((model (eql :meta)) (size integer)
+(defmethod generate-random-graph ((model (eql :viger-latapy)) (size integer)
 				  &key degree (name-fn #'princ-to-string) (swaps 20)
 				  &allow-other-keys)
   "Generate a random graph of SIZE nodes with average degree as close to DEGREE as possible.
 Method based on http://www-rp.lip6.fr/~latapy/Publis/random.pdf"
-  (unless (and (integerp degree) (plusp degree))
-    (error "DEGREE must be a positive integer"))
+  (assert (and (integerp degree) (plusp degree)))
   (let* ((graph (make-graph)) (queue nil))
     (dotimes (i size)
       (push i queue)
@@ -102,4 +109,3 @@ Method based on http://www-rp.lip6.fr/~latapy/Publis/random.pdf"
 		      (incf (aref degree-table j))
 		      (add-edge graph i j))))))
     graph))
-
