@@ -3,31 +3,17 @@
 (defmethod check-degree ((graph graph) degree)
   (map-nodes #'(lambda (name id)
 		 (unless (= (degree graph id) degree)
-		   (format t "~A: ~A has degree ~A~%" id name (degree graph id))
+		   (format t "~A: ~A has degree ~A~%" 
+			   id name (degree graph id))
 		   id))
 	     graph :collect? t :remove-nulls? t))
 
-(defun generate-hierarchical-graph (layers components-per-layer)
-  "Generate a tree with LAYERS levels and COMPONENTS-PER-LAYER children for each node."
-  (let ((graph (make-graph)))
-    (let ((root (add-node graph "root")))
-      (labels ((make-layer (parent layer)
-		 (unless (> layer layers)
-		   (let ((nodes nil))
-		     (dotimes (component components-per-layer)
-		       (let ((node (add-node graph (format nil "C-~A-~A-~A" parent layer component))))
-			 (push node nodes)
-			 (add-edge graph parent node)))
-		     (dolist (node nodes)
-		       (make-layer node (1+ layer)))))))
-	(make-layer root 1)))
-    graph))
-
 (defmethod generate-random-graph ((model (eql :viger-latapy)) (size integer)
-				  &key degree (name-fn #'princ-to-string) (swaps 20)
-				  &allow-other-keys)
-  "Generate a random, connected graph of SIZE nodes with average degree as close to DEGREE as possible.
-Method based on http://www-rp.lip6.fr/~latapy/Publis/random.pdf"
+				  &key degree (name-fn #'princ-to-string) 
+				  (swaps 20) &allow-other-keys)
+  "Generate a random, connected graph of SIZE nodes with average degree as 
+close to DEGREE as possible. Method based on 
+http://www-rp.lip6.fr/~latapy/Publis/random.pdf"
   (assert (and (integerp degree) (plusp degree)))
   (let* ((graph (make-graph)) (queue nil))
     (dotimes (i size)
@@ -35,7 +21,8 @@ Method based on http://www-rp.lip6.fr/~latapy/Publis/random.pdf"
       (add-node graph (funcall name-fn i) :no-expand? t))
     (adjust-adjacency-matrix graph)
     (labels ((choose-node ()
-	       (setq queue (sort queue #'< :key #'(lambda (id) (degree graph id))))
+	       (setq queue (sort queue #'< :key #'(lambda (id) 
+						    (degree graph id))))
 	       (let ((node (first queue)))
 		 (when node
 		   (if (>= (degree graph node) degree)
@@ -63,7 +50,8 @@ Method based on http://www-rp.lip6.fr/~latapy/Publis/random.pdf"
 	(let ((edge1 (random-edge graph)) (edge2 (random-edge graph)))
 	  (swap-edges graph edge1 edge2)
 	  (unless (= 1 (length (find-components graph)))
-	    (error "Edge swap of ~A and ~A disconnected the graph" edge1 edge2))))
+	    (error "Edge swap of ~A and ~A disconnected the graph" 
+		   edge1 edge2))))
       graph)))
 
 (defmethod generate-random-graph ((model (eql :erdos-renyi)) (size integer) 
@@ -78,13 +66,17 @@ Method based on http://www-rp.lip6.fr/~latapy/Publis/random.pdf"
 	     (add-edge graph i j))))
     graph))
 
-(defmethod generate-random-graph ((model (eql :barabasi-albert)) (size integer)
-				  &key (saturation-point 0) (name-fn #'princ-to-string)
+(defmethod generate-random-graph ((model (eql :barabasi-albert)) 
+				  (size integer)
+				  &key (saturation-point 0) 
+				  (name-fn #'princ-to-string)
 				  &allow-other-keys)
   (when (< size 4)
     (error "Cannot generate a barabasi-albert graph of size less than 4"))
   (let ((graph (make-graph :saturation-point saturation-point))
-	(degree-table (make-array size :element-type 'integer :initial-element 0)))
+	(degree-table (make-array size 
+				  :element-type 'integer 
+				  :initial-element 0)))
     (dotimes (i 3)
       (add-node graph (funcall name-fn i)))
     (dotimes (i 3)
@@ -101,7 +93,8 @@ Method based on http://www-rp.lip6.fr/~latapy/Publis/random.pdf"
 		(when (not (and (> (s-point graph) 0) 
 				(>= (aref degree-table j) (s-point graph))))
 		  (when (<= (random 1.0) 
-			    ;; This is the traditional barabasi-albert calculation:
+			    ;; This is the traditional barabasi-albert 
+			    ;; calculation:
 			    ;; (/ (aref degree-table j) (edge-count graph)))
 			    ;; This is what we used for Lab 2:
 			    (/ (1+ (aref degree-table j))

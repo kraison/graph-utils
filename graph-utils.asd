@@ -9,7 +9,12 @@
   :author "Kevin Raison <last name @ chatsubo dot net>"
   :version "0.1"
   :description "Graph utilities."
-  :depends-on (:cl-ppcre :dso-lex :yacc :trivial-shell :parse-number)
+  :depends-on (:cl-ppcre 
+	       :dso-lex 
+	       :yacc 
+	       :trivial-shell 
+	       :parse-number 
+	       :simple-rgb)
   :components ((:file "graph-package")
                (:file "node" :depends-on ("graph-package"))
 	       (:file "graph-class" :depends-on ("node"))

@@ -85,11 +85,14 @@
 
 (defmethod adjust-adjacency-matrix ((graph graph))
   "Grow the adjacency-matrix of the graph to match the number of nodes."
-  (adjust-array (matrix graph) (list (1+ (last-id graph)) (1+ (last-id graph))))
-  #+allegro (loop for i from 0 to (1- (array-dimension (matrix graph) 0)) do
-		 (loop for j from 0 to (1- (array-dimension (matrix graph) 1)) do
-		      (when (null (aref (matrix graph) i j))
-			(setf (aref (matrix graph) i j) 0)))))
+  (adjust-array (matrix graph) (list (1+ (last-id graph)) 
+				     (1+ (last-id graph))))
+  #+allegro (loop for i from 0 to (1- (array-dimension (matrix graph) 0)) 
+	       do
+	       (loop for j from 0 to (1- (array-dimension (matrix graph) 1)) 
+		  do
+		  (when (null (aref (matrix graph) i j))
+		    (setf (aref (matrix graph) i j) 0)))))
 
 (defmethod add-node ((graph graph) value &key no-expand?)
   "Add a node to the graph.  If no-expand? it true, do not grow the adjacency-matrix. It is
@@ -106,6 +109,12 @@ after all nodes have been added."
 	      (gethash value (nodes graph)) id
 	      (gethash id (ids graph)) value)
 	id)))
+
+(defmethod rename-node ((graph graph) (id integer) name)
+  (let ((old-name (lookup-node graph id)))
+    (remhash old-name (nodes graph))
+    (setf (gethash name (nodes graph)) id
+	  (gethash id (ids graph)) name)))
 
 (defmethod lookup-node ((graph graph) value)
   "Lookup a node based on value."

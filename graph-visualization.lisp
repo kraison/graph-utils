@@ -6,7 +6,8 @@
    (trivial-shell:shell-command (format nil "/usr/bin/which ~A" program))
    ""))
 
-(defmethod visualize ((graph graph) &key (file "/var/tmp/graph.dot") render? colors)
+(defmethod visualize ((graph graph) &key (file "/var/tmp/graph.dot") render? 
+		      colors sizes (format "svg"))
   "Save a dot file of this graph. Render can be one of (:heirarchical :circular :radial :spring),
 which will render the graph using the appropriate Graphviz tool."
   (let ((memory (make-hash-table :test 'equalp)) 
@@ -15,8 +16,9 @@ which will render the graph using the appropriate Graphviz tool."
 			 :direction :output
 			 :if-exists :supersede
 			 :if-does-not-exist :create)
-      (format out "~A graphutils {~%" (if (directed? graph) "digraph" "graph"))
-      (format out "  node [ color = black, fillcolor = while, style = filled ];~%")
+      (format out "~A graphutils~%{~%  splines=true;~%  node [ color = black, " 
+	      (if (directed? graph) "digraph" "graph"))
+      (format out "fillcolor = white, style = filled ];~%")
       (map-nodes #'(lambda (name id)
 		     (let ((neighbors (if (directed? graph)
 					  (outbound-neighbors graph id)
@@ -34,15 +36,23 @@ which will render the graph using the appropriate Graphviz tool."
 				   connector
 				   (gethash n (ids graph))
 				   (aref (matrix graph) id n))))
-		       (format out "  \"~A\" [fillcolor=\"#~A\"];~%" 
+		       (format out "  \"~A\" [fillcolor=\"~A\""
 			       name 
 			       (if (hash-table-p colors)
 				   (gethash name colors)
-				   "ffff00"))))
+				   "#ffff00"))
+		       (if (hash-table-p sizes)
+			   (progn
+			     (format out ",shape=box,width=~F,fontname=Helvetica,"
+				     (gethash name sizes))
+			     (format out "fixedsize=true,fontsize=~D"
+				     (truncate (* 10 (gethash name sizes)))))
+				   "")
+		       (format out "];~%")))
 		 graph)
       (format out "}~%"))
     (if render?
-	(let ((f (regex-replace "\.[a-z]+$" file "\.png"))
+	(let ((f (regex-replace "\.[a-z]+$" file (format nil "\.~A" format)))
 	      (program (case render?
 			 (:hierarchical (which "dot"))
 			 (:circular     (which "circo"))
@@ -51,7 +61,8 @@ which will render the graph using the appropriate Graphviz tool."
 			 (otherwise     (or (which "fdp") (which "dot"))))))
 	  (if program
 	      (multiple-value-bind (output error-output exit-status)
-		  (trivial-shell:shell-command (format nil "~A -Tpng -o ~A ~A" program f file))
+		  (trivial-shell:shell-command 
+		   (format nil "~A -T~A -o ~A ~A" program format f file))
 		(unless (= 0 exit-status)
 		  (error "~A exited with status ~A: ~A ~A~%" program exit-status output error-output)))
 	      (format t "Unable to create PNG of graph ~A.  Graphviz not in your path.~%" graph))

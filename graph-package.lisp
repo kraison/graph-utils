@@ -1,7 +1,7 @@
 (in-package #:cl-user)
 
 (defpackage #:graph-utils
-  (:use #:cl #:cl-ppcre #:dso-lex #:yacc)
+  (:use #:cl #:cl-ppcre #:dso-lex #:yacc #:simple-rgb)
   (:export #:make-graph
 	   #:copy-graph
 	   #:graph=
@@ -13,6 +13,7 @@
 	   #:lookup-node
 	   #:map-nodes
 	   #:list-nodes
+	   #:rename-node
 	   #:node-count
 	   #:neighbors
 	   #:edges
