@@ -11,7 +11,8 @@
   :description "Graph utilities."
   :depends-on (:cl-ppcre :dso-lex :yacc :trivial-shell :parse-number)
   :components ((:file "graph-package")
-	       (:file "graph-class" :depends-on ("graph-package"))
+               (:file "node" :depends-on ("graph-package"))
+	       (:file "graph-class" :depends-on ("node"))
 	       (:file "graph-methods" :depends-on ("graph-class"))
 	       (:file "graph-generation" :depends-on ("graph-methods"))
 	       (:file "graph-visualization" :depends-on ("graph-methods"))

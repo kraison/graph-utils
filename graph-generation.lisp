@@ -8,6 +8,7 @@
 	     graph :collect? t :remove-nulls? t))
 
 (defun generate-hierarchical-graph (layers components-per-layer)
+  "Generate a tree with LAYERS levels and COMPONENTS-PER-LAYER children for each node."
   (let ((graph (make-graph)))
     (let ((root (add-node graph "root")))
       (labels ((make-layer (parent layer)
@@ -25,7 +26,7 @@
 (defmethod generate-random-graph ((model (eql :viger-latapy)) (size integer)
 				  &key degree (name-fn #'princ-to-string) (swaps 20)
 				  &allow-other-keys)
-  "Generate a random graph of SIZE nodes with average degree as close to DEGREE as possible.
+  "Generate a random, connected graph of SIZE nodes with average degree as close to DEGREE as possible.
 Method based on http://www-rp.lip6.fr/~latapy/Publis/random.pdf"
   (assert (and (integerp degree) (plusp degree)))
   (let* ((graph (make-graph)) (queue nil))
@@ -33,21 +34,21 @@ Method based on http://www-rp.lip6.fr/~latapy/Publis/random.pdf"
       (push i queue)
       (add-node graph (funcall name-fn i) :no-expand? t))
     (adjust-adjacency-matrix graph)
-    (labels ((random-node ()
+    (labels ((choose-node ()
 	       (setq queue (sort queue #'< :key #'(lambda (id) (degree graph id))))
 	       (let ((node (first queue)))
 		 (when node
 		   (if (>= (degree graph node) degree)
 		       (progn
 			 (pop queue)
-			 (random-node))
+			 (choose-node))
 		       node)))))
       (map-nodes #'(lambda (name id)
 		     (declare (ignore name))
 		     (let ((difference (- degree (degree graph id))))
 		       (if (> difference 0)
 			   (dotimes (i difference)
-			     (let ((end-point (random-node)))
+			     (let ((end-point (choose-node)))
 			       (when end-point
 				 (add-edge graph id end-point))
 			       (setq queue (remove id queue)))))))

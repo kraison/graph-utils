@@ -94,7 +94,7 @@
 (defmethod add-node ((graph graph) value &key no-expand?)
   "Add a node to the graph.  If no-expand? it true, do not grow the adjacency-matrix. It is
 recommended that when adding nodes in bulk, you use no-expand? and call adjust-adjacency-matrix
-afert all nodes have been added."
+after all nodes have been added."
   (or (gethash value (nodes graph))
       (let ((id (incf (last-id graph))))
 	(unless no-expand?
@@ -108,11 +108,11 @@ afert all nodes have been added."
 	id)))
 
 (defmethod lookup-node ((graph graph) value)
-  "Lookup a node's id"
+  "Lookup a node based on value."
   (gethash value (nodes graph)))
 
 (defmethod lookup-node ((graph graph) (id integer))
-  "Lookup a node's value"
+  "Lookup a node based on id"
   (gethash id (ids graph)))
 
 (defmethod map-nodes ((fn function) (graph graph) &key collect? remove-nulls?)
