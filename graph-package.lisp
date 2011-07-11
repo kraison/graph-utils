@@ -3,6 +3,7 @@
 (defpackage #:graph-utils
   (:use #:cl #:cl-ppcre #:dso-lex #:yacc #:simple-rgb)
   (:export #:make-graph
+	   #:graph
 	   #:copy-graph
 	   #:graph=
 	   #:graph?
@@ -15,7 +16,10 @@
 	   #:list-nodes
 	   #:rename-node
 	   #:node-count
+	   #:leaves
 	   #:neighbors
+	   #:inbound-neighbors
+	   #:outbound-neighbors
 	   #:edges
 	   #:edge-exists?
 	   #:add-edge
