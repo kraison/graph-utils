@@ -17,6 +17,7 @@
 	   #:rename-node
 	   #:node-count
 	   #:leaves
+	   #:leaf?
 	   #:neighbors
 	   #:inbound-neighbors
 	   #:outbound-neighbors

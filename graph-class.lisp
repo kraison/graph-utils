@@ -303,9 +303,16 @@ neighbors for a directed graph."
       (gethash node (degree-table graph))
       (error "Cannot calculate the degree in a directed graph.  Use in-degree or out-degree instead.")))
 
+(defmethod leaf? ((graph graph) (id integer))
+  (= (out-degree graph id) 0))
+
+(defmethod leaf? ((graph graph) node)
+  (leaf? graph (lookup-node graph node)))
+
 (defmethod leaves ((graph directed-graph))
   (map-nodes #'(lambda (name id)
 		 (declare (ignore name))
-		 (when (= (out-degree graph id) 0)
+		 (when (leaf? graph id)
 		   id))
 	     graph :collect? t :remove-nulls? t))
+
