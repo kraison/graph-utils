@@ -1,0 +1,627 @@
+Graph of data/karate: #<GRAPH undirected (34 vertices & 78 edges)>
+  Density: 0.13903743
+  Degree distribution:
+     (1 . 1)
+     (2 . 11)
+     (3 . 6)
+     (4 . 6)
+     (5 . 3)
+     (6 . 2)
+     (9 . 1)
+     (10 . 1)
+     (12 . 1)
+     (16 . 1)
+     (17 . 1)
+  Components:
+    C: (24 15 16 19 21 23 30 27 25 26 29 33 34 31 17 10 28 2 3 4 5 6 7 8 9 11
+        12 13 14 18 20 22 32 1)
+  Shortest paths:
+    Path from 1 to 2: 1 -> 2
+    Path from 1 to 3: 1 -> 3
+    Path from 1 to 4: 1 -> 4
+    Path from 1 to 5: 1 -> 5
+    Path from 1 to 6: 1 -> 6
+    Path from 1 to 7: 1 -> 7
+    Path from 1 to 8: 1 -> 8
+    Path from 1 to 9: 1 -> 9
+    Path from 1 to 10: 1 -> 3 -> 10
+    Path from 1 to 11: 1 -> 11
+    Path from 1 to 12: 1 -> 12
+    Path from 1 to 13: 1 -> 13
+    Path from 1 to 14: 1 -> 14
+    Path from 1 to 15: 1 -> 3 -> 33 -> 15
+    Path from 1 to 16: 1 -> 3 -> 33 -> 16
+    Path from 1 to 17: 1 -> 6 -> 17
+    Path from 1 to 18: 1 -> 18
+    Path from 1 to 19: 1 -> 3 -> 33 -> 19
+    Path from 1 to 20: 1 -> 20
+    Path from 1 to 21: 1 -> 3 -> 33 -> 21
+    Path from 1 to 22: 1 -> 22
+    Path from 1 to 23: 1 -> 3 -> 33 -> 23
+    Path from 1 to 24: 1 -> 3 -> 28 -> 24
+    Path from 1 to 25: 1 -> 32 -> 25
+    Path from 1 to 26: 1 -> 32 -> 26
+    Path from 1 to 27: 1 -> 9 -> 34 -> 27
+    Path from 1 to 28: 1 -> 3 -> 28
+    Path from 1 to 29: 1 -> 3 -> 29
+    Path from 1 to 30: 1 -> 3 -> 33 -> 30
+    Path from 1 to 31: 1 -> 2 -> 31
+    Path from 1 to 32: 1 -> 32
+    Path from 1 to 33: 1 -> 3 -> 33
+    Path from 1 to 34: 1 -> 9 -> 34
+    Path from 2 to 3: 2 -> 3
+    Path from 2 to 4: 2 -> 4
+    Path from 2 to 5: 2 -> 1 -> 5
+    Path from 2 to 6: 2 -> 1 -> 6
+    Path from 2 to 7: 2 -> 1 -> 7
+    Path from 2 to 8: 2 -> 8
+    Path from 2 to 9: 2 -> 1 -> 9
+    Path from 2 to 10: 2 -> 3 -> 10
+    Path from 2 to 11: 2 -> 1 -> 11
+    Path from 2 to 12: 2 -> 1 -> 12
+    Path from 2 to 13: 2 -> 1 -> 13
+    Path from 2 to 14: 2 -> 14
+    Path from 2 to 15: 2 -> 3 -> 33 -> 15
+    Path from 2 to 16: 2 -> 3 -> 33 -> 16
+    Path from 2 to 17: 2 -> 1 -> 6 -> 17
+    Path from 2 to 18: 2 -> 18
+    Path from 2 to 19: 2 -> 3 -> 33 -> 19
+    Path from 2 to 20: 2 -> 20
+    Path from 2 to 21: 2 -> 3 -> 33 -> 21
+    Path from 2 to 22: 2 -> 22
+    Path from 2 to 23: 2 -> 3 -> 33 -> 23
+    Path from 2 to 24: 2 -> 3 -> 28 -> 24
+    Path from 2 to 25: 2 -> 1 -> 32 -> 25
+    Path from 2 to 26: 2 -> 1 -> 32 -> 26
+    Path from 2 to 27: 2 -> 14 -> 34 -> 27
+    Path from 2 to 28: 2 -> 3 -> 28
+    Path from 2 to 29: 2 -> 3 -> 29
+    Path from 2 to 30: 2 -> 3 -> 33 -> 30
+    Path from 2 to 31: 2 -> 31
+    Path from 2 to 32: 2 -> 1 -> 32
+    Path from 2 to 33: 2 -> 3 -> 33
+    Path from 2 to 34: 2 -> 14 -> 34
+    Path from 3 to 4: 3 -> 4
+    Path from 3 to 5: 3 -> 1 -> 5
+    Path from 3 to 6: 3 -> 1 -> 6
+    Path from 3 to 7: 3 -> 1 -> 7
+    Path from 3 to 8: 3 -> 8
+    Path from 3 to 9: 3 -> 9
+    Path from 3 to 10: 3 -> 10
+    Path from 3 to 11: 3 -> 1 -> 11
+    Path from 3 to 12: 3 -> 1 -> 12
+    Path from 3 to 13: 3 -> 1 -> 13
+    Path from 3 to 14: 3 -> 14
+    Path from 3 to 15: 3 -> 33 -> 15
+    Path from 3 to 16: 3 -> 33 -> 16
+    Path from 3 to 17: 3 -> 1 -> 6 -> 17
+    Path from 3 to 18: 3 -> 1 -> 18
+    Path from 3 to 19: 3 -> 33 -> 19
+    Path from 3 to 20: 3 -> 1 -> 20
+    Path from 3 to 21: 3 -> 33 -> 21
+    Path from 3 to 22: 3 -> 1 -> 22
+    Path from 3 to 23: 3 -> 33 -> 23
+    Path from 3 to 24: 3 -> 28 -> 24
+    Path from 3 to 25: 3 -> 28 -> 25
+    Path from 3 to 26: 3 -> 1 -> 32 -> 26
+    Path from 3 to 27: 3 -> 9 -> 34 -> 27
+    Path from 3 to 28: 3 -> 28
+    Path from 3 to 29: 3 -> 29
+    Path from 3 to 30: 3 -> 33 -> 30
+    Path from 3 to 31: 3 -> 2 -> 31
+    Path from 3 to 32: 3 -> 1 -> 32
+    Path from 3 to 33: 3 -> 33
+    Path from 3 to 34: 3 -> 9 -> 34
+    Path from 4 to 5: 4 -> 1 -> 5
+    Path from 4 to 6: 4 -> 1 -> 6
+    Path from 4 to 7: 4 -> 1 -> 7
+    Path from 4 to 8: 4 -> 8
+    Path from 4 to 9: 4 -> 1 -> 9
+    Path from 4 to 10: 4 -> 3 -> 10
+    Path from 4 to 11: 4 -> 1 -> 11
+    Path from 4 to 12: 4 -> 1 -> 12
+    Path from 4 to 13: 4 -> 13
+    Path from 4 to 14: 4 -> 14
+    Path from 4 to 15: 4 -> 3 -> 33 -> 15
+    Path from 4 to 16: 4 -> 3 -> 33 -> 16
+    Path from 4 to 17: 4 -> 1 -> 6 -> 17
+    Path from 4 to 18: 4 -> 1 -> 18
+    Path from 4 to 19: 4 -> 3 -> 33 -> 19
+    Path from 4 to 20: 4 -> 1 -> 20
+    Path from 4 to 21: 4 -> 3 -> 33 -> 21
+    Path from 4 to 22: 4 -> 1 -> 22
+    Path from 4 to 23: 4 -> 3 -> 33 -> 23
+    Path from 4 to 24: 4 -> 3 -> 28 -> 24
+    Path from 4 to 25: 4 -> 1 -> 32 -> 25
+    Path from 4 to 26: 4 -> 1 -> 32 -> 26
+    Path from 4 to 27: 4 -> 14 -> 34 -> 27
+    Path from 4 to 28: 4 -> 3 -> 28
+    Path from 4 to 29: 4 -> 3 -> 29
+    Path from 4 to 30: 4 -> 3 -> 33 -> 30
+    Path from 4 to 31: 4 -> 2 -> 31
+    Path from 4 to 32: 4 -> 1 -> 32
+    Path from 4 to 33: 4 -> 3 -> 33
+    Path from 4 to 34: 4 -> 14 -> 34
+    Path from 5 to 6: 5 -> 1 -> 6
+    Path from 5 to 7: 5 -> 7
+    Path from 5 to 8: 5 -> 1 -> 8
+    Path from 5 to 9: 5 -> 1 -> 9
+    Path from 5 to 10: 5 -> 1 -> 3 -> 10
+    Path from 5 to 11: 5 -> 11
+    Path from 5 to 12: 5 -> 1 -> 12
+    Path from 5 to 13: 5 -> 1 -> 13
+    Path from 5 to 14: 5 -> 1 -> 14
+    Path from 5 to 15: 5 -> 1 -> 3 -> 33 -> 15
+    Path from 5 to 16: 5 -> 1 -> 3 -> 33 -> 16
+    Path from 5 to 17: 5 -> 7 -> 17
+    Path from 5 to 18: 5 -> 1 -> 18
+    Path from 5 to 19: 5 -> 1 -> 3 -> 33 -> 19
+    Path from 5 to 20: 5 -> 1 -> 20
+    Path from 5 to 21: 5 -> 1 -> 3 -> 33 -> 21
+    Path from 5 to 22: 5 -> 1 -> 22
+    Path from 5 to 23: 5 -> 1 -> 3 -> 33 -> 23
+    Path from 5 to 24: 5 -> 1 -> 3 -> 28 -> 24
+    Path from 5 to 25: 5 -> 1 -> 32 -> 25
+    Path from 5 to 26: 5 -> 1 -> 32 -> 26
+    Path from 5 to 27: 5 -> 1 -> 9 -> 34 -> 27
+    Path from 5 to 28: 5 -> 1 -> 3 -> 28
+    Path from 5 to 29: 5 -> 1 -> 3 -> 29
+    Path from 5 to 30: 5 -> 1 -> 3 -> 33 -> 30
+    Path from 5 to 31: 5 -> 1 -> 2 -> 31
+    Path from 5 to 32: 5 -> 1 -> 32
+    Path from 5 to 33: 5 -> 1 -> 3 -> 33
+    Path from 5 to 34: 5 -> 1 -> 9 -> 34
+    Path from 6 to 7: 6 -> 7
+    Path from 6 to 8: 6 -> 1 -> 8
+    Path from 6 to 9: 6 -> 1 -> 9
+    Path from 6 to 10: 6 -> 1 -> 3 -> 10
+    Path from 6 to 11: 6 -> 11
+    Path from 6 to 12: 6 -> 1 -> 12
+    Path from 6 to 13: 6 -> 1 -> 13
+    Path from 6 to 14: 6 -> 1 -> 14
+    Path from 6 to 15: 6 -> 1 -> 3 -> 33 -> 15
+    Path from 6 to 16: 6 -> 1 -> 3 -> 33 -> 16
+    Path from 6 to 17: 6 -> 17
+    Path from 6 to 18: 6 -> 1 -> 18
+    Path from 6 to 19: 6 -> 1 -> 3 -> 33 -> 19
+    Path from 6 to 20: 6 -> 1 -> 20
+    Path from 6 to 21: 6 -> 1 -> 3 -> 33 -> 21
+    Path from 6 to 22: 6 -> 1 -> 22
+    Path from 6 to 23: 6 -> 1 -> 3 -> 33 -> 23
+    Path from 6 to 24: 6 -> 1 -> 3 -> 28 -> 24
+    Path from 6 to 25: 6 -> 1 -> 32 -> 25
+    Path from 6 to 26: 6 -> 1 -> 32 -> 26
+    Path from 6 to 27: 6 -> 1 -> 9 -> 34 -> 27
+    Path from 6 to 28: 6 -> 1 -> 3 -> 28
+    Path from 6 to 29: 6 -> 1 -> 3 -> 29
+    Path from 6 to 30: 6 -> 1 -> 3 -> 33 -> 30
+    Path from 6 to 31: 6 -> 1 -> 2 -> 31
+    Path from 6 to 32: 6 -> 1 -> 32
+    Path from 6 to 33: 6 -> 1 -> 3 -> 33
+    Path from 6 to 34: 6 -> 1 -> 9 -> 34
+    Path from 7 to 8: 7 -> 1 -> 8
+    Path from 7 to 9: 7 -> 1 -> 9
+    Path from 7 to 10: 7 -> 1 -> 3 -> 10
+    Path from 7 to 11: 7 -> 1 -> 11
+    Path from 7 to 12: 7 -> 1 -> 12
+    Path from 7 to 13: 7 -> 1 -> 13
+    Path from 7 to 14: 7 -> 1 -> 14
+    Path from 7 to 15: 7 -> 1 -> 3 -> 33 -> 15
+    Path from 7 to 16: 7 -> 1 -> 3 -> 33 -> 16
+    Path from 7 to 17: 7 -> 17
+    Path from 7 to 18: 7 -> 1 -> 18
+    Path from 7 to 19: 7 -> 1 -> 3 -> 33 -> 19
+    Path from 7 to 20: 7 -> 1 -> 20
+    Path from 7 to 21: 7 -> 1 -> 3 -> 33 -> 21
+    Path from 7 to 22: 7 -> 1 -> 22
+    Path from 7 to 23: 7 -> 1 -> 3 -> 33 -> 23
+    Path from 7 to 24: 7 -> 1 -> 3 -> 28 -> 24
+    Path from 7 to 25: 7 -> 1 -> 32 -> 25
+    Path from 7 to 26: 7 -> 1 -> 32 -> 26
+    Path from 7 to 27: 7 -> 1 -> 9 -> 34 -> 27
+    Path from 7 to 28: 7 -> 1 -> 3 -> 28
+    Path from 7 to 29: 7 -> 1 -> 3 -> 29
+    Path from 7 to 30: 7 -> 1 -> 3 -> 33 -> 30
+    Path from 7 to 31: 7 -> 1 -> 2 -> 31
+    Path from 7 to 32: 7 -> 1 -> 32
+    Path from 7 to 33: 7 -> 1 -> 3 -> 33
+    Path from 7 to 34: 7 -> 1 -> 9 -> 34
+    Path from 8 to 9: 8 -> 1 -> 9
+    Path from 8 to 10: 8 -> 3 -> 10
+    Path from 8 to 11: 8 -> 1 -> 11
+    Path from 8 to 12: 8 -> 1 -> 12
+    Path from 8 to 13: 8 -> 1 -> 13
+    Path from 8 to 14: 8 -> 1 -> 14
+    Path from 8 to 15: 8 -> 3 -> 33 -> 15
+    Path from 8 to 16: 8 -> 3 -> 33 -> 16
+    Path from 8 to 17: 8 -> 1 -> 6 -> 17
+    Path from 8 to 18: 8 -> 1 -> 18
+    Path from 8 to 19: 8 -> 3 -> 33 -> 19
+    Path from 8 to 20: 8 -> 1 -> 20
+    Path from 8 to 21: 8 -> 3 -> 33 -> 21
+    Path from 8 to 22: 8 -> 1 -> 22
+    Path from 8 to 23: 8 -> 3 -> 33 -> 23
+    Path from 8 to 24: 8 -> 3 -> 28 -> 24
+    Path from 8 to 25: 8 -> 1 -> 32 -> 25
+    Path from 8 to 26: 8 -> 1 -> 32 -> 26
+    Path from 8 to 27: 8 -> 1 -> 9 -> 34 -> 27
+    Path from 8 to 28: 8 -> 3 -> 28
+    Path from 8 to 29: 8 -> 3 -> 29
+    Path from 8 to 30: 8 -> 3 -> 33 -> 30
+    Path from 8 to 31: 8 -> 2 -> 31
+    Path from 8 to 32: 8 -> 1 -> 32
+    Path from 8 to 33: 8 -> 3 -> 33
+    Path from 8 to 34: 8 -> 1 -> 9 -> 34
+    Path from 9 to 10: 9 -> 3 -> 10
+    Path from 9 to 11: 9 -> 1 -> 11
+    Path from 9 to 12: 9 -> 1 -> 12
+    Path from 9 to 13: 9 -> 1 -> 13
+    Path from 9 to 14: 9 -> 1 -> 14
+    Path from 9 to 15: 9 -> 33 -> 15
+    Path from 9 to 16: 9 -> 33 -> 16
+    Path from 9 to 17: 9 -> 1 -> 6 -> 17
+    Path from 9 to 18: 9 -> 1 -> 18
+    Path from 9 to 19: 9 -> 33 -> 19
+    Path from 9 to 20: 9 -> 1 -> 20
+    Path from 9 to 21: 9 -> 33 -> 21
+    Path from 9 to 22: 9 -> 1 -> 22
+    Path from 9 to 23: 9 -> 33 -> 23
+    Path from 9 to 24: 9 -> 33 -> 24
+    Path from 9 to 25: 9 -> 1 -> 32 -> 25
+    Path from 9 to 26: 9 -> 1 -> 32 -> 26
+    Path from 9 to 27: 9 -> 34 -> 27
+    Path from 9 to 28: 9 -> 3 -> 28
+    Path from 9 to 29: 9 -> 3 -> 29
+    Path from 9 to 30: 9 -> 33 -> 30
+    Path from 9 to 31: 9 -> 31
+    Path from 9 to 32: 9 -> 1 -> 32
+    Path from 9 to 33: 9 -> 33
+    Path from 9 to 34: 9 -> 34
+    Path from 10 to 11: 10 -> 3 -> 1 -> 11
+    Path from 10 to 12: 10 -> 3 -> 1 -> 12
+    Path from 10 to 13: 10 -> 3 -> 1 -> 13
+    Path from 10 to 14: 10 -> 3 -> 14
+    Path from 10 to 15: 10 -> 34 -> 15
+    Path from 10 to 16: 10 -> 34 -> 16
+    Path from 10 to 17: 10 -> 3 -> 1 -> 6 -> 17
+    Path from 10 to 18: 10 -> 3 -> 1 -> 18
+    Path from 10 to 19: 10 -> 34 -> 19
+    Path from 10 to 20: 10 -> 34 -> 20
+    Path from 10 to 21: 10 -> 34 -> 21
+    Path from 10 to 22: 10 -> 3 -> 1 -> 22
+    Path from 10 to 23: 10 -> 34 -> 23
+    Path from 10 to 24: 10 -> 34 -> 24
+    Path from 10 to 25: 10 -> 3 -> 28 -> 25
+    Path from 10 to 26: 10 -> 34 -> 24 -> 26
+    Path from 10 to 27: 10 -> 34 -> 27
+    Path from 10 to 28: 10 -> 3 -> 28
+    Path from 10 to 29: 10 -> 3 -> 29
+    Path from 10 to 30: 10 -> 34 -> 30
+    Path from 10 to 31: 10 -> 34 -> 31
+    Path from 10 to 32: 10 -> 34 -> 32
+    Path from 10 to 33: 10 -> 3 -> 33
+    Path from 10 to 34: 10 -> 34
+    Path from 11 to 12: 11 -> 1 -> 12
+    Path from 11 to 13: 11 -> 1 -> 13
+    Path from 11 to 14: 11 -> 1 -> 14
+    Path from 11 to 15: 11 -> 1 -> 3 -> 33 -> 15
+    Path from 11 to 16: 11 -> 1 -> 3 -> 33 -> 16
+    Path from 11 to 17: 11 -> 6 -> 17
+    Path from 11 to 18: 11 -> 1 -> 18
+    Path from 11 to 19: 11 -> 1 -> 3 -> 33 -> 19
+    Path from 11 to 20: 11 -> 1 -> 20
+    Path from 11 to 21: 11 -> 1 -> 3 -> 33 -> 21
+    Path from 11 to 22: 11 -> 1 -> 22
+    Path from 11 to 23: 11 -> 1 -> 3 -> 33 -> 23
+    Path from 11 to 24: 11 -> 1 -> 3 -> 28 -> 24
+    Path from 11 to 25: 11 -> 1 -> 32 -> 25
+    Path from 11 to 26: 11 -> 1 -> 32 -> 26
+    Path from 11 to 27: 11 -> 1 -> 9 -> 34 -> 27
+    Path from 11 to 28: 11 -> 1 -> 3 -> 28
+    Path from 11 to 29: 11 -> 1 -> 3 -> 29
+    Path from 11 to 30: 11 -> 1 -> 3 -> 33 -> 30
+    Path from 11 to 31: 11 -> 1 -> 2 -> 31
+    Path from 11 to 32: 11 -> 1 -> 32
+    Path from 11 to 33: 11 -> 1 -> 3 -> 33
+    Path from 11 to 34: 11 -> 1 -> 9 -> 34
+    Path from 12 to 13: 12 -> 1 -> 13
+    Path from 12 to 14: 12 -> 1 -> 14
+    Path from 12 to 15: 12 -> 1 -> 3 -> 33 -> 15
+    Path from 12 to 16: 12 -> 1 -> 3 -> 33 -> 16
+    Path from 12 to 17: 12 -> 1 -> 6 -> 17
+    Path from 12 to 18: 12 -> 1 -> 18
+    Path from 12 to 19: 12 -> 1 -> 3 -> 33 -> 19
+    Path from 12 to 20: 12 -> 1 -> 20
+    Path from 12 to 21: 12 -> 1 -> 3 -> 33 -> 21
+    Path from 12 to 22: 12 -> 1 -> 22
+    Path from 12 to 23: 12 -> 1 -> 3 -> 33 -> 23
+    Path from 12 to 24: 12 -> 1 -> 3 -> 28 -> 24
+    Path from 12 to 25: 12 -> 1 -> 32 -> 25
+    Path from 12 to 26: 12 -> 1 -> 32 -> 26
+    Path from 12 to 27: 12 -> 1 -> 9 -> 34 -> 27
+    Path from 12 to 28: 12 -> 1 -> 3 -> 28
+    Path from 12 to 29: 12 -> 1 -> 3 -> 29
+    Path from 12 to 30: 12 -> 1 -> 3 -> 33 -> 30
+    Path from 12 to 31: 12 -> 1 -> 2 -> 31
+    Path from 12 to 32: 12 -> 1 -> 32
+    Path from 12 to 33: 12 -> 1 -> 3 -> 33
+    Path from 12 to 34: 12 -> 1 -> 9 -> 34
+    Path from 13 to 14: 13 -> 1 -> 14
+    Path from 13 to 15: 13 -> 1 -> 3 -> 33 -> 15
+    Path from 13 to 16: 13 -> 1 -> 3 -> 33 -> 16
+    Path from 13 to 17: 13 -> 1 -> 6 -> 17
+    Path from 13 to 18: 13 -> 1 -> 18
+    Path from 13 to 19: 13 -> 1 -> 3 -> 33 -> 19
+    Path from 13 to 20: 13 -> 1 -> 20
+    Path from 13 to 21: 13 -> 1 -> 3 -> 33 -> 21
+    Path from 13 to 22: 13 -> 1 -> 22
+    Path from 13 to 23: 13 -> 1 -> 3 -> 33 -> 23
+    Path from 13 to 24: 13 -> 1 -> 3 -> 28 -> 24
+    Path from 13 to 25: 13 -> 1 -> 32 -> 25
+    Path from 13 to 26: 13 -> 1 -> 32 -> 26
+    Path from 13 to 27: 13 -> 1 -> 9 -> 34 -> 27
+    Path from 13 to 28: 13 -> 1 -> 3 -> 28
+    Path from 13 to 29: 13 -> 1 -> 3 -> 29
+    Path from 13 to 30: 13 -> 1 -> 3 -> 33 -> 30
+    Path from 13 to 31: 13 -> 1 -> 2 -> 31
+    Path from 13 to 32: 13 -> 1 -> 32
+    Path from 13 to 33: 13 -> 1 -> 3 -> 33
+    Path from 13 to 34: 13 -> 1 -> 9 -> 34
+    Path from 14 to 15: 14 -> 34 -> 15
+    Path from 14 to 16: 14 -> 34 -> 16
+    Path from 14 to 17: 14 -> 1 -> 6 -> 17
+    Path from 14 to 18: 14 -> 1 -> 18
+    Path from 14 to 19: 14 -> 34 -> 19
+    Path from 14 to 20: 14 -> 1 -> 20
+    Path from 14 to 21: 14 -> 34 -> 21
+    Path from 14 to 22: 14 -> 1 -> 22
+    Path from 14 to 23: 14 -> 34 -> 23
+    Path from 14 to 24: 14 -> 34 -> 24
+    Path from 14 to 25: 14 -> 1 -> 32 -> 25
+    Path from 14 to 26: 14 -> 1 -> 32 -> 26
+    Path from 14 to 27: 14 -> 34 -> 27
+    Path from 14 to 28: 14 -> 3 -> 28
+    Path from 14 to 29: 14 -> 3 -> 29
+    Path from 14 to 30: 14 -> 34 -> 30
+    Path from 14 to 31: 14 -> 2 -> 31
+    Path from 14 to 32: 14 -> 1 -> 32
+    Path from 14 to 33: 14 -> 3 -> 33
+    Path from 14 to 34: 14 -> 34
+    Path from 15 to 16: 15 -> 33 -> 16
+    Path from 15 to 17: 15 -> 33 -> 3 -> 1 -> 6 -> 17
+    Path from 15 to 18: 15 -> 33 -> 3 -> 1 -> 18
+    Path from 15 to 19: 15 -> 33 -> 19
+    Path from 15 to 20: 15 -> 34 -> 20
+    Path from 15 to 21: 15 -> 33 -> 21
+    Path from 15 to 22: 15 -> 33 -> 3 -> 1 -> 22
+    Path from 15 to 23: 15 -> 33 -> 23
+    Path from 15 to 24: 15 -> 33 -> 24
+    Path from 15 to 25: 15 -> 33 -> 32 -> 25
+    Path from 15 to 26: 15 -> 33 -> 24 -> 26
+    Path from 15 to 27: 15 -> 34 -> 27
+    Path from 15 to 28: 15 -> 34 -> 28
+    Path from 15 to 29: 15 -> 34 -> 29
+    Path from 15 to 30: 15 -> 33 -> 30
+    Path from 15 to 31: 15 -> 33 -> 31
+    Path from 15 to 32: 15 -> 33 -> 32
+    Path from 15 to 33: 15 -> 33
+    Path from 15 to 34: 15 -> 34
+    Path from 16 to 17: 16 -> 33 -> 3 -> 1 -> 6 -> 17
+    Path from 16 to 18: 16 -> 33 -> 3 -> 1 -> 18
+    Path from 16 to 19: 16 -> 33 -> 19
+    Path from 16 to 20: 16 -> 34 -> 20
+    Path from 16 to 21: 16 -> 33 -> 21
+    Path from 16 to 22: 16 -> 33 -> 3 -> 1 -> 22
+    Path from 16 to 23: 16 -> 33 -> 23
+    Path from 16 to 24: 16 -> 33 -> 24
+    Path from 16 to 25: 16 -> 33 -> 32 -> 25
+    Path from 16 to 26: 16 -> 33 -> 24 -> 26
+    Path from 16 to 27: 16 -> 34 -> 27
+    Path from 16 to 28: 16 -> 34 -> 28
+    Path from 16 to 29: 16 -> 34 -> 29
+    Path from 16 to 30: 16 -> 33 -> 30
+    Path from 16 to 31: 16 -> 33 -> 31
+    Path from 16 to 32: 16 -> 33 -> 32
+    Path from 16 to 33: 16 -> 33
+    Path from 16 to 34: 16 -> 34
+    Path from 17 to 18: 17 -> 6 -> 1 -> 18
+    Path from 17 to 19: 17 -> 6 -> 1 -> 3 -> 33 -> 19
+    Path from 17 to 20: 17 -> 6 -> 1 -> 20
+    Path from 17 to 21: 17 -> 6 -> 1 -> 3 -> 33 -> 21
+    Path from 17 to 22: 17 -> 6 -> 1 -> 22
+    Path from 17 to 23: 17 -> 6 -> 1 -> 3 -> 33 -> 23
+    Path from 17 to 24: 17 -> 6 -> 1 -> 3 -> 28 -> 24
+    Path from 17 to 25: 17 -> 6 -> 1 -> 32 -> 25
+    Path from 17 to 26: 17 -> 6 -> 1 -> 32 -> 26
+    Path from 17 to 27: 17 -> 6 -> 1 -> 9 -> 34 -> 27
+    Path from 17 to 28: 17 -> 6 -> 1 -> 3 -> 28
+    Path from 17 to 29: 17 -> 6 -> 1 -> 3 -> 29
+    Path from 17 to 30: 17 -> 6 -> 1 -> 3 -> 33 -> 30
+    Path from 17 to 31: 17 -> 6 -> 1 -> 2 -> 31
+    Path from 17 to 32: 17 -> 6 -> 1 -> 32
+    Path from 17 to 33: 17 -> 6 -> 1 -> 3 -> 33
+    Path from 17 to 34: 17 -> 6 -> 1 -> 9 -> 34
+    Path from 18 to 19: 18 -> 1 -> 3 -> 33 -> 19
+    Path from 18 to 20: 18 -> 1 -> 20
+    Path from 18 to 21: 18 -> 1 -> 3 -> 33 -> 21
+    Path from 18 to 22: 18 -> 1 -> 22
+    Path from 18 to 23: 18 -> 1 -> 3 -> 33 -> 23
+    Path from 18 to 24: 18 -> 1 -> 3 -> 28 -> 24
+    Path from 18 to 25: 18 -> 1 -> 32 -> 25
+    Path from 18 to 26: 18 -> 1 -> 32 -> 26
+    Path from 18 to 27: 18 -> 1 -> 9 -> 34 -> 27
+    Path from 18 to 28: 18 -> 1 -> 3 -> 28
+    Path from 18 to 29: 18 -> 1 -> 3 -> 29
+    Path from 18 to 30: 18 -> 1 -> 3 -> 33 -> 30
+    Path from 18 to 31: 18 -> 2 -> 31
+    Path from 18 to 32: 18 -> 1 -> 32
+    Path from 18 to 33: 18 -> 1 -> 3 -> 33
+    Path from 18 to 34: 18 -> 1 -> 9 -> 34
+    Path from 19 to 20: 19 -> 34 -> 20
+    Path from 19 to 21: 19 -> 33 -> 21
+    Path from 19 to 22: 19 -> 33 -> 3 -> 1 -> 22
+    Path from 19 to 23: 19 -> 33 -> 23
+    Path from 19 to 24: 19 -> 33 -> 24
+    Path from 19 to 25: 19 -> 33 -> 32 -> 25
+    Path from 19 to 26: 19 -> 33 -> 24 -> 26
+    Path from 19 to 27: 19 -> 34 -> 27
+    Path from 19 to 28: 19 -> 34 -> 28
+    Path from 19 to 29: 19 -> 34 -> 29
+    Path from 19 to 30: 19 -> 33 -> 30
+    Path from 19 to 31: 19 -> 33 -> 31
+    Path from 19 to 32: 19 -> 33 -> 32
+    Path from 19 to 33: 19 -> 33
+    Path from 19 to 34: 19 -> 34
+    Path from 20 to 21: 20 -> 34 -> 21
+    Path from 20 to 22: 20 -> 1 -> 22
+    Path from 20 to 23: 20 -> 34 -> 23
+    Path from 20 to 24: 20 -> 34 -> 24
+    Path from 20 to 25: 20 -> 1 -> 32 -> 25
+    Path from 20 to 26: 20 -> 1 -> 32 -> 26
+    Path from 20 to 27: 20 -> 34 -> 27
+    Path from 20 to 28: 20 -> 34 -> 28
+    Path from 20 to 29: 20 -> 34 -> 29
+    Path from 20 to 30: 20 -> 34 -> 30
+    Path from 20 to 31: 20 -> 2 -> 31
+    Path from 20 to 32: 20 -> 1 -> 32
+    Path from 20 to 33: 20 -> 34 -> 33
+    Path from 20 to 34: 20 -> 34
+    Path from 21 to 22: 21 -> 33 -> 3 -> 1 -> 22
+    Path from 21 to 23: 21 -> 33 -> 23
+    Path from 21 to 24: 21 -> 33 -> 24
+    Path from 21 to 25: 21 -> 33 -> 32 -> 25
+    Path from 21 to 26: 21 -> 33 -> 24 -> 26
+    Path from 21 to 27: 21 -> 34 -> 27
+    Path from 21 to 28: 21 -> 34 -> 28
+    Path from 21 to 29: 21 -> 34 -> 29
+    Path from 21 to 30: 21 -> 33 -> 30
+    Path from 21 to 31: 21 -> 33 -> 31
+    Path from 21 to 32: 21 -> 33 -> 32
+    Path from 21 to 33: 21 -> 33
+    Path from 21 to 34: 21 -> 34
+    Path from 22 to 23: 22 -> 1 -> 3 -> 33 -> 23
+    Path from 22 to 24: 22 -> 1 -> 3 -> 28 -> 24
+    Path from 22 to 25: 22 -> 1 -> 32 -> 25
+    Path from 22 to 26: 22 -> 1 -> 32 -> 26
+    Path from 22 to 27: 22 -> 1 -> 9 -> 34 -> 27
+    Path from 22 to 28: 22 -> 1 -> 3 -> 28
+    Path from 22 to 29: 22 -> 1 -> 3 -> 29
+    Path from 22 to 30: 22 -> 1 -> 3 -> 33 -> 30
+    Path from 22 to 31: 22 -> 2 -> 31
+    Path from 22 to 32: 22 -> 1 -> 32
+    Path from 22 to 33: 22 -> 1 -> 3 -> 33
+    Path from 22 to 34: 22 -> 1 -> 9 -> 34
+    Path from 23 to 24: 23 -> 33 -> 24
+    Path from 23 to 25: 23 -> 33 -> 32 -> 25
+    Path from 23 to 26: 23 -> 33 -> 24 -> 26
+    Path from 23 to 27: 23 -> 34 -> 27
+    Path from 23 to 28: 23 -> 34 -> 28
+    Path from 23 to 29: 23 -> 34 -> 29
+    Path from 23 to 30: 23 -> 33 -> 30
+    Path from 23 to 31: 23 -> 33 -> 31
+    Path from 23 to 32: 23 -> 33 -> 32
+    Path from 23 to 33: 23 -> 33
+    Path from 23 to 34: 23 -> 34
+    Path from 24 to 25: 24 -> 26 -> 25
+    Path from 24 to 26: 24 -> 26
+    Path from 24 to 27: 24 -> 30 -> 27
+    Path from 24 to 28: 24 -> 28
+    Path from 24 to 29: 24 -> 34 -> 29
+    Path from 24 to 30: 24 -> 30
+    Path from 24 to 31: 24 -> 33 -> 31
+    Path from 24 to 32: 24 -> 26 -> 32
+    Path from 24 to 33: 24 -> 33
+    Path from 24 to 34: 24 -> 34
+    Path from 25 to 26: 25 -> 26
+    Path from 25 to 27: 25 -> 28 -> 34 -> 27
+    Path from 25 to 28: 25 -> 28
+    Path from 25 to 29: 25 -> 32 -> 29
+    Path from 25 to 30: 25 -> 26 -> 24 -> 30
+    Path from 25 to 31: 25 -> 28 -> 34 -> 31
+    Path from 25 to 32: 25 -> 32
+    Path from 25 to 33: 25 -> 32 -> 33
+    Path from 25 to 34: 25 -> 28 -> 34
+    Path from 26 to 27: 26 -> 24 -> 30 -> 27
+    Path from 26 to 28: 26 -> 24 -> 28
+    Path from 26 to 29: 26 -> 32 -> 29
+    Path from 26 to 30: 26 -> 24 -> 30
+    Path from 26 to 31: 26 -> 24 -> 33 -> 31
+    Path from 26 to 32: 26 -> 32
+    Path from 26 to 33: 26 -> 24 -> 33
+    Path from 26 to 34: 26 -> 24 -> 34
+    Path from 27 to 28: 27 -> 34 -> 28
+    Path from 27 to 29: 27 -> 34 -> 29
+    Path from 27 to 30: 27 -> 30
+    Path from 27 to 31: 27 -> 34 -> 31
+    Path from 27 to 32: 27 -> 34 -> 32
+    Path from 27 to 33: 27 -> 30 -> 33
+    Path from 27 to 34: 27 -> 34
+    Path from 28 to 29: 28 -> 3 -> 29
+    Path from 28 to 30: 28 -> 24 -> 30
+    Path from 28 to 31: 28 -> 34 -> 31
+    Path from 28 to 32: 28 -> 25 -> 32
+    Path from 28 to 33: 28 -> 3 -> 33
+    Path from 28 to 34: 28 -> 34
+    Path from 29 to 30: 29 -> 34 -> 30
+    Path from 29 to 31: 29 -> 34 -> 31
+    Path from 29 to 32: 29 -> 32
+    Path from 29 to 33: 29 -> 3 -> 33
+    Path from 29 to 34: 29 -> 34
+    Path from 30 to 31: 30 -> 33 -> 31
+    Path from 30 to 32: 30 -> 33 -> 32
+    Path from 30 to 33: 30 -> 33
+    Path from 30 to 34: 30 -> 34
+    Path from 31 to 32: 31 -> 33 -> 32
+    Path from 31 to 33: 31 -> 33
+    Path from 31 to 34: 31 -> 34
+    Path from 32 to 33: 32 -> 33
+    Path from 32 to 34: 32 -> 34
+    Path from 33 to 34: 33 -> 34
+  Minimal cut (removed edges):
+    25 -> 28
+    24 -> 26
+    20 -> 34
+    14 -> 34
+    10 -> 34
+    3 -> 29
+    3 -> 28
+    2 -> 31
+    1 -> 32
+    33 -> 34
+    32 -> 33
+    23 -> 34
+    21 -> 34
+    19 -> 34
+    16 -> 34
+    15 -> 34
+    32 -> 34
+    31 -> 34
+    9 -> 34
+    31 -> 33
+    30 -> 34
+    27 -> 34
+    30 -> 33
+    28 -> 34
+    26 -> 32
+    9 -> 33
+    7 -> 17
+    6 -> 11
+    6 -> 7
+    5 -> 11
+    5 -> 7
+    4 -> 14
+    4 -> 13
+    4 -> 8
+    3 -> 14
+    3 -> 9
+    3 -> 8
+    3 -> 4
+    2 -> 22
+    2 -> 20
+    2 -> 18
+    2 -> 14
+    2 -> 8
+    2 -> 4
+    2 -> 3
+    29 -> 34
+

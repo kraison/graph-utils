@@ -1,0 +1,769 @@
+Graph of data/Dining: #<DIRECTED-GRAPH directed (26 vertices & 52 edges)>
+  Density: 0.16
+  Degree distribution:
+     (2 . 26)
+  In-degree distribution:
+     (0 . 5)
+     (1 . 5)
+     (2 . 9)
+     (3 . 3)
+     (4 . 2)
+     (6 . 2)
+  Components:
+    C: (Mary Betty Ruth Hilda Irene Alice Maxine Laura Edna Jane Hazel Ellen
+        Ella Martha Frances Eva Adele Anna Helen Robin Marion Lena Jean Cora
+        Louise Ada)
+  Shortest paths:
+    Path from Ada to Cora: Ada -> Cora
+    Path from Ada to Louise: Ada -> Louise
+    Path from Ada to Jean: Ada -> Cora -> Jean
+    Path from Ada to Helen: Ada -> Cora -> Jean -> Helen
+    Path from Ada to Martha: Ada -> Louise -> Marion -> Martha
+    Path from Ada to Alice: Alice
+    Path from Ada to Robin: Ada -> Cora -> Jean -> Robin
+    Path from Ada to Marion: Ada -> Louise -> Marion
+    Path from Ada to Maxine: Ada -> Cora -> Jean -> Helen -> Eva -> Maxine
+    Path from Ada to Lena: Ada -> Louise -> Lena
+    Path from Ada to Hazel: Hazel
+    Path from Ada to Hilda: Hilda
+    Path from Ada to Frances: Ada -> Louise -> Marion -> Frances
+    Path from Ada to Eva: Ada -> Cora -> Jean -> Helen -> Eva
+    Path from Ada to Ruth: Ruth
+    Path from Ada to Edna: Edna
+    Path from Ada to Adele: Ada -> Cora -> Jean -> Helen -> Eva -> Maxine -> Adele
+    Path from Ada to Jane: Jane
+    Path from Ada to Anna: Ada -> Louise -> Marion -> Martha -> Anna
+    Path from Ada to Mary: Mary
+    Path from Ada to Betty: Betty
+    Path from Ada to Ella: Ella
+    Path from Ada to Ellen: Ellen
+    Path from Ada to Laura: Laura
+    Path from Ada to Irene: Irene
+    Path from Cora to Ada: Cora -> Ada
+    Path from Cora to Louise: Cora -> Ada -> Louise
+    Path from Cora to Jean: Cora -> Jean
+    Path from Cora to Helen: Cora -> Jean -> Helen
+    Path from Cora to Martha: Cora -> Ada -> Louise -> Marion -> Martha
+    Path from Cora to Alice: Alice
+    Path from Cora to Robin: Cora -> Jean -> Robin
+    Path from Cora to Marion: Cora -> Ada -> Louise -> Marion
+    Path from Cora to Maxine: Cora -> Jean -> Helen -> Eva -> Maxine
+    Path from Cora to Lena: Cora -> Ada -> Louise -> Lena
+    Path from Cora to Hazel: Hazel
+    Path from Cora to Hilda: Hilda
+    Path from Cora to Frances: Cora -> Ada -> Louise -> Marion -> Frances
+    Path from Cora to Eva: Cora -> Jean -> Helen -> Eva
+    Path from Cora to Ruth: Ruth
+    Path from Cora to Edna: Edna
+    Path from Cora to Adele: Cora -> Jean -> Helen -> Eva -> Maxine -> Adele
+    Path from Cora to Jane: Jane
+    Path from Cora to Anna: Cora -> Ada -> Louise -> Marion -> Martha -> Anna
+    Path from Cora to Mary: Mary
+    Path from Cora to Betty: Betty
+    Path from Cora to Ella: Ella
+    Path from Cora to Ellen: Ellen
+    Path from Cora to Laura: Laura
+    Path from Cora to Irene: Irene
+    Path from Louise to Ada: Ada
+    Path from Louise to Cora: Cora
+    Path from Louise to Jean: Jean
+    Path from Louise to Helen: Helen
+    Path from Louise to Martha: Louise -> Marion -> Martha
+    Path from Louise to Alice: Alice
+    Path from Louise to Robin: Robin
+    Path from Louise to Marion: Louise -> Marion
+    Path from Louise to Maxine: Louise -> Marion -> Martha -> Anna -> Maxine
+    Path from Louise to Lena: Louise -> Lena
+    Path from Louise to Hazel: Hazel
+    Path from Louise to Hilda: Hilda
+    Path from Louise to Frances: Louise -> Marion -> Frances
+    Path from Louise to Eva: Louise -> Marion -> Frances -> Eva
+    Path from Louise to Ruth: Ruth
+    Path from Louise to Edna: Edna
+    Path from Louise to Adele: Louise -> Marion -> Martha -> Anna -> Maxine -> Adele
+    Path from Louise to Jane: Jane
+    Path from Louise to Anna: Louise -> Marion -> Martha -> Anna
+    Path from Louise to Mary: Mary
+    Path from Louise to Betty: Betty
+    Path from Louise to Ella: Ella
+    Path from Louise to Ellen: Ellen
+    Path from Louise to Laura: Laura
+    Path from Louise to Irene: Irene
+    Path from Jean to Ada: Ada
+    Path from Jean to Cora: Cora
+    Path from Jean to Louise: Jean -> Helen -> Eva -> Marion -> Martha -> Anna -> Lena -> Louise
+    Path from Jean to Helen: Jean -> Helen
+    Path from Jean to Martha: Jean -> Helen -> Eva -> Marion -> Martha
+    Path from Jean to Alice: Alice
+    Path from Jean to Robin: Jean -> Robin
+    Path from Jean to Marion: Jean -> Helen -> Eva -> Marion
+    Path from Jean to Maxine: Jean -> Helen -> Eva -> Maxine
+    Path from Jean to Lena: Jean -> Helen -> Eva -> Marion -> Martha -> Anna -> Lena
+    Path from Jean to Hazel: Hazel
+    Path from Jean to Hilda: Hilda
+    Path from Jean to Frances: Jean -> Helen -> Eva -> Marion -> Frances
+    Path from Jean to Eva: Jean -> Helen -> Eva
+    Path from Jean to Ruth: Ruth
+    Path from Jean to Edna: Edna
+    Path from Jean to Adele: Jean -> Helen -> Eva -> Maxine -> Adele
+    Path from Jean to Jane: Jane
+    Path from Jean to Anna: Jean -> Helen -> Eva -> Marion -> Martha -> Anna
+    Path from Jean to Mary: Mary
+    Path from Jean to Betty: Betty
+    Path from Jean to Ella: Ella
+    Path from Jean to Ellen: Ellen
+    Path from Jean to Laura: Laura
+    Path from Jean to Irene: Irene
+    Path from Helen to Ada: Ada
+    Path from Helen to Cora: Cora
+    Path from Helen to Louise: Helen -> Eva -> Marion -> Martha -> Anna -> Lena -> Louise
+    Path from Helen to Jean: Helen -> Jean
+    Path from Helen to Martha: Helen -> Eva -> Marion -> Martha
+    Path from Helen to Alice: Alice
+    Path from Helen to Robin: Helen -> Jean -> Robin
+    Path from Helen to Marion: Helen -> Eva -> Marion
+    Path from Helen to Maxine: Helen -> Eva -> Maxine
+    Path from Helen to Lena: Helen -> Eva -> Marion -> Martha -> Anna -> Lena
+    Path from Helen to Hazel: Hazel
+    Path from Helen to Hilda: Hilda
+    Path from Helen to Frances: Helen -> Eva -> Marion -> Frances
+    Path from Helen to Eva: Helen -> Eva
+    Path from Helen to Ruth: Ruth
+    Path from Helen to Edna: Edna
+    Path from Helen to Adele: Helen -> Eva -> Maxine -> Adele
+    Path from Helen to Jane: Jane
+    Path from Helen to Anna: Helen -> Eva -> Marion -> Martha -> Anna
+    Path from Helen to Mary: Mary
+    Path from Helen to Betty: Betty
+    Path from Helen to Ella: Ella
+    Path from Helen to Ellen: Ellen
+    Path from Helen to Laura: Laura
+    Path from Helen to Irene: Irene
+    Path from Martha to Ada: Ada
+    Path from Martha to Cora: Cora
+    Path from Martha to Louise: Martha -> Anna -> Lena -> Louise
+    Path from Martha to Jean: Jean
+    Path from Martha to Helen: Helen
+    Path from Martha to Alice: Alice
+    Path from Martha to Robin: Robin
+    Path from Martha to Marion: Martha -> Marion
+    Path from Martha to Maxine: Martha -> Anna -> Maxine
+    Path from Martha to Lena: Martha -> Anna -> Lena
+    Path from Martha to Hazel: Hazel
+    Path from Martha to Hilda: Hilda
+    Path from Martha to Frances: Martha -> Marion -> Frances
+    Path from Martha to Eva: Martha -> Marion -> Frances -> Eva
+    Path from Martha to Ruth: Ruth
+    Path from Martha to Edna: Edna
+    Path from Martha to Adele: Martha -> Anna -> Maxine -> Adele
+    Path from Martha to Jane: Jane
+    Path from Martha to Anna: Martha -> Anna
+    Path from Martha to Mary: Mary
+    Path from Martha to Betty: Betty
+    Path from Martha to Ella: Ella
+    Path from Martha to Ellen: Ellen
+    Path from Martha to Laura: Laura
+    Path from Martha to Irene: Irene
+    Path from Alice to Ada: Ada
+    Path from Alice to Cora: Cora
+    Path from Alice to Louise: Alice -> Martha -> Anna -> Lena -> Louise
+    Path from Alice to Jean: Jean
+    Path from Alice to Helen: Helen
+    Path from Alice to Martha: Alice -> Martha
+    Path from Alice to Robin: Robin
+    Path from Alice to Marion: Alice -> Martha -> Marion
+    Path from Alice to Maxine: Alice -> Eva -> Maxine
+    Path from Alice to Lena: Alice -> Martha -> Anna -> Lena
+    Path from Alice to Hazel: Hazel
+    Path from Alice to Hilda: Hilda
+    Path from Alice to Frances: Alice -> Martha -> Marion -> Frances
+    Path from Alice to Eva: Alice -> Eva
+    Path from Alice to Ruth: Ruth
+    Path from Alice to Edna: Edna
+    Path from Alice to Adele: Alice -> Eva -> Maxine -> Adele
+    Path from Alice to Jane: Jane
+    Path from Alice to Anna: Alice -> Martha -> Anna
+    Path from Alice to Mary: Mary
+    Path from Alice to Betty: Betty
+    Path from Alice to Ella: Ella
+    Path from Alice to Ellen: Ellen
+    Path from Alice to Laura: Laura
+    Path from Alice to Irene: Irene
+    Path from Robin to Ada: Ada
+    Path from Robin to Cora: Cora
+    Path from Robin to Louise: Robin -> Eva -> Marion -> Martha -> Anna -> Lena -> Louise
+    Path from Robin to Jean: Robin -> Helen -> Jean
+    Path from Robin to Helen: Robin -> Helen
+    Path from Robin to Martha: Robin -> Eva -> Marion -> Martha
+    Path from Robin to Alice: Alice
+    Path from Robin to Marion: Robin -> Eva -> Marion
+    Path from Robin to Maxine: Robin -> Eva -> Maxine
+    Path from Robin to Lena: Robin -> Eva -> Marion -> Martha -> Anna -> Lena
+    Path from Robin to Hazel: Hazel
+    Path from Robin to Hilda: Hilda
+    Path from Robin to Frances: Robin -> Eva -> Marion -> Frances
+    Path from Robin to Eva: Robin -> Eva
+    Path from Robin to Ruth: Ruth
+    Path from Robin to Edna: Edna
+    Path from Robin to Adele: Robin -> Eva -> Maxine -> Adele
+    Path from Robin to Jane: Jane
+    Path from Robin to Anna: Robin -> Eva -> Marion -> Martha -> Anna
+    Path from Robin to Mary: Mary
+    Path from Robin to Betty: Betty
+    Path from Robin to Ella: Ella
+    Path from Robin to Ellen: Ellen
+    Path from Robin to Laura: Laura
+    Path from Robin to Irene: Irene
+    Path from Marion to Ada: Ada
+    Path from Marion to Cora: Cora
+    Path from Marion to Louise: Marion -> Martha -> Anna -> Lena -> Louise
+    Path from Marion to Jean: Jean
+    Path from Marion to Helen: Helen
+    Path from Marion to Martha: Marion -> Martha
+    Path from Marion to Alice: Alice
+    Path from Marion to Robin: Robin
+    Path from Marion to Maxine: Marion -> Martha -> Anna -> Maxine
+    Path from Marion to Lena: Marion -> Martha -> Anna -> Lena
+    Path from Marion to Hazel: Hazel
+    Path from Marion to Hilda: Hilda
+    Path from Marion to Frances: Marion -> Frances
+    Path from Marion to Eva: Marion -> Frances -> Eva
+    Path from Marion to Ruth: Ruth
+    Path from Marion to Edna: Edna
+    Path from Marion to Adele: Marion -> Martha -> Anna -> Maxine -> Adele
+    Path from Marion to Jane: Jane
+    Path from Marion to Anna: Marion -> Martha -> Anna
+    Path from Marion to Mary: Mary
+    Path from Marion to Betty: Betty
+    Path from Marion to Ella: Ella
+    Path from Marion to Ellen: Ellen
+    Path from Marion to Laura: Laura
+    Path from Marion to Irene: Irene
+    Path from Maxine to Ada: Ada
+    Path from Maxine to Cora: Cora
+    Path from Maxine to Louise: Maxine -> Eva -> Marion -> Martha -> Anna -> Lena -> Louise
+    Path from Maxine to Jean: Jean
+    Path from Maxine to Helen: Helen
+    Path from Maxine to Martha: Maxine -> Eva -> Marion -> Martha
+    Path from Maxine to Alice: Alice
+    Path from Maxine to Robin: Robin
+    Path from Maxine to Marion: Maxine -> Eva -> Marion
+    Path from Maxine to Lena: Maxine -> Eva -> Marion -> Martha -> Anna -> Lena
+    Path from Maxine to Hazel: Hazel
+    Path from Maxine to Hilda: Hilda
+    Path from Maxine to Frances: Maxine -> Adele -> Frances
+    Path from Maxine to Eva: Maxine -> Eva
+    Path from Maxine to Ruth: Ruth
+    Path from Maxine to Edna: Edna
+    Path from Maxine to Adele: Maxine -> Adele
+    Path from Maxine to Jane: Jane
+    Path from Maxine to Anna: Maxine -> Eva -> Marion -> Martha -> Anna
+    Path from Maxine to Mary: Mary
+    Path from Maxine to Betty: Betty
+    Path from Maxine to Ella: Ella
+    Path from Maxine to Ellen: Ellen
+    Path from Maxine to Laura: Laura
+    Path from Maxine to Irene: Irene
+    Path from Lena to Ada: Ada
+    Path from Lena to Cora: Cora
+    Path from Lena to Louise: Lena -> Louise
+    Path from Lena to Jean: Jean
+    Path from Lena to Helen: Helen
+    Path from Lena to Martha: Lena -> Marion -> Martha
+    Path from Lena to Alice: Alice
+    Path from Lena to Robin: Robin
+    Path from Lena to Marion: Lena -> Marion
+    Path from Lena to Maxine: Lena -> Marion -> Martha -> Anna -> Maxine
+    Path from Lena to Hazel: Hazel
+    Path from Lena to Hilda: Hilda
+    Path from Lena to Frances: Lena -> Marion -> Frances
+    Path from Lena to Eva: Lena -> Marion -> Frances -> Eva
+    Path from Lena to Ruth: Ruth
+    Path from Lena to Edna: Edna
+    Path from Lena to Adele: Lena -> Marion -> Martha -> Anna -> Maxine -> Adele
+    Path from Lena to Jane: Jane
+    Path from Lena to Anna: Lena -> Marion -> Martha -> Anna
+    Path from Lena to Mary: Mary
+    Path from Lena to Betty: Betty
+    Path from Lena to Ella: Ella
+    Path from Lena to Ellen: Ellen
+    Path from Lena to Laura: Laura
+    Path from Lena to Irene: Irene
+    Path from Hazel to Ada: Ada
+    Path from Hazel to Cora: Cora
+    Path from Hazel to Louise: Hazel -> Anna -> Lena -> Louise
+    Path from Hazel to Jean: Jean
+    Path from Hazel to Helen: Helen
+    Path from Hazel to Martha: Hazel -> Anna -> Lena -> Marion -> Martha
+    Path from Hazel to Alice: Alice
+    Path from Hazel to Robin: Robin
+    Path from Hazel to Marion: Hazel -> Anna -> Lena -> Marion
+    Path from Hazel to Maxine: Hazel -> Anna -> Maxine
+    Path from Hazel to Lena: Hazel -> Anna -> Lena
+    Path from Hazel to Hilda: Hazel -> Hilda
+    Path from Hazel to Frances: Hazel -> Anna -> Maxine -> Adele -> Frances
+    Path from Hazel to Eva: Hazel -> Anna -> Maxine -> Eva
+    Path from Hazel to Ruth: Ruth
+    Path from Hazel to Edna: Hazel -> Hilda -> Betty -> Edna
+    Path from Hazel to Adele: Hazel -> Anna -> Maxine -> Adele
+    Path from Hazel to Jane: Hazel -> Hilda -> Betty -> Edna -> Mary -> Jane
+    Path from Hazel to Anna: Hazel -> Anna
+    Path from Hazel to Mary: Hazel -> Hilda -> Betty -> Edna -> Mary
+    Path from Hazel to Betty: Hazel -> Hilda -> Betty
+    Path from Hazel to Ella: Ella
+    Path from Hazel to Ellen: Ellen
+    Path from Hazel to Laura: Laura
+    Path from Hazel to Irene: Irene
+    Path from Hilda to Ada: Ada
+    Path from Hilda to Cora: Cora
+    Path from Hilda to Louise: Hilda -> Hazel -> Anna -> Lena -> Louise
+    Path from Hilda to Jean: Jean
+    Path from Hilda to Helen: Helen
+    Path from Hilda to Martha: Hilda -> Hazel -> Anna -> Lena -> Marion -> Martha
+    Path from Hilda to Alice: Alice
+    Path from Hilda to Robin: Robin
+    Path from Hilda to Marion: Hilda -> Hazel -> Anna -> Lena -> Marion
+    Path from Hilda to Maxine: Hilda -> Hazel -> Anna -> Maxine
+    Path from Hilda to Lena: Hilda -> Hazel -> Anna -> Lena
+    Path from Hilda to Hazel: Hilda -> Hazel
+    Path from Hilda to Frances: Hilda -> Betty -> Edna -> Adele -> Frances
+    Path from Hilda to Eva: Hilda -> Hazel -> Anna -> Maxine -> Eva
+    Path from Hilda to Ruth: Ruth
+    Path from Hilda to Edna: Hilda -> Betty -> Edna
+    Path from Hilda to Adele: Hilda -> Betty -> Edna -> Adele
+    Path from Hilda to Jane: Hilda -> Betty -> Edna -> Mary -> Jane
+    Path from Hilda to Anna: Hilda -> Hazel -> Anna
+    Path from Hilda to Mary: Hilda -> Betty -> Edna -> Mary
+    Path from Hilda to Betty: Hilda -> Betty
+    Path from Hilda to Ella: Ella
+    Path from Hilda to Ellen: Ellen
+    Path from Hilda to Laura: Laura
+    Path from Hilda to Irene: Irene
+    Path from Frances to Ada: Ada
+    Path from Frances to Cora: Cora
+    Path from Frances to Louise: Frances -> Marion -> Martha -> Anna -> Lena -> Louise
+    Path from Frances to Jean: Jean
+    Path from Frances to Helen: Helen
+    Path from Frances to Martha: Frances -> Marion -> Martha
+    Path from Frances to Alice: Alice
+    Path from Frances to Robin: Robin
+    Path from Frances to Marion: Frances -> Marion
+    Path from Frances to Maxine: Frances -> Eva -> Maxine
+    Path from Frances to Lena: Frances -> Marion -> Martha -> Anna -> Lena
+    Path from Frances to Hazel: Hazel
+    Path from Frances to Hilda: Hilda
+    Path from Frances to Eva: Frances -> Eva
+    Path from Frances to Ruth: Ruth
+    Path from Frances to Edna: Edna
+    Path from Frances to Adele: Frances -> Eva -> Maxine -> Adele
+    Path from Frances to Jane: Jane
+    Path from Frances to Anna: Frances -> Marion -> Martha -> Anna
+    Path from Frances to Mary: Mary
+    Path from Frances to Betty: Betty
+    Path from Frances to Ella: Ella
+    Path from Frances to Ellen: Ellen
+    Path from Frances to Laura: Laura
+    Path from Frances to Irene: Irene
+    Path from Eva to Ada: Ada
+    Path from Eva to Cora: Cora
+    Path from Eva to Louise: Eva -> Marion -> Martha -> Anna -> Lena -> Louise
+    Path from Eva to Jean: Jean
+    Path from Eva to Helen: Helen
+    Path from Eva to Martha: Eva -> Marion -> Martha
+    Path from Eva to Alice: Alice
+    Path from Eva to Robin: Robin
+    Path from Eva to Marion: Eva -> Marion
+    Path from Eva to Maxine: Eva -> Maxine
+    Path from Eva to Lena: Eva -> Marion -> Martha -> Anna -> Lena
+    Path from Eva to Hazel: Hazel
+    Path from Eva to Hilda: Hilda
+    Path from Eva to Frances: Eva -> Marion -> Frances
+    Path from Eva to Ruth: Ruth
+    Path from Eva to Edna: Edna
+    Path from Eva to Adele: Eva -> Maxine -> Adele
+    Path from Eva to Jane: Jane
+    Path from Eva to Anna: Eva -> Marion -> Martha -> Anna
+    Path from Eva to Mary: Mary
+    Path from Eva to Betty: Betty
+    Path from Eva to Ella: Ella
+    Path from Eva to Ellen: Ellen
+    Path from Eva to Laura: Laura
+    Path from Eva to Irene: Irene
+    Path from Ruth to Ada: Ada
+    Path from Ruth to Cora: Cora
+    Path from Ruth to Louise: Ruth -> Hilda -> Hazel -> Anna -> Lena -> Louise
+    Path from Ruth to Jean: Jean
+    Path from Ruth to Helen: Helen
+    Path from Ruth to Martha: Ruth -> Jane -> Adele -> Marion -> Martha
+    Path from Ruth to Alice: Alice
+    Path from Ruth to Robin: Robin
+    Path from Ruth to Marion: Ruth -> Jane -> Adele -> Marion
+    Path from Ruth to Maxine: Ruth -> Hilda -> Hazel -> Anna -> Maxine
+    Path from Ruth to Lena: Ruth -> Hilda -> Hazel -> Anna -> Lena
+    Path from Ruth to Hazel: Ruth -> Hilda -> Hazel
+    Path from Ruth to Hilda: Ruth -> Hilda
+    Path from Ruth to Frances: Ruth -> Jane -> Adele -> Frances
+    Path from Ruth to Eva: Ruth -> Jane -> Adele -> Frances -> Eva
+    Path from Ruth to Edna: Ruth -> Hilda -> Betty -> Edna
+    Path from Ruth to Adele: Ruth -> Jane -> Adele
+    Path from Ruth to Jane: Ruth -> Jane
+    Path from Ruth to Anna: Ruth -> Hilda -> Hazel -> Anna
+    Path from Ruth to Mary: Ruth -> Jane -> Mary
+    Path from Ruth to Betty: Ruth -> Hilda -> Betty
+    Path from Ruth to Ella: Ella
+    Path from Ruth to Ellen: Ellen
+    Path from Ruth to Laura: Laura
+    Path from Ruth to Irene: Irene
+    Path from Edna to Ada: Ada
+    Path from Edna to Cora: Cora
+    Path from Edna to Louise: Edna -> Adele -> Marion -> Martha -> Anna -> Lena -> Louise
+    Path from Edna to Jean: Jean
+    Path from Edna to Helen: Helen
+    Path from Edna to Martha: Edna -> Adele -> Marion -> Martha
+    Path from Edna to Alice: Alice
+    Path from Edna to Robin: Robin
+    Path from Edna to Marion: Edna -> Adele -> Marion
+    Path from Edna to Maxine: Edna -> Adele -> Frances -> Eva -> Maxine
+    Path from Edna to Lena: Edna -> Adele -> Marion -> Martha -> Anna -> Lena
+    Path from Edna to Hazel: Hazel
+    Path from Edna to Hilda: Hilda
+    Path from Edna to Frances: Edna -> Adele -> Frances
+    Path from Edna to Eva: Edna -> Adele -> Frances -> Eva
+    Path from Edna to Ruth: Ruth
+    Path from Edna to Adele: Edna -> Adele
+    Path from Edna to Jane: Edna -> Mary -> Jane
+    Path from Edna to Anna: Edna -> Adele -> Marion -> Martha -> Anna
+    Path from Edna to Mary: Edna -> Mary
+    Path from Edna to Betty: Betty
+    Path from Edna to Ella: Ella
+    Path from Edna to Ellen: Ellen
+    Path from Edna to Laura: Laura
+    Path from Edna to Irene: Irene
+    Path from Adele to Ada: Ada
+    Path from Adele to Cora: Cora
+    Path from Adele to Louise: Adele -> Marion -> Martha -> Anna -> Lena -> Louise
+    Path from Adele to Jean: Jean
+    Path from Adele to Helen: Helen
+    Path from Adele to Martha: Adele -> Marion -> Martha
+    Path from Adele to Alice: Alice
+    Path from Adele to Robin: Robin
+    Path from Adele to Marion: Adele -> Marion
+    Path from Adele to Maxine: Adele -> Frances -> Eva -> Maxine
+    Path from Adele to Lena: Adele -> Marion -> Martha -> Anna -> Lena
+    Path from Adele to Hazel: Hazel
+    Path from Adele to Hilda: Hilda
+    Path from Adele to Frances: Adele -> Frances
+    Path from Adele to Eva: Adele -> Frances -> Eva
+    Path from Adele to Ruth: Ruth
+    Path from Adele to Edna: Edna
+    Path from Adele to Jane: Jane
+    Path from Adele to Anna: Adele -> Marion -> Martha -> Anna
+    Path from Adele to Mary: Mary
+    Path from Adele to Betty: Betty
+    Path from Adele to Ella: Ella
+    Path from Adele to Ellen: Ellen
+    Path from Adele to Laura: Laura
+    Path from Adele to Irene: Irene
+    Path from Jane to Ada: Ada
+    Path from Jane to Cora: Cora
+    Path from Jane to Louise: Jane -> Adele -> Marion -> Martha -> Anna -> Lena -> Louise
+    Path from Jane to Jean: Jean
+    Path from Jane to Helen: Helen
+    Path from Jane to Martha: Jane -> Adele -> Marion -> Martha
+    Path from Jane to Alice: Alice
+    Path from Jane to Robin: Robin
+    Path from Jane to Marion: Jane -> Adele -> Marion
+    Path from Jane to Maxine: Jane -> Adele -> Frances -> Eva -> Maxine
+    Path from Jane to Lena: Jane -> Adele -> Marion -> Martha -> Anna -> Lena
+    Path from Jane to Hazel: Hazel
+    Path from Jane to Hilda: Hilda
+    Path from Jane to Frances: Jane -> Adele -> Frances
+    Path from Jane to Eva: Jane -> Adele -> Frances -> Eva
+    Path from Jane to Ruth: Ruth
+    Path from Jane to Edna: Jane -> Mary -> Edna
+    Path from Jane to Adele: Jane -> Adele
+    Path from Jane to Anna: Jane -> Adele -> Marion -> Martha -> Anna
+    Path from Jane to Mary: Jane -> Mary
+    Path from Jane to Betty: Betty
+    Path from Jane to Ella: Ella
+    Path from Jane to Ellen: Ellen
+    Path from Jane to Laura: Laura
+    Path from Jane to Irene: Irene
+    Path from Anna to Ada: Ada
+    Path from Anna to Cora: Cora
+    Path from Anna to Louise: Anna -> Lena -> Louise
+    Path from Anna to Jean: Jean
+    Path from Anna to Helen: Helen
+    Path from Anna to Martha: Anna -> Lena -> Marion -> Martha
+    Path from Anna to Alice: Alice
+    Path from Anna to Robin: Robin
+    Path from Anna to Marion: Anna -> Lena -> Marion
+    Path from Anna to Maxine: Anna -> Maxine
+    Path from Anna to Lena: Anna -> Lena
+    Path from Anna to Hazel: Hazel
+    Path from Anna to Hilda: Hilda
+    Path from Anna to Frances: Anna -> Maxine -> Adele -> Frances
+    Path from Anna to Eva: Anna -> Maxine -> Eva
+    Path from Anna to Ruth: Ruth
+    Path from Anna to Edna: Edna
+    Path from Anna to Adele: Anna -> Maxine -> Adele
+    Path from Anna to Jane: Jane
+    Path from Anna to Mary: Mary
+    Path from Anna to Betty: Betty
+    Path from Anna to Ella: Ella
+    Path from Anna to Ellen: Ellen
+    Path from Anna to Laura: Laura
+    Path from Anna to Irene: Irene
+    Path from Mary to Ada: Ada
+    Path from Mary to Cora: Cora
+    Path from Mary to Louise: Mary -> Edna -> Adele -> Marion -> Martha -> Anna -> Lena -> Louise
+    Path from Mary to Jean: Jean
+    Path from Mary to Helen: Helen
+    Path from Mary to Martha: Mary -> Edna -> Adele -> Marion -> Martha
+    Path from Mary to Alice: Alice
+    Path from Mary to Robin: Robin
+    Path from Mary to Marion: Mary -> Edna -> Adele -> Marion
+    Path from Mary to Maxine: Mary -> Edna -> Adele -> Frances -> Eva -> Maxine
+    Path from Mary to Lena: Mary -> Edna -> Adele -> Marion -> Martha -> Anna -> Lena
+    Path from Mary to Hazel: Hazel
+    Path from Mary to Hilda: Hilda
+    Path from Mary to Frances: Mary -> Edna -> Adele -> Frances
+    Path from Mary to Eva: Mary -> Edna -> Adele -> Frances -> Eva
+    Path from Mary to Ruth: Ruth
+    Path from Mary to Edna: Mary -> Edna
+    Path from Mary to Adele: Mary -> Edna -> Adele
+    Path from Mary to Jane: Mary -> Jane
+    Path from Mary to Anna: Mary -> Edna -> Adele -> Marion -> Martha -> Anna
+    Path from Mary to Betty: Betty
+    Path from Mary to Ella: Ella
+    Path from Mary to Ellen: Ellen
+    Path from Mary to Laura: Laura
+    Path from Mary to Irene: Irene
+    Path from Betty to Ada: Ada
+    Path from Betty to Cora: Cora
+    Path from Betty to Louise: Betty -> Hilda -> Hazel -> Anna -> Lena -> Louise
+    Path from Betty to Jean: Jean
+    Path from Betty to Helen: Helen
+    Path from Betty to Martha: Betty -> Edna -> Adele -> Marion -> Martha
+    Path from Betty to Alice: Alice
+    Path from Betty to Robin: Robin
+    Path from Betty to Marion: Betty -> Edna -> Adele -> Marion
+    Path from Betty to Maxine: Betty -> Hilda -> Hazel -> Anna -> Maxine
+    Path from Betty to Lena: Betty -> Hilda -> Hazel -> Anna -> Lena
+    Path from Betty to Hazel: Betty -> Hilda -> Hazel
+    Path from Betty to Hilda: Betty -> Hilda
+    Path from Betty to Frances: Betty -> Edna -> Adele -> Frances
+    Path from Betty to Eva: Betty -> Edna -> Adele -> Frances -> Eva
+    Path from Betty to Ruth: Ruth
+    Path from Betty to Edna: Betty -> Edna
+    Path from Betty to Adele: Betty -> Edna -> Adele
+    Path from Betty to Jane: Betty -> Edna -> Mary -> Jane
+    Path from Betty to Anna: Betty -> Hilda -> Hazel -> Anna
+    Path from Betty to Mary: Betty -> Edna -> Mary
+    Path from Betty to Ella: Ella
+    Path from Betty to Ellen: Ellen
+    Path from Betty to Laura: Laura
+    Path from Betty to Irene: Irene
+    Path from Ella to Ada: Ada
+    Path from Ella to Cora: Cora
+    Path from Ella to Louise: Ella -> Ellen -> Anna -> Lena -> Louise
+    Path from Ella to Jean: Ella -> Helen -> Jean
+    Path from Ella to Helen: Ella -> Helen
+    Path from Ella to Martha: Ella -> Helen -> Eva -> Marion -> Martha
+    Path from Ella to Alice: Alice
+    Path from Ella to Robin: Ella -> Helen -> Jean -> Robin
+    Path from Ella to Marion: Ella -> Helen -> Eva -> Marion
+    Path from Ella to Maxine: Ella -> Helen -> Eva -> Maxine
+    Path from Ella to Lena: Ella -> Ellen -> Anna -> Lena
+    Path from Ella to Hazel: Hazel
+    Path from Ella to Hilda: Hilda
+    Path from Ella to Frances: Ella -> Helen -> Eva -> Marion -> Frances
+    Path from Ella to Eva: Ella -> Helen -> Eva
+    Path from Ella to Ruth: Ruth
+    Path from Ella to Edna: Ella -> Ellen -> Edna
+    Path from Ella to Adele: Ella -> Ellen -> Edna -> Adele
+    Path from Ella to Jane: Ella -> Ellen -> Edna -> Mary -> Jane
+    Path from Ella to Anna: Ella -> Ellen -> Anna
+    Path from Ella to Mary: Ella -> Ellen -> Edna -> Mary
+    Path from Ella to Betty: Betty
+    Path from Ella to Ellen: Ella -> Ellen
+    Path from Ella to Laura: Laura
+    Path from Ella to Irene: Irene
+    Path from Ellen to Ada: Ada
+    Path from Ellen to Cora: Cora
+    Path from Ellen to Louise: Ellen -> Anna -> Lena -> Louise
+    Path from Ellen to Jean: Jean
+    Path from Ellen to Helen: Helen
+    Path from Ellen to Martha: Ellen -> Edna -> Adele -> Marion -> Martha
+    Path from Ellen to Alice: Alice
+    Path from Ellen to Robin: Robin
+    Path from Ellen to Marion: Ellen -> Edna -> Adele -> Marion
+    Path from Ellen to Maxine: Ellen -> Anna -> Maxine
+    Path from Ellen to Lena: Ellen -> Anna -> Lena
+    Path from Ellen to Hazel: Hazel
+    Path from Ellen to Hilda: Hilda
+    Path from Ellen to Frances: Ellen -> Edna -> Adele -> Frances
+    Path from Ellen to Eva: Ellen -> Anna -> Maxine -> Eva
+    Path from Ellen to Ruth: Ruth
+    Path from Ellen to Edna: Ellen -> Edna
+    Path from Ellen to Adele: Ellen -> Edna -> Adele
+    Path from Ellen to Jane: Ellen -> Edna -> Mary -> Jane
+    Path from Ellen to Anna: Ellen -> Anna
+    Path from Ellen to Mary: Ellen -> Edna -> Mary
+    Path from Ellen to Betty: Betty
+    Path from Ellen to Ella: Ella
+    Path from Ellen to Laura: Laura
+    Path from Ellen to Irene: Irene
+    Path from Laura to Ada: Ada
+    Path from Laura to Cora: Cora
+    Path from Laura to Louise: Laura -> Eva -> Marion -> Martha -> Anna -> Lena -> Louise
+    Path from Laura to Jean: Jean
+    Path from Laura to Helen: Helen
+    Path from Laura to Martha: Laura -> Eva -> Marion -> Martha
+    Path from Laura to Alice: Alice
+    Path from Laura to Robin: Robin
+    Path from Laura to Marion: Laura -> Eva -> Marion
+    Path from Laura to Maxine: Laura -> Eva -> Maxine
+    Path from Laura to Lena: Laura -> Eva -> Marion -> Martha -> Anna -> Lena
+    Path from Laura to Hazel: Hazel
+    Path from Laura to Hilda: Hilda
+    Path from Laura to Frances: Laura -> Eva -> Marion -> Frances
+    Path from Laura to Eva: Laura -> Eva
+    Path from Laura to Ruth: Ruth
+    Path from Laura to Edna: Laura -> Edna
+    Path from Laura to Adele: Laura -> Edna -> Adele
+    Path from Laura to Jane: Laura -> Edna -> Mary -> Jane
+    Path from Laura to Anna: Laura -> Eva -> Marion -> Martha -> Anna
+    Path from Laura to Mary: Laura -> Edna -> Mary
+    Path from Laura to Betty: Betty
+    Path from Laura to Ella: Ella
+    Path from Laura to Ellen: Ellen
+    Path from Laura to Irene: Irene
+    Path from Irene to Ada: Ada
+    Path from Irene to Cora: Cora
+    Path from Irene to Louise: Irene -> Ellen -> Anna -> Lena -> Louise
+    Path from Irene to Jean: Jean
+    Path from Irene to Helen: Helen
+    Path from Irene to Martha: Irene -> Ellen -> Edna -> Adele -> Marion -> Martha
+    Path from Irene to Alice: Alice
+    Path from Irene to Robin: Robin
+    Path from Irene to Marion: Irene -> Ellen -> Edna -> Adele -> Marion
+    Path from Irene to Maxine: Irene -> Ellen -> Anna -> Maxine
+    Path from Irene to Lena: Irene -> Ellen -> Anna -> Lena
+    Path from Irene to Hazel: Irene -> Hilda -> Hazel
+    Path from Irene to Hilda: Irene -> Hilda
+    Path from Irene to Frances: Irene -> Ellen -> Edna -> Adele -> Frances
+    Path from Irene to Eva: Irene -> Ellen -> Anna -> Maxine -> Eva
+    Path from Irene to Ruth: Ruth
+    Path from Irene to Edna: Irene -> Ellen -> Edna
+    Path from Irene to Adele: Irene -> Ellen -> Edna -> Adele
+    Path from Irene to Jane: Irene -> Ellen -> Edna -> Mary -> Jane
+    Path from Irene to Anna: Irene -> Ellen -> Anna
+    Path from Irene to Mary: Irene -> Ellen -> Edna -> Mary
+    Path from Irene to Betty: Irene -> Hilda -> Betty
+    Path from Irene to Ella: Ella
+    Path from Irene to Ellen: Irene -> Ellen
+    Path from Irene to Laura: Laura
+  Page rank:
+    Marion     .1466346200
+    Frances    .0774038400
+    Maxine     .0774038400
+    Eva        .0765384600
+    Adele      .0713461600
+    Mary       .0540384650
+    Martha     .0540384600
+    Edna       .0497115370
+    Anna       .0479807670
+    Lena       .0462500000
+    Jean       .0384615400
+    Betty      .0367307700
+    Hazel      .0367307700
+    Helen      .0324038500
+    Louise     .0306730800
+    Hilda      .0263461560
+    Jane       .0228846170
+    Robin      .0211538490
+    Cora       .0133653860
+    Ada        .0133653860
+    Ellen      .0073076943
+    Irene      .0038461548
+    Laura      .0038461548
+    Ella       .0038461548
+    Ruth       .0038461548
+    Alice      .0038461548
+  Hubs-authorities:
+    Hubs:
+      Frances    .0847589450
+      Laura      .0676516300
+      Martha     .0590979800
+      Maxine     .0583203730
+      Robin      .0575427670
+      Alice      .0528771400
+      Helen      .0520995330
+      Louise     .0505443250
+      Eva        .0505443250
+      Adele      .0505443250
+      Lena       .0497667200
+      Betty      .0451010880
+      Ellen      .0419906680
+      Hazel      .0388802480
+      Mary       .0334370140
+      Ruth       .0303265940
+      Irene      .0295489900
+      Edna       .0225505440
+      Jane       .0225505440
+      Ella       .0225505440
+      Marion     .0186625200
+      Anna       .0186625200
+      Jean       .0171073100
+      Ada        .0108864700
+      Cora       .0108864700
+      Hilda      .0031104200
+    Authorities:
+      Eva        .1627907000
+      Marion     .1540697700
+      Edna       .0901162800
+      Hilda      .0784883700
+      Anna       .0668604700
+      Adele      .0552325600
+      Helen      .0523255800
+      Martha     .0348837230
+      Maxine     .0348837230
+      Lena       .0348837230
+      Frances    .0348837230
+      Jane       .0348837230
+      Louise     .0319767450
+      Jean       .0319767450
+      Ellen      .0319767450
+      Mary       .0290697680
+      Robin      .0116279070
+      Ada        .0087209310
+      Cora       .0087209310
+      Hazel      .0058139535
+      Betty      .0058139535
+      Alice      .0000000000
+      Ruth       .0000000000
+      Ella       .0000000000
+      Laura      .0000000000
+      Irene      .0000000000
+  Minimal cut (removed edges):
+    Ada -> Louise
+    Hazel -> Anna
+    Ellen -> Anna
+    Anna -> Maxine
+    Ruth -> Jane
+    Laura -> Eva
+    Alice -> Eva
+    Louise -> Lena
+    Jane -> Adele
+    Eva -> Marion
+    Frances -> Marion
+    Maxine -> Eva
+    Martha -> Marion
+    Helen -> Eva
+    Adele -> Frances
+    Lena -> Marion
+    Jean -> Helen
+    Irene -> Ellen
+    Irene -> Hilda
+

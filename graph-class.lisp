@@ -3,17 +3,21 @@
 (declaim (optimize (speed 3) (space 2)))
 
 (defclass graph ()
-  ((nodes      :accessor nodes      :initarg :nodes      :initform (make-hash-table :test 'equal))
-   (ids        :accessor ids        :initarg :ids        :initform (make-hash-table))
-   (s-point    :accessor s-point    :initarg :s-point    :initform 0)
-   (last-id    :accessor last-id    :initarg :id         :initform -1)
-   (edges      :accessor edges      :initarg :edges      :initform 0)
-   (comparator :accessor comparator :initarg :comparator :initform 'equal)
-   (degree-table :accessor degree-table :initarg :degree-table :initform (make-hash-table))
-   (matrix     :accessor matrix     :initarg :matrix     :initform (make-array '(0 0)
-								     :adjustable t
-								     :element-type 'number
-								     :initial-element 0))))
+  ((nodes        :accessor nodes      :initarg :nodes
+                 :initform (make-hash-table :test 'equal))
+   (ids          :accessor ids        :initarg :ids
+                 :initform (make-hash-table))
+   (s-point      :accessor s-point    :initarg :s-point    :initform 0)
+   (last-id      :accessor last-id    :initarg :id         :initform -1)
+   (edges        :accessor edges      :initarg :edges      :initform 0)
+   (comparator   :accessor comparator :initarg :comparator :initform 'equal)
+   (degree-table :accessor degree-table :initarg :degree-table
+                 :initform (make-hash-table))
+   (matrix       :accessor matrix     :initarg :matrix
+                 :initform (make-array '(0 0)
+                                       :adjustable t
+                                       :element-type 'number
+                                       :initial-element 0))))
 
 (defgeneric graph? (thing)
   (:documentation "graph predicate")
@@ -21,8 +25,10 @@
   (:method (thing) nil))
 
 (defclass directed-graph (graph)
-  ((in-degree-table  :accessor in-degree-table  :initarg :in-degree-table  :initform (make-hash-table))
-   (out-degree-table :accessor out-degree-table :initarg :out-degree-table :initform (make-hash-table))))
+  ((in-degree-table  :accessor in-degree-table  :initarg :in-degree-table
+                     :initform (make-hash-table))
+   (out-degree-table :accessor out-degree-table :initarg :out-degree-table
+                     :initform (make-hash-table))))
 
 (defgeneric directed? (thing)
   (:documentation "directed graph predicate")
@@ -33,10 +39,11 @@
   "Print a graph"
   (print-unreadable-object (graph stream :type t)
     (format stream "~A (~A vertices & ~A edges)"
-	    (if (directed? graph) "directed" "undirected") 
+	    (if (directed? graph) "directed" "undirected")
 	    (hash-table-count (ids graph)) (edge-count graph))))
 
-(defun make-graph (&key directed? (node-comparator #'equal) (saturation-point 0))
+(defun make-graph (&key directed? (node-comparator #'equal)
+                   (saturation-point 0))
   "Create a new graph object"
   (make-instance (if directed? 'directed-graph 'graph)
 		 :comparator node-comparator
@@ -67,14 +74,19 @@
 
 (defmethod copy-graph ((graph graph))
   "Make a deep copy of a graph."
-  (let ((new-graph (make-instance (if (directed? graph) 'directed-graph 'graph)
-				  :matrix (make-array (list (array-dimension (matrix graph) 0)
-							    (array-dimension (matrix graph) 1)))
-				  :edges (edges graph)
-				  :id (last-id graph))))
-    (maphash #'(lambda (k v) (setf (gethash k (nodes new-graph)) v)) (nodes graph))
-    (maphash #'(lambda (k v) (setf (gethash k (ids new-graph)) v)) (ids graph))
-    (maphash #'(lambda (k v) (setf (gethash k (degree-table new-graph)) v)) (degree-table graph))
+  (let ((new-graph (make-instance
+                    (if (directed? graph) 'directed-graph 'graph)
+                    :matrix (make-array
+                             (list (array-dimension (matrix graph) 0)
+                                   (array-dimension (matrix graph) 1)))
+                    :edges (edges graph)
+                    :id (last-id graph))))
+    (maphash #'(lambda (k v) (setf (gethash k (nodes new-graph)) v))
+             (nodes graph))
+    (maphash #'(lambda (k v) (setf (gethash k (ids new-graph)) v))
+             (ids graph))
+    (maphash #'(lambda (k v) (setf (gethash k (degree-table new-graph)) v))
+             (degree-table graph))
     (loop for i from 0 to (1- (array-dimension (matrix graph) 0)) do
 	 (loop for j from 0 to (1- (array-dimension (matrix graph) 1)) do
 	      (setf (aref (matrix new-graph) i j) (aref (matrix graph) i j))))
@@ -85,19 +97,19 @@
 
 (defmethod adjust-adjacency-matrix ((graph graph))
   "Grow the adjacency-matrix of the graph to match the number of nodes."
-  (adjust-array (matrix graph) (list (1+ (last-id graph)) 
+  (adjust-array (matrix graph) (list (1+ (last-id graph))
 				     (1+ (last-id graph))))
-  #+allegro (loop for i from 0 to (1- (array-dimension (matrix graph) 0)) 
+  #+allegro (loop for i from 0 to (1- (array-dimension (matrix graph) 0))
 	       do
-	       (loop for j from 0 to (1- (array-dimension (matrix graph) 1)) 
+	       (loop for j from 0 to (1- (array-dimension (matrix graph) 1))
 		  do
 		  (when (null (aref (matrix graph) i j))
 		    (setf (aref (matrix graph) i j) 0)))))
 
 (defmethod add-node ((graph graph) value &key no-expand?)
-  "Add a node to the graph.  If no-expand? it true, do not grow the adjacency-matrix. It is
-recommended that when adding nodes in bulk, you use no-expand? and call adjust-adjacency-matrix
-after all nodes have been added."
+  "Add a node to the graph.  If no-expand? it true, do not grow the
+adjacency-matrix. It is recommended that when adding nodes in bulk, you use
+no-expand? and call adjust-adjacency-matrix after all nodes have been added."
   (or (gethash value (nodes graph))
       (let ((id (incf (last-id graph))))
 	(unless no-expand?
@@ -137,19 +149,21 @@ after all nodes have been added."
 
 (defmethod list-nodes ((graph graph))
   "List all node values."
-  (map-nodes #'(lambda (name id) (declare (ignore id)) name) graph :collect? t))
+  (map-nodes #'(lambda (name id) (declare (ignore id)) name)
+             graph :collect? t))
 
 (defmethod node-ids ((graph graph))
   "List al lnode ids."
-  (map-nodes #'(lambda (name id) (declare (ignore name)) id) graph :collect? t))
+  (map-nodes #'(lambda (name id) (declare (ignore name)) id)
+             graph :collect? t))
 
 (defmethod node-count ((graph graph))
   "Return the node count."
   (hash-table-count (nodes graph)))
 
 (defmethod neighbors ((graph graph) (node integer) &key (return-ids? t))
-  "Return a list of ids for this node's neighbors. Returns inbound and outbound 
-neighbors for a directed graph."
+  "Return a list of ids for this node's neighbors. Returns inbound and
+outbound neighbors for a directed graph."
   (let ((neighbors nil))
     (loop for i from 0 to (1- (array-dimension (matrix graph) 1)) do
 	 (when (> (aref (matrix graph) node i) 0)
@@ -166,10 +180,14 @@ neighbors for a directed graph."
   "Return a list of ids for this node's neighbors."
   (neighbors graph (gethash node (nodes graph)) :return-ids? return-ids?))
 
-(defmethod inbound-neighbors ((graph directed-graph) node &key (return-ids? t))
-  (inbound-neighbors graph (gethash node (nodes graph)) :return-ids? return-ids?))
+(defmethod inbound-neighbors ((graph directed-graph) node &key
+                              (return-ids? t))
+  (inbound-neighbors graph
+                     (gethash node (nodes graph))
+                     :return-ids? return-ids?))
 
-(defmethod inbound-neighbors ((graph directed-graph) (node integer) &key (return-ids? t))
+(defmethod inbound-neighbors ((graph directed-graph) (node integer) &key
+                              (return-ids? t))
   (let ((neighbors nil))
     (loop for i from 0 to (1- (array-dimension (matrix graph) 1)) do
 	 (when (> (aref (matrix graph) i node) 0)
@@ -178,10 +196,14 @@ neighbors for a directed graph."
 	(nreverse neighbors)
 	(mapcar #'lookup-node (nreverse neighbors)))))
 
-(defmethod outbound-neighbors ((graph directed-graph) node &key (return-ids? t))
-  (outbound-neighbors graph (gethash node (nodes graph)) :return-ids? return-ids?))
+(defmethod outbound-neighbors ((graph directed-graph) node &key
+                               (return-ids? t))
+  (outbound-neighbors graph
+                      (gethash node (nodes graph))
+                      :return-ids? return-ids?))
 
-(defmethod outbound-neighbors ((graph directed-graph) (node integer) &key (return-ids? t))
+(defmethod outbound-neighbors ((graph directed-graph) (node integer) &key
+                               (return-ids? t))
   (let ((neighbors nil))
     (loop for i from 0 to (1- (array-dimension (matrix graph) 0)) do
 	 (when (> (aref (matrix graph) node i) 0)
@@ -211,9 +233,11 @@ neighbors for a directed graph."
 
 (defmethod add-edge ((graph graph) n1 n2 &key (weight 1))
   "Add an edge between n1 and n2."
-  (add-edge graph (gethash n1 (nodes graph)) (gethash n2 (nodes graph)) :weight weight))
+  (add-edge graph (gethash n1 (nodes graph)) (gethash n2 (nodes graph))
+            :weight weight))
 
-(defmethod add-edge ((graph directed-graph) (n1 integer) (n2 integer) &key (weight 1))
+(defmethod add-edge ((graph directed-graph) (n1 integer) (n2 integer) &key
+                     (weight 1))
   (unless (= n1 n2)
     (unless (> (aref (matrix graph) n1 n2) 0)
       (incf (gethash n1 (out-degree-table graph)))
@@ -224,7 +248,8 @@ neighbors for a directed graph."
 
 (defmethod add-edge ((graph directed-graph) n1 n2 &key (weight 1))
   "Add an edge between n1 and n2."
-  (add-edge graph (gethash n1 (nodes graph)) (gethash n2 (nodes graph)) :weight weight))
+  (add-edge graph (gethash n1 (nodes graph)) (gethash n2 (nodes graph))
+            :weight weight))
 
 (defmethod delete-edge ((graph graph) (n1 integer) (n2 integer))
   "Remove an edge from the graph."
@@ -252,7 +277,10 @@ neighbors for a directed graph."
   "Apply a function to all edges."
   (let ((r nil))
     (loop for i from 0 to (1- (array-dimension (matrix graph) 0)) do
-	 (loop for j from (if (directed? graph) 0 i) to (1- (array-dimension (matrix graph) 1)) do
+	 (loop
+            for j
+            from (if (directed? graph) 0 i)
+            to (1- (array-dimension (matrix graph) 1)) do
 	      (when (> (aref (matrix graph) i j) 0)
 		(if collect?
 		    (push (funcall fn i j) r)
@@ -270,6 +298,29 @@ neighbors for a directed graph."
 
 (defmethod edge-weight ((graph graph) n1 n2)
   (edge-weight graph (gethash n1 (nodes graph)) (gethash n2 (nodes graph))))
+
+(defmethod incf-edge-weight ((graph graph) (n1 integer) (n2 integer)
+                             &optional (delta 1))
+  (incf (aref (matrix graph) n1 n2) delta))
+
+(defmethod incf-edge-weight ((graph graph) n1 n2 &optional delta)
+  (incf-edge-weight graph
+                    (gethash n1 (nodes graph))
+                    (gethash n2 (nodes graph))
+                    delta))
+
+(defmethod decf-edge-weight ((graph graph) (n1 integer) (n2 integer)
+                             &optional (delta 1))
+  (decf (aref (matrix graph) n1 n2) delta))
+
+(defmethod decf-edge-weight ((graph graph) n1 n2 &optional delta)
+  (decf-edge-weight graph
+                    (gethash n1 (nodes graph))
+                    (gethash n2 (nodes graph))
+                    delta))
+
+(defmethod capacity ((graph graph) n1 n2)
+  (edge-weight graph n1 n2))
 
 (defmethod edge-count ((graph graph))
   "How many edges does the graph have?"
@@ -301,7 +352,8 @@ neighbors for a directed graph."
   "Calculate the degree of a node."
   (if (undirected? graph)
       (gethash node (degree-table graph))
-      (error "Cannot calculate the degree in a directed graph.  Use in-degree or out-degree instead.")))
+      (error "Cannot calculate the degree in a directed graph.  ~
+              Use in-degree or out-degree instead.")))
 
 (defmethod leaf? ((graph graph) (id integer))
   (= (out-degree graph id) 0))

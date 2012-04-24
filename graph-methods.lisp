@@ -5,7 +5,7 @@
 (defmethod density ((graph graph))
   "Calculate the graph's density."
   (coerce
-   (/ (edge-count graph) 
+   (/ (edge-count graph)
       (/ (* (node-count graph) (- (node-count graph) 1)) 2))
    'float))
 
@@ -35,13 +35,16 @@
       (error "Cannot calculate out-degree on an undirected graph")))
 
 (defmethod degree-distribution ((graph graph))
-  "Generate the degree distribution for the graph. For a directed graph, returns the out-degree 
-distribution."
+  "Generate the degree distribution for the graph. For a directed graph,
+returns the out-degree distribution."
   (let ((dist nil))
     (maphash #'(lambda (node id)
 		 (declare (ignore node))
 		 (let ((degree 0))
-		   (loop for i from 0 to (1- (array-dimension (matrix graph) 0)) do
+		   (loop
+                      for i
+                      from 0
+                      to (1- (array-dimension (matrix graph) 0)) do
 			(when (not (zerop (aref (matrix graph) id i)))
 			  (incf degree)))
 		   (if (assoc degree dist)
@@ -51,15 +54,18 @@ distribution."
     (sort dist #'< :key 'car)))
 
 (defmethod in-degree-distribution ((graph graph))
-  "Generate the degree distribution for the graph. For a directed graph, returns the out-degree 
-distribution."
+  "Generate the degree distribution for the graph. For a directed graph,
+returns the out-degree distribution."
   (unless (directed? graph)
     (error "Cannot compute in-degree-distribution on an undirected graph"))
   (let ((dist nil))
     (maphash #'(lambda (node id)
 		 (declare (ignore node))
 		 (let ((degree 0))
-		   (loop for i from 0 to (1- (array-dimension (matrix graph) 1)) do
+		   (loop
+                      for i
+                      from 0
+                      to (1- (array-dimension (matrix graph) 1)) do
 			(when (not (zerop (aref (matrix graph) i id)))
 			  (incf degree)))
 		   (if (assoc degree dist)
@@ -69,8 +75,8 @@ distribution."
     (sort dist #'< :key 'car)))
 
 (defun reconstruct-path (prev end)
-  "Helper function for find-shortest-path;  walks the shortest path and returns it
-as a list of edges as pairs of nodes."
+  "Helper function for find-shortest-path;  walks the shortest path and
+returns it as a list of edges as pairs of nodes."
   (when (cdr (assoc end prev))
     (cons (list (cdr (assoc end prev)) end)
 	  (reconstruct-path prev (cdr (assoc end prev))))))
@@ -78,7 +84,8 @@ as a list of edges as pairs of nodes."
 (defmethod find-shortest-path ((graph graph) (n1 integer) (n2 integer))
   "Dijkstra's algorithm for finding the shortest path between two nodes."
   (let ((nodes (node-ids graph)))
-    (let ((distances (mapcar #'(lambda (n) (cons n most-positive-fixnum)) nodes))
+    (let ((distances (mapcar
+                      #'(lambda (n) (cons n most-positive-fixnum)) nodes))
 	  (previous (mapcar #'(lambda (n) (cons n nil)) nodes)))
       (setf (cdr (assoc n1 distances)) 0)
       (loop until (null nodes) do
@@ -89,7 +96,7 @@ as a list of edges as pairs of nodes."
 	     (when (= (cdr next) most-positive-fixnum)
 	       (return nil))
 	     (when (= (car next) n2)
-	       (return-from find-shortest-path 
+	       (return-from find-shortest-path
 		 (nreverse (reconstruct-path previous n2))))
 	     (setq nodes (remove (car next) nodes))
 	     (dolist (neighbor (if (directed? graph)
@@ -101,8 +108,8 @@ as a list of edges as pairs of nodes."
 			 (cdr (assoc neighbor previous)) (car next))))))))))
 
 (defmethod find-shortest-path ((graph graph) n1 n2)
-  (find-shortest-path graph 
-		      (gethash n1 (nodes graph)) 
+  (find-shortest-path graph
+		      (gethash n1 (nodes graph))
 		      (gethash n2 (nodes graph))))
 
 (defmethod distance-map ((graph graph) (id integer) &key expand-ids?)
@@ -146,8 +153,8 @@ as a list of edges as pairs of nodes."
 (defmethod calculate-shortest-paths ((graph graph))
   (let ((paths nil))
     (loop for i from 0 to (1- (array-dimension (matrix graph) 0)) do
-	 (loop for j from (if (directed? graph) 0 i) to 
-	      (1- (array-dimension (matrix graph) 1)) 
+	 (loop for j from (if (directed? graph) 0 i) to
+	      (1- (array-dimension (matrix graph) 1))
 	    do
 	      (unless (= i j)
 		(push (list i j (find-shortest-path graph i j)) paths))))
@@ -156,19 +163,20 @@ as a list of edges as pairs of nodes."
 
 (defmethod cluster ((graph graph) (method (eql :edge-betweenness))
 		    &key (edge-removal-count 0))
-  "The clustering algorithm here is based on a metric called 'edge betweenness'. It counts how many
-shortest paths in the network include a given edge. An edge with high betweenness is one that is
-likely to separate dense areas of the graph."
+  "The clustering algorithm here is based on a metric called 'edge
+betweenness'. It counts how many shortest paths in the network include a
+given edge. An edge with high betweenness is one that islikely to separate
+dense areas of the graph."
   (let* ((shortest-paths (calculate-shortest-paths graph))
 	 (between-table (sort
-			 (map-edges 
+			 (map-edges
 			  #'(lambda (i j)
 			      (let ((coord (list i j)))
 				(list coord
-				      (reduce #'+ (mapcar 
-						   #'(lambda (p) 
+				      (reduce #'+ (mapcar
+						   #'(lambda (p)
 						       (count coord
-							      (rest (third p)) 
+							      (rest (third p))
 							      :test 'equal))
 						   shortest-paths)))))
 			  graph :collect? t)
@@ -198,11 +206,12 @@ likely to separate dense areas of the graph."
 	(sort span-map #'> :key #'second)
 	span-map)))
 
-(defmethod cluster ((graph graph) (method (eql :edge-span)) 
+(defmethod cluster ((graph graph) (method (eql :edge-span))
 		    &key (edge-removal-count 0))
-  "Recall that the span of an edge is the distance between the two endpoints of the edge
-after the edge is removed. An edge with high span is one that links vertices that would otherwise
-be far apart. This method scores the edges and clusters based on span."
+  "Recall that the span of an edge is the distance between the two endpoints
+of the edge after the edge is removed. An edge with high span is one that
+links vertices that would otherwise be far apart. This method scores the
+edges and clusters based on span."
   (let ((span-map (score-edges graph :sort? t)) (removed-edges nil))
     (dotimes (i edge-removal-count)
       (let ((edge (pop span-map)))
@@ -222,8 +231,8 @@ be far apart. This method scores the edges and clusters based on span."
 			  (>= (length (find-components g)) 2))
 		      g)
 		     (t
-		      (push (first (cluster graph :edge-span 
-						  :edge-removal-count 1)) 
+		      (push (first (cluster graph :edge-span
+						  :edge-removal-count 1))
 			    removed-edges)
 		      (cut graph)))))
       (cut graph))
@@ -233,44 +242,50 @@ be far apart. This method scores the edges and clusters based on span."
   (let ((g (copy-graph graph)))
     (values (minimal-cut! g) g)))
 
-(defmethod compute-page-rank ((graph graph) &key (k 2) (scaling-factor 1) initial-values)
-  (assert (and (numberp scaling-factor) (>= scaling-factor 0) (<= scaling-factor 1)))
+(defmethod compute-page-rank ((graph graph) &key (k 2) (scaling-factor 1)
+                              initial-values)
+  (assert (and (numberp scaling-factor)
+               (>= scaling-factor 0)
+               (<= scaling-factor 1)))
   (assert (directed? graph))
   (assert (> k 0))
   (let* ((node-count (node-count graph))
-	 (page-rank (or (and (arrayp initial-values) 
-			     (= (length initial-values) (node-count graph)) 
+	 (page-rank (or (and (arrayp initial-values)
+			     (= (length initial-values) (node-count graph))
 			     initial-values)
-			(make-array node-count :element-type 'number :initial-element (/ 1 node-count)))))
+			(make-array node-count
+                                    :element-type 'number
+                                    :initial-element (/ 1 node-count)))))
     (dotimes (step k)
       ;;(format t "page-rank is ~A~%" page-rank)
-      (let ((rank-received (make-array node-count :element-type 'number :initial-element 0)))
+      (let ((rank-received (make-array node-count :element-type 'number
+                                       :initial-element 0)))
 	(dotimes (source node-count)
 	  (let* ((out-links (outbound-neighbors graph source))
 		 (count (length out-links)))
-	    ;;(format t "~A (~A) has ~A outbound links~%" source (lookup-node graph source) count)
 	    (if (= count 0)
-		(setf (aref rank-received source) 
+		(setf (aref rank-received source)
 		      (+ (aref page-rank source) (aref rank-received source)))
 		(dolist (node out-links)
-		  ;;(format t "Adding ~A to page-rank of ~A (~A)~%" 
-			  ;;(/ (aref page-rank source) count) node (lookup-node graph node))
 		  (setf (aref rank-received node)
 			(+ (aref rank-received node)
 			   (/ (aref page-rank source) count)))))))
 	(when (< scaling-factor 1)
 	  (dotimes (i node-count)
-	    (setf (aref rank-received i) (* (aref rank-received i) scaling-factor)))
+	    (setf (aref rank-received i)
+                  (* (aref rank-received i) scaling-factor)))
 	  (let ((pr (/ (- 1 scaling-factor) node-count)))
 	    (dotimes (i node-count)
 	      (setf (aref rank-received i) (+ (aref rank-received i) pr)))))
 	(setq page-rank rank-received)))
     page-rank))
 
-(defmethod compute-page-rank-distribution ((graph graph) &key page-rank (bin-count 2) (k 2) 
-					   (scaling-factor 1))
+(defmethod compute-page-rank-distribution ((graph graph) &key page-rank
+                                           (bin-count 2) (k 2)
+                                           (scaling-factor 1))
   (unless (arrayp page-rank)
-    (setq page-rank (compute-page-rank graph :k k :scaling-factor scaling-factor)))
+    (setq page-rank
+          (compute-page-rank graph :k k :scaling-factor scaling-factor)))
   (let ((min most-positive-fixnum) (max 0))
     (map-nodes #'(lambda (name id)
 		   (declare (ignore name))
@@ -282,9 +297,12 @@ be far apart. This method scores the edges and clusters based on span."
 	       graph)
     (if (= 0 max)
 	(error "Got 0 for max pagerank value.  Cannot compute distribution.")
-	(let ((bin-size (/ (- max min) bin-count)) (bins nil) (bin-map (make-hash-table)))
+	(let ((bin-size (/ (- max min) bin-count))
+              (bins nil)
+              (bin-map (make-hash-table)))
 	  (dotimes (i bin-count)
-	    (push (list (+ min (* i bin-size)) (+ min (* (1+ i) bin-size)) 0) bins))
+	    (push (list (+ min (* i bin-size)) (+ min (* (1+ i) bin-size)) 0)
+                  bins))
 	  (map-nodes #'(lambda (name id)
 			 (declare (ignore name))
 			 (let ((rank (aref page-rank id)))
@@ -294,7 +312,8 @@ be far apart. This method scores the edges and clusters based on span."
 			       (setf (gethash id bin-map) (second triple))
 			       (incf (third triple))))))
 		     graph)
-	  (values (mapcar #'(lambda (triple) (list (second triple) (third triple)))
+	  (values (mapcar #'(lambda (triple)
+                              (list (second triple) (third triple)))
 			  (sort bins #'> :key 'first))
 		  bin-map)))))
 
@@ -302,40 +321,39 @@ be far apart. This method scores the edges and clusters based on span."
   "Return (values hubs authorities) for all nods in the graph."
   (let ((hub-values (map-nodes #'(lambda (name id)
 				   (declare (ignore id))
-				   (cons name 1)) 
+				   (cons name 1))
 			       graph :collect? t))
-	(auth-values (map-nodes #'(lambda (name id) 
+	(auth-values (map-nodes #'(lambda (name id)
 				    (declare (ignore id))
-				    (cons name 1)) 
+				    (cons name 1))
 				graph :collect? t)))
     (dotimes (i k)
-      (map-nodes #'(lambda (name id)
-		     (let ((inbound-neighbors (inbound-neighbors graph id)))
-		       ;;(format t "~A inbound:  ~A~%" name inbound-neighbors)
-		       (setf (cdr (assoc name auth-values :test 'equal))
-			     (reduce #'+ 
-				     (mapcar #'(lambda (n)
-						 (cdr (assoc (lookup-node graph n)
-							     hub-values 
-							     :test 'equal)))
-					     inbound-neighbors)))))
-		 graph)
-      (map-nodes #'(lambda (name id)
-		     (let ((outbound-neighbors (outbound-neighbors graph id)))
-		       ;;(format t "~A outbound:  ~A~%" name outbound-neighbors)
-		       (setf (cdr (assoc name hub-values :test 'equal))
-			     (reduce #'+ 
-				     (mapcar #'(lambda (n)
-						 (cdr (assoc (lookup-node graph n)
-							     auth-values 
-							     :test 'equal)))
-					     outbound-neighbors)))))
-		 graph))
+      (map-nodes
+       #'(lambda (name id)
+           (let ((inbound-neighbors (inbound-neighbors graph id)))
+             (setf (cdr (assoc name auth-values :test 'equal))
+                   (reduce #'+
+                           (mapcar #'(lambda (n)
+                                       (cdr (assoc (lookup-node graph n)
+                                                   hub-values
+                                                   :test 'equal)))
+                                   inbound-neighbors)))))
+       graph)
+      (map-nodes
+       #'(lambda (name id)
+           (let ((outbound-neighbors (outbound-neighbors graph id)))
+             (setf (cdr (assoc name hub-values :test 'equal))
+                   (reduce #'+
+                           (mapcar #'(lambda (n)
+                                       (cdr (assoc (lookup-node graph n)
+                                                   auth-values
+                                                   :test 'equal)))
+                                   outbound-neighbors)))))
+       graph))
     (multiple-value-bind (h a)
 	(if normalize?
 	    (let ((hub-sum (reduce #'+ hub-values :key #'cdr))
 		  (auth-sum (reduce #'+ auth-values :key #'cdr)))
-	      ;;(format t "hub-sum: ~A, auth-sum: ~A~%" hub-sum auth-sum)
 	      (values (mapcar #'(lambda (pair)
 				  (cons (car pair)
 					(/ (cdr pair) hub-sum)))
@@ -361,9 +379,76 @@ be far apart. This method scores the edges and clusters based on span."
     (let ((sorted-max-paths (sort max-paths #'< :key #'cdr)))
       (mapcar #'car
 	      (remove-if-not #'(lambda (n)
-				 (= (cdr n) 
+				 (= (cdr n)
 				    (cdr (first sorted-max-paths))))
 			     sorted-max-paths)))))
 
+(defmethod push-flow ((graph graph) path)
+  (let ((min-cap (apply #'min (mapcar
+                               #'(lambda (e)
+                                   (capacity graph (nth 0 e) (nth 1 e)))
+                               path))))
+    (dolist (edge path)
+      (destructuring-bind (n1 n2) edge
+        (decf-edge-weight graph n1 n2 min-cap)
+        (incf-edge-weight graph n2 n1 min-cap)))
+    min-cap))
 
+(defmethod compute-layered-network ((graph graph) n1)
+  "Build the layered network of graph using tweaked BFS."
+  (let* ((nodes nil) (edges nil)
+         (distances (make-hash-table))
+         (queue (make-empty-queue)))
+    ;; Stage 1
+    (dolist (node (node-ids graph))
+      (setf (gethash node distances) most-positive-fixnum))
+    (setf (gethash n1 distances) 0)
+    (enqueue queue n1)
+    (loop until (empty-queue? queue) do
+         (let ((v (dequeue queue)))
+           (dolist (w (outbound-neighbors graph v))
+             (cond ((= most-positive-fixnum (gethash w distances))
+                    (enqueue queue w)
+                    (setf (gethash w distances) (1+ (gethash v distances)))
+                    (pushnew w nodes)
+                    (pushnew (list v w) edges :test 'equalp))
+                   ((= (gethash w distances) (1+ (gethash v distances)))
+                    (pushnew (list v w) edges :test 'equalp))))))
+    ;; Stage 2
+    ))
 
+(defmethod find-maximum-flow ((graph directed-graph) (source integer)
+                              (sink integer)
+                              (algorithm (eql :dinic)))
+  "This implements Dinic's algorithm."
+  (let ((flow 0) (gf (copy-graph graph)))
+    ;; Well, not yet.
+    (compute-layered-network gf source)))
+
+    (return-from find-maximum-flow flow)))
+
+(defmethod find-maximum-flow ((graph directed-graph) (source integer)
+                              (sink integer)
+                              (algorithm (eql :ford-fulkerson)))
+  "This implements the basic Ford-Fulkerson algorithm."
+  (let ((flow 0) (gf (copy-graph graph)))
+    (loop
+       (format t "~A~%~%" (matrix gf))
+       (let ((path (find-shortest-path gf source sink)))
+         (format t "PATH: ~A~%WEIGHTS: ~A~%"
+                 path (mapcar #'(lambda (e) (capacity gf (nth 0 e) (nth 1 e)))
+                              path))
+         (if path
+             (incf flow (push-flow gf path))
+             (return-from find-maximum-flow flow))))))
+
+(defmethod compute-maximum-flow ((graph directed-graph) (source integer)
+                                 (sink integer) &optional algorithm)
+  (find-maximum-flow graph source sink (or algorithm :ford-fulkerson)))
+
+(defmethod compute-maximum-flow ((graph directed-graph) source sink
+                                 &optional algorithm)
+  (find-maximum-flow graph
+                     (gethash source (nodes graph))
+                     (gethash sink (nodes graph))
+                     (or algorithm :ford-fulkerson)))

@@ -81,14 +81,15 @@
       edge)))
 
 (defun build-graph (gml-tree)
-  (let ((graph nil) (directed? nil) (nodes nil) (edges nil) 
+  (let ((graph nil) (directed? nil) (nodes nil) (edges nil)
 	(id-table (make-hash-table :test 'equal)))
     (labels ((walk-tree (tree)
 	       (cond ((null tree) nil)
 		     ((atom tree) nil)
 		     ((consp tree)
 		      (let ((this (first tree)))
-			(cond ((and (equal (first this) "directed") (equal (second this) "1"))
+			(cond ((and (equal (first this) "directed")
+                                    (equal (second this) "1"))
 			       (setq directed? t))
 			      ((equal (first this) "node")
 			       (push (build-node this) nodes))
@@ -114,9 +115,12 @@
       (do ((input (read-line in nil :eof) (read-line in nil :eof)))
 	  ((or (eql input :eof) (equal input "")))
 	(setq tokens (nconc tokens (lex-gml 'scan-gml input)))))
-    (let ((tree (parse-with-lexer (lambda () (values-list (pop tokens))) *gml-parser*)))
+    (let ((tree (parse-with-lexer
+                 (lambda () (values-list (pop tokens))) *gml-parser*)))
       (dolist (branch tree)
-	(when (and (consp branch) (consp (first branch)) (equal "graph" (first (first branch))))
+	(when (and (consp branch)
+                   (consp (first branch))
+                   (equal "graph" (first (first branch))))
 	  (setq graph (build-graph (second (second (first branch))))))))
     graph))
 
@@ -127,7 +131,7 @@
       (add-node graph i :no-expand? t)))
   (format t "Done checking nodes~%")
   (adjust-adjacency-matrix graph))
-    
+
 (defun parse-pajek (file)
   "Parse a .net file and make a graph out of it."
   (let ((graph nil)
@@ -139,9 +143,10 @@
           ((eql line :eof))
         (setq line (regex-replace "^\\s+" line ""))
         (cond ((scan "^\%" line) nil)
-	      ((scan "^\*[Vv]ertices" line) 
+	      ((scan "^\*[Vv]ertices" line)
 	       (format t "Doing vertices~%")
-	       (do-register-groups (count) ("^\*[Vv]ertices\\s+([0-9]+)\\s*" line)
+	       (do-register-groups (count)
+                   ("^\*[Vv]ertices\\s+([0-9]+)\\s*" line)
 		 (when count
 		   (setq vertex-count (parse-integer count))))
 	       (setq vertices? t arcs? nil))
@@ -159,15 +164,19 @@
                (setq arcs? t vertices? nil))
               (vertices?
 	       (do-register-groups (id value rest)
-		   ("^([0-9]+)\\s+(\"(?:[^\"]|\"\")*\"|\\w+)\\s+(.*)$" line nil :start 0 :sharedp t)
+		   ("^([0-9]+)\\s+(\"(?:[^\"]|\"\")*\"|\\w+)\\s+(.*)$"
+                    line nil :start 0 :sharedp t)
                  (declare (ignore rest))
                  (setq value (regex-replace-all "\"" value ""))
                  (setf (gethash id index) value)
                  (push value vertex-queue)))
               (arcs?
-               (destructuring-bind (source destination &optional value) (split "\\s+" line)
-		 (add-edge graph 
+               (destructuring-bind (source destination &optional value)
+                   (split "\\s+" line)
+		 (add-edge graph
 			   (or (gethash source index) source)
 			   (or (gethash destination index) destination)
-			   :weight (if (scan "^[0-9\.]+$" value) (parse-number:parse-number value) 1)))))))
+			   :weight (if (scan "^[0-9\.]+$" value)
+                                       (parse-number:parse-number value)
+                                       1)))))))
     graph))

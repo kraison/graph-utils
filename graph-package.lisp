@@ -43,6 +43,7 @@
 	   #:cluster
 	   #:minimal-cut
 	   #:minimal-cut!
+           #:compute-maximum-flow
 	   #:visualize
 	   #:generate-random-graph
 	   #:compute-page-rank-distribution
