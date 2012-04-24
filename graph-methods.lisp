@@ -423,8 +423,7 @@ edges and clusters based on span."
   "This implements Dinic's algorithm."
   (let ((flow 0) (gf (copy-graph graph)))
     ;; Well, not yet.
-    (compute-layered-network gf source)))
-
+    (compute-layered-network gf source)
     (return-from find-maximum-flow flow)))
 
 (defmethod find-maximum-flow ((graph directed-graph) (source integer)
