@@ -287,10 +287,12 @@ outbound neighbors for a directed graph."
 		    (funcall fn i j)))))
     (nreverse (if remove-nulls? (remove-if #'null r) r))))
 
-(defmethod list-edges ((graph graph))
+(defmethod list-edges ((graph graph) &key nodes-as-ids)
   "Return all edges as pairs of nodes."
   (map-edges #'(lambda (n1 n2)
-		 `(,(gethash n1 (ids graph)) ,(gethash n2 (ids graph))))
+                 (if nodes-as-ids
+                     (list n1 n2)
+                     `(,(gethash n1 (ids graph)) ,(gethash n2 (ids graph)))))
 	     graph :collect? t :remove-nulls? t))
 
 (defmethod edge-weight ((graph graph) (n1 integer) (n2 integer))
@@ -322,6 +324,14 @@ outbound neighbors for a directed graph."
 (defmethod capacity ((graph graph) n1 n2)
   (edge-weight graph n1 n2))
 
+(defmethod minimum-capacity ((graph graph) edges)
+  (let ((min most-positive-fixnum) (min-list nil))
+    (dolist (edge edges)
+      (when (< (apply #'edge-weight graph edge) min)
+        (setq min (apply #'edge-weight graph edge))
+        (push edge min-list)))
+    (values min min-list)))
+
 (defmethod edge-count ((graph graph))
   "How many edges does the graph have?"
   (edges graph))
@@ -344,6 +354,13 @@ outbound neighbors for a directed graph."
   (apply #'delete-edge (cons graph e2))
   (add-edge graph (first e1) (first e2))
   (add-edge graph (second e1) (second e2)))
+
+(defmethod reverse-all-edges ((graph graph))
+  (dolist (edge (list-edges graph :nodes-as-ids t))
+    (let ((weight (edge-weight graph (first edge) (second edge))))
+      (delete-edge graph (first edge) (second edge))
+      (add-edge graph (second edge) (first edge) :weight weight)))
+  graph)
 
 (defmethod degree ((graph graph) node)
   (degree graph (gethash node (nodes graph))))

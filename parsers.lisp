@@ -125,11 +125,11 @@
     graph))
 
 (defun check-nodes (graph vertex-count)
-  (format t "Checking nodes~%")
+  ;;(format t "Checking nodes~%")
   (unless (= vertex-count (node-count graph))
     (dotimes (i vertex-count)
       (add-node graph i :no-expand? t)))
-  (format t "Done checking nodes~%")
+  ;;(format t "Done checking nodes~%")
   (adjust-adjacency-matrix graph))
 
 (defun parse-pajek (file)
@@ -144,7 +144,7 @@
         (setq line (regex-replace "^\\s+" line ""))
         (cond ((scan "^\%" line) nil)
 	      ((scan "^\*[Vv]ertices" line)
-	       (format t "Doing vertices~%")
+	       ;;(format t "Doing vertices~%")
 	       (do-register-groups (count)
                    ("^\*[Vv]ertices\\s+([0-9]+)\\s*" line)
 		 (when count

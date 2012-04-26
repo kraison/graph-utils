@@ -20,6 +20,7 @@
                (:file "node" :depends-on ("graph-package"))
 	       (:file "graph-class" :depends-on ("node"))
 	       (:file "graph-methods" :depends-on ("queue" "graph-class"))
+               (:file "maximum-flow" :depends-on ("graph-methods"))
 	       (:file "graph-generation" :depends-on ("graph-methods"))
 	       (:file "graph-visualization" :depends-on ("graph-methods"))
 	       (:file "parsers" :depends-on ("graph-methods"))))
