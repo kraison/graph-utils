@@ -13,6 +13,8 @@
    (comparator   :accessor comparator :initarg :comparator :initform 'equal)
    (degree-table :accessor degree-table :initarg :degree-table
                  :initform (make-hash-table))
+;   (edge-index   :accessor edge-index :initarg :edge-index
+;                 :initform (make-edge-index))
    (matrix       :accessor matrix     :initarg :matrix
                  :initform (make-array '(0 0)
                                        :adjustable t
@@ -70,6 +72,7 @@
 			(unless (funcall (comparator g1) v1 v2)
 			  (return-from graph-equal nil))))
 		  (ids g1))
+         ;; FIXME: compare edge-index
 	 (equalp (matrix g1) (matrix g2)))))
 
 (defmethod copy-graph ((graph graph))
@@ -85,8 +88,16 @@
              (nodes graph))
     (maphash #'(lambda (k v) (setf (gethash k (ids new-graph)) v))
              (ids graph))
+    (when (directed? graph)
+      (maphash #'(lambda (k v)
+                   (setf (gethash k (in-degree-table new-graph)) v))
+               (in-degree-table graph))
+      (maphash #'(lambda (k v)
+                   (setf (gethash k (out-degree-table new-graph)) v))
+               (out-degree-table graph)))
     (maphash #'(lambda (k v) (setf (gethash k (degree-table new-graph)) v))
              (degree-table graph))
+    ;; FIXME: copy edge-index instead
     (loop for i from 0 to (1- (array-dimension (matrix graph) 0)) do
 	 (loop for j from 0 to (1- (array-dimension (matrix graph) 1)) do
 	      (setf (aref (matrix new-graph) i j) (aref (matrix graph) i j))))
@@ -264,8 +275,13 @@ outbound neighbors for a directed graph."
 (defmethod delete-edge ((graph directed-graph) (n1 integer) (n2 integer))
   "Remove an edge from the graph."
   (unless (= n1 n2)
+    (dbg "Deleting edge (~A,~A)" n1 n2)
     (when (> (aref (matrix graph) n1 n2) 0)
+      (dbg "Decrementing out-degree table entry for ~A (was ~A)"
+           n1 (gethash n1 (out-degree-table graph)))
       (decf (gethash n1 (out-degree-table graph)))
+      (dbg "Decrementing in-degree table entry for ~A (was ~A)"
+           n2 (gethash n2 (in-degree-table graph)))
       (decf (gethash n2 (in-degree-table graph)))
       (decf (edges graph))
       (setf (aref (matrix graph) n1 n2) 0))))
@@ -322,7 +338,16 @@ outbound neighbors for a directed graph."
                     delta))
 
 (defmethod capacity ((graph graph) n1 n2)
-  (edge-weight graph n1 n2))
+  (or (edge-weight graph n1 n2) 0))
+
+(defmethod node-capacity ((graph graph) node)
+  (min
+   (apply #'+ (mapcar #'(lambda (n2)
+                          (capacity graph node n2))
+                      (outbound-neighbors graph node)))
+   (apply #'+ (mapcar #'(lambda (n2)
+                          (capacity graph n2 node))
+                      (inbound-neighbors graph node)))))
 
 (defmethod minimum-capacity ((graph graph) edges)
   (let ((min most-positive-fixnum) (min-list nil))

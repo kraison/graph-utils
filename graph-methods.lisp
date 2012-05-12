@@ -257,7 +257,7 @@ edges and clusters based on span."
                                     :element-type 'number
                                     :initial-element (/ 1 node-count)))))
     (dotimes (step k)
-      ;;(format t "page-rank is ~A~%" page-rank)
+      (dbg "page-rank is ~A" page-rank)
       (let ((rank-received (make-array node-count :element-type 'number
                                        :initial-element 0)))
 	(dotimes (source node-count)
