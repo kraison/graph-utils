@@ -158,7 +158,9 @@ formulation."
                         (dbg "  New cap~A = ~A" edge (capacity gf u w))
                         (setq f0 0)))))
            (when (not (eql u node))
+             (dbg "CAPS: ~A" capacities)
              (let ((cap-u (find u capacities :key 'first)))
+               (dbg "Got cap-u of ~A: ~A" cap-u u)
                (setf (second cap-u) (- (second cap-u) (gethash u flows 0)))
                (when (eq 0 (second cap-u))
                  (setq l0-nodes (remove u l0-nodes))
@@ -245,12 +247,14 @@ formulation."
            (let ((capacities (init-karzanov gf l0-nodes l0-edges source sink))
                  (f* 0))
              (dbg "CAPS: ~A" capacities)
-             (loop until (null l0-nodes) do
+             (loop until (or (null l0-nodes) (not (member sink l0-nodes))) do
                   (destructuring-bind (node cap) (first capacities)
                     (if (>= 0 (second (find node capacities :key 'first)))
                         (progn
                           (dbg "Deleting node ~A" node)
                           (setq l0-nodes (remove node l0-nodes)
+                                l0-edges (remove node l0-edges :key 'first)
+                                l0-edges (remove node l0-edges :key 'second)
                                 capacities (rest capacities)))
                         (progn
                           (dbg "Using node ~A of cap ~A" node cap)
@@ -261,14 +265,13 @@ formulation."
                           (dbg "Incrementing f* (~A) by ~A" f* cap)
                           (incf f* cap)))))
              (dbg "Incrementing flow (~A) by ~A to ~A"
-                     flow f*
-                     (incf flow f*)))))
+                  flow f* (incf flow f*)))))
     (dbg "Computed ~A loops" loops)
     flow))
 
 (defmethod compute-maximum-flow ((graph directed-graph) (source integer)
                                  (sink integer) &optional algorithm)
-  (find-maximum-flow graph source sink (or algorithm :edmond-karp)))
+  (find-maximum-flow graph source sink (or algorithm :karzanov)))
 
 (defmethod compute-maximum-flow ((graph directed-graph) source sink
                                  &optional algorithm)
@@ -277,4 +280,4 @@ formulation."
   (find-maximum-flow graph
                      (gethash source (nodes graph))
                      (gethash sink (nodes graph))
-                     (or algorithm :edmond-karp)))
+                     (or algorithm :karzanov)))
