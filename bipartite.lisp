@@ -59,7 +59,7 @@
           (add-edge flow-net source node :weight 1))
         (dolist (node white)
           (add-edge flow-net node sink :weight 1))
-        (visualize flow-net :render? t :file "data/matching.dot")
+        ;;(visualize flow-net :render? t :file "data/matching.dot")
         (multiple-value-bind (flow edges)
             (compute-maximum-flow flow-net source sink
                                   ;;:karvanov)
