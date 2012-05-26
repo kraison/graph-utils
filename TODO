@@ -1,6 +1,6 @@
 TODO:
--  Use max flow algorithms for compute maximum matchings for bipartite graphs
--  Get rid of the adjacency matrix and add typed edges.
+-  Get rid of the adjacency matrix and replace with sparse representation.
+-  Add typed edges.
 -  Add a node class to make life easier.
 -  Add an edge class to make life easier.
 -  Optimize!
@@ -8,3 +8,4 @@ TODO:
 DONE:
 -  Create a directed graph subclass and update methods for it.
 -  Add maximum flow methods for directed graphs
+-  Use max flow algorithms to compute maximum matchings for bipartite graphs.
