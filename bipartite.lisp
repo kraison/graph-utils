@@ -5,7 +5,6 @@
         (partition-table (make-hash-table))
         (queue (make-empty-queue))
         (components (find-components graph)))
-    ;;(when (> (length components) 1) (return-from bipartite? nil))
     (flet ((set-color (node color)
              (setf (gethash node color-table) color))
            (color-of (node)
@@ -50,17 +49,22 @@
       (let* ((flow-net (copy-graph graph))
              (source (add-node flow-net :source))
              (sink (add-node flow-net :sink)))
+        (map-edges #'(lambda (n1 n2)
+                       (set-edge-weight flow-net n1 n2 1)
+                       ;; Make sure edges go the proper direction
+                       (when (member n1 white)
+                         (reverse-edge flow-net n1 n2)))
+                   flow-net)
         (dolist (node black)
           (add-edge flow-net source node :weight 1))
         (dolist (node white)
           (add-edge flow-net node sink :weight 1))
-        ;;(visualize flow-net :render? t :file "data/matching.dot")
+        (visualize flow-net :render? t :file "data/matching.dot")
         (multiple-value-bind (flow edges)
             (compute-maximum-flow flow-net source sink
-                                  ;;:edmond-karp)
-                                  ;;:karvanov
+                                  ;;:karvanov)
                                   :dinic)
-          (declare (ignore flow))
+                                  ;;:edmond-karp)
           (values
            (mapcar #'(lambda (edge)
                        (subseq edge 0 2))
@@ -71,5 +75,5 @@
                                       (eq (second edge) source)
                                       (eq (second edge) sink)))
                               edges))
-           black white))))))
+           black white flow))))))
 

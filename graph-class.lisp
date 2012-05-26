@@ -278,13 +278,13 @@ outbound neighbors for a directed graph."
 (defmethod delete-edge ((graph directed-graph) (n1 integer) (n2 integer))
   "Remove an edge from the graph."
   (unless (= n1 n2)
-    (dbg "Deleting edge (~A,~A)" n1 n2)
+    ;;(dbg "Deleting edge (~A,~A)" n1 n2)
     (when (> (aref (matrix graph) n1 n2) 0)
-      (dbg "Decrementing out-degree table entry for ~A (was ~A)"
-           n1 (gethash n1 (out-degree-table graph)))
+      ;;(dbg "Decrementing out-degree table entry for ~A (was ~A)"
+      ;;n1 (gethash n1 (out-degree-table graph)))
       (decf (gethash n1 (out-degree-table graph)))
-      (dbg "Decrementing in-degree table entry for ~A (was ~A)"
-           n2 (gethash n2 (in-degree-table graph)))
+      ;;(dbg "Decrementing in-degree table entry for ~A (was ~A)"
+      ;;n2 (gethash n2 (in-degree-table graph)))
       (decf (gethash n2 (in-degree-table graph)))
       (decf (edges graph))
       (setf (aref (matrix graph) n1 n2) 0))))
@@ -385,6 +385,11 @@ outbound neighbors for a directed graph."
   (apply #'delete-edge (cons graph e2))
   (add-edge graph (first e1) (first e2))
   (add-edge graph (second e1) (second e2)))
+
+(defmethod reverse-edge ((graph graph) n1 n2)
+  (let ((weight (edge-weight graph n1 n2)))
+    (delete-edge graph n1 n2)
+    (add-edge graph n2 n1 :weight weight)))
 
 (defmethod reverse-all-edges ((graph graph))
   (dolist (edge (list-edges graph :nodes-as-ids t))
