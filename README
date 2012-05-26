@@ -22,5 +22,6 @@ Implements the following functionality:
     16. Hubs and authorities calculation
     17. Graph center calculator
     18. Maximum flow calculation for directed graphs using Karzanov's algorithm, Dinic's algorithm, and the Edmond/Karp method
-    19. GML and Pajek .net graph file format parsers
+    19. Maximum matching for bipartite graphs using the max-flow method
+    20. GML and Pajek .net graph file format parsers
 
