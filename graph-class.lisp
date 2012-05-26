@@ -81,7 +81,10 @@
                     (if (directed? graph) 'directed-graph 'graph)
                     :matrix (make-array
                              (list (array-dimension (matrix graph) 0)
-                                   (array-dimension (matrix graph) 1)))
+                                   (array-dimension (matrix graph) 1))
+                             :adjustable t
+                             :element-type 'number
+                             :initial-element 0)
                     :edges (edges graph)
                     :id (last-id graph))))
     (maphash #'(lambda (k v) (setf (gethash k (nodes new-graph)) v))
@@ -310,6 +313,9 @@ outbound neighbors for a directed graph."
                      (list n1 n2)
                      `(,(gethash n1 (ids graph)) ,(gethash n2 (ids graph)))))
 	     graph :collect? t :remove-nulls? t))
+
+(defmethod set-edge-weight ((graph graph) (n1 integer) (n2 integer) weight)
+  (setf (aref (matrix graph) n1 n2) weight))
 
 (defmethod edge-weight ((graph graph) (n1 integer) (n2 integer))
   (aref (matrix graph) n1 n2))

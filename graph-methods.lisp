@@ -137,7 +137,7 @@ returns it as a list of edges as pairs of nodes."
 (defmethod distance-map ((graph graph) (value string) &key expand-ids?)
   (distance-map graph (gethash value (nodes graph)) :expand-ids? expand-ids?))
 
-(defmethod find-components ((graph graph))
+(defmethod find-components ((graph graph) &key (return-ids? t))
   "Find all components in the graph and return them as a list of lists."
   (let ((nodes (node-ids graph))
 	(components nil))
@@ -148,7 +148,13 @@ returns it as a list of edges as pairs of nodes."
 	     (push (gethash (car pair) (ids graph)) component))
 	   (when component
 	     (push component components))))
-    (sort components #'> :key #'length)))
+    (if return-ids?
+        (mapcar #'(lambda (component)
+                    (mapcar #'(lambda (n)
+                                (lookup-node graph n))
+                            component))
+                (sort components #'> :key #'length))
+        (sort components #'> :key #'length))))
 
 (defmethod calculate-shortest-paths ((graph graph))
   (let ((paths nil))

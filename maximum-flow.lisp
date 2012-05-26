@@ -1,16 +1,25 @@
 (in-package :graph-utils)
 
-(defmethod push-flow-via-edges ((graph graph) path)
+(defmethod push-flow-via-edges ((graph graph) path edges-in-flow)
   (let ((min-cap (apply #'min (mapcar
                                #'(lambda (e)
                                    (capacity graph (nth 0 e) (nth 1 e)))
                                path))))
-    (dbg "min-cap of ~A is ~A" path min-cap)
+    ;;(dbg "min-cap of ~A is ~A" path min-cap)
     (dolist (edge path)
       (destructuring-bind (n1 n2) edge
-        (decf-edge-weight graph n1 n2 min-cap)
-        (incf-edge-weight graph n2 n1 min-cap)))
-    min-cap))
+        (let ((p-edge (if (> n2 n1) (list n1 n2) (list n2 n1))))
+          (let ((p (position p-edge
+                             edges-in-flow
+                             :test #'(lambda (e1 e2)
+                                       (and (eql (first e1) (first e2))
+                                            (eql (second e1) (second e2)))))))
+            (if p
+                (incf (nth 2 (nth p edges-in-flow)) min-cap)
+                (push (append p-edge (list min-cap)) edges-in-flow))
+            (decf-edge-weight graph n1 n2 min-cap)
+            (incf-edge-weight graph n2 n1 min-cap)))))
+    (values min-cap edges-in-flow)))
 
 (defmethod compute-layered-network ((graph graph) source sink)
   "Build the layered network of graph using tweaked BFS."
@@ -56,7 +65,7 @@
 (defmethod find-maximum-flow ((graph directed-graph) (source integer)
                               (sink integer) (algorithm (eql :dinic)))
   "This implements Dinic's algorithm."
-  (let ((flow 0) (gf (copy-graph graph)) (loops 0))
+  (let ((flow 0) (gf (copy-graph graph)) (loops 0) (edges-in-flow nil))
     (loop until (null (find-shortest-path gf source sink)) do
          (incf loops)
          (multiple-value-bind (l0-nodes l0-edges)
@@ -82,28 +91,35 @@
                     (multiple-value-bind (min-cap min-edges)
                         (minimum-capacity gf path)
                       (declare (ignore min-cap))
-                      (incf flow (push-flow-via-edges gf path))
+                      (multiple-value-bind (pushed-flow eif)
+                          (push-flow-via-edges gf path edges-in-flow)
+                        (incf flow pushed-flow)
+                        (setq edges-in-flow eif))
                       (setq l0-edges
                             (set-difference l0-edges
                                             min-edges
                                             :test 'equalp))))))))
-    (dbg "Computed ~A loops" loops)
-    flow))
+    (dbg "Dinic computed ~A loops" loops)
+    (values flow edges-in-flow)))
 
 (defmethod find-maximum-flow ((graph directed-graph) (source integer)
                               (sink integer)
                               (algorithm (eql :edmond-karp)))
   "This implements the basic Ford-Fulkerson algorithm using the Edmond-Karp
 formulation."
-  (let ((flow 0) (gf (copy-graph graph)) (loops 0))
+  (let ((flow 0) (gf (copy-graph graph)) (loops 0) (edges-in-flow nil))
     (loop
        (incf loops)
        (let ((path (find-shortest-path gf source sink)))
          (if path
-             (incf flow (push-flow-via-edges gf path))
+             (multiple-value-bind (pushed-flow eif)
+                 (push-flow-via-edges gf path edges-in-flow)
+               (incf flow pushed-flow)
+               (setq edges-in-flow eif))
              (progn
-               (dbg "Computed ~A loops" loops)
-               (return-from find-maximum-flow flow)))))))
+               (dbg "Edmond-Karp computed ~A loops" loops)
+               (return-from find-maximum-flow
+                 (values flow edges-in-flow))))))))
 
 (defmethod init-karzanov ((gf graph) nodes edges source sink)
   (let ((in (make-hash-table))
@@ -126,7 +142,7 @@ formulation."
      #'< :key #'second)))
 
 (defmethod karzanov-push ((gf graph) node l0-nodes l0-edges capacities cap
-                          source sink)
+                          source sink edges-in-flow)
   (dbg "Pushing ~A through node ~A" cap node)
   (let ((q (make-empty-queue))
         (flows (make-hash-table)))
@@ -174,10 +190,11 @@ formulation."
                        (when cap-n
                          (setf (second cap-n) 0)))))
                  ))))))
-  (values l0-nodes l0-edges (sort capacities #'< :key #'second)))
+  (values l0-nodes l0-edges
+          (sort capacities #'< :key #'second) edges-in-flow))
 
 (defmethod karzanov-pull ((gf graph) node l0-nodes l0-edges capacities cap
-                          source sink)
+                          source sink edges-in-flow)
   (dbg "Pulling ~A through node ~A" cap node)
   (let ((q (make-empty-queue))
         (flows (make-hash-table)))
@@ -224,19 +241,22 @@ formulation."
                    (let ((cap-n (find n capacities :key 'first)))
                      (when cap-n
                        (setf (second cap-n) 0)))))))))
-    (values l0-nodes l0-edges (sort capacities #'< :key #'second))))
+    (values l0-nodes l0-edges
+            (sort capacities #'< :key #'second) edges-in-flow)))
 
 (defmethod karzanov-push-pull ((gf graph) node l0-nodes l0-edges capacities
-                               cap source sink)
+                               cap source sink edges-in-flow)
   (multiple-value-bind (l0-nodes l0-edges capacities)
-      (karzanov-push gf node l0-nodes l0-edges capacities cap source sink)
-    (karzanov-pull gf node l0-nodes l0-edges capacities cap source sink)))
+      (karzanov-push gf node l0-nodes l0-edges capacities cap source sink
+                     edges-in-flow)
+    (karzanov-pull gf node l0-nodes l0-edges capacities cap source sink
+                   edges-in-flow)))
 
 (defmethod find-maximum-flow ((graph directed-graph) (source integer)
                               (sink integer)
                               (algorithm (eql :karzanov)))
   "This implements Karzanov's algorithm."
-  (let ((flow 0) (gf (copy-graph graph)) (loops 0))
+  (let ((flow 0) (gf (copy-graph graph)) (loops 0) (edges-in-flow nil))
     (loop until (null (find-shortest-path gf source sink)) do
          (incf loops)
          (dbg "Karzanov loop ~A, flow is ~A" loops flow)
@@ -259,15 +279,16 @@ formulation."
                         (progn
                           (dbg "Using node ~A of cap ~A" node cap)
                           (multiple-value-setq
-                              (l0-nodes l0-edges capacities)
+                              (l0-nodes l0-edges capacities edges-in-flow)
                             (karzanov-push-pull gf node l0-nodes l0-edges
-                                                capacities cap source sink))
+                                                capacities cap source sink
+                                                edges-in-flow))
                           (dbg "Incrementing f* (~A) by ~A" f* cap)
                           (incf f* cap)))))
              (dbg "Incrementing flow (~A) by ~A to ~A"
                   flow f* (incf flow f*)))))
     (dbg "Computed ~A loops" loops)
-    flow))
+    (values flow edges-in-flow)))
 
 (defmethod compute-maximum-flow ((graph directed-graph) (source integer)
                                  (sink integer) &optional algorithm)
