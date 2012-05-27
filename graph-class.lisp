@@ -7,6 +7,8 @@
                  :initform (make-hash-table :test 'equal))
    (ids          :accessor ids        :initarg :ids
                  :initform (make-hash-table))
+   (node-caps    :accessor node-caps  :initarg :node-caps
+                 :initform (make-hash-table))
    (s-point      :accessor s-point    :initarg :s-point    :initform 0)
    (last-id      :accessor last-id    :initarg :id         :initform -1)
    (edges        :accessor edges      :initarg :edges      :initform 0)
@@ -91,6 +93,8 @@
              (nodes graph))
     (maphash #'(lambda (k v) (setf (gethash k (ids new-graph)) v))
              (ids graph))
+    (maphash #'(lambda (k v) (setf (gethash k (node-caps new-graph)) v))
+             (node-caps graph))
     (when (directed? graph)
       (maphash #'(lambda (k v)
                    (setf (gethash k (in-degree-table new-graph)) v))
@@ -120,7 +124,7 @@
 		  (when (null (aref (matrix graph) i j))
 		    (setf (aref (matrix graph) i j) 0)))))
 
-(defmethod add-node ((graph graph) value &key no-expand?)
+(defmethod add-node ((graph graph) value &key no-expand? capacity)
   "Add a node to the graph.  If no-expand? it true, do not grow the
 adjacency-matrix. It is recommended that when adding nodes in bulk, you use
 no-expand? and call adjust-adjacency-matrix after all nodes have been added."
@@ -128,6 +132,8 @@ no-expand? and call adjust-adjacency-matrix after all nodes have been added."
       (let ((id (incf (last-id graph))))
 	(unless no-expand?
 	  (adjust-array (matrix graph) (list (1+ id) (1+ id))))
+        (when capacity
+          (setf (gethash id (node-caps graph)) capacity))
 	(when (directed? graph)
 	  (setf (gethash id (in-degree-table graph)) 0
 		(gethash id (out-degree-table graph)) 0))
@@ -135,6 +141,12 @@ no-expand? and call adjust-adjacency-matrix after all nodes have been added."
 	      (gethash value (nodes graph)) id
 	      (gethash id (ids graph)) value)
 	id)))
+
+(defmethod set-capacity ((graph graph) (node-id integer) capacity)
+  (setf (gethash node-id (node-caps graph)) capacity))
+
+(defmethod set-capacity ((graph graph) node capacity)
+  (set-capacity graph (lookup-node graph node) capacity))
 
 (defmethod rename-node ((graph graph) (id integer) name)
   (let ((old-name (lookup-node graph id)))

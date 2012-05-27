@@ -171,7 +171,7 @@ returns it as a list of edges as pairs of nodes."
 		    &key (edge-removal-count 0))
   "The clustering algorithm here is based on a metric called 'edge
 betweenness'. It counts how many shortest paths in the network include a
-given edge. An edge with high betweenness is one that islikely to separate
+given edge. An edge with high betweenness is one that is likely to separate
 dense areas of the graph."
   (let* ((shortest-paths (calculate-shortest-paths graph))
 	 (between-table (sort
@@ -193,8 +193,8 @@ dense areas of the graph."
 	(push edge removed-edges)
 	(delete-edge graph (first (first edge)) (second (first edge)))))
     (nreverse (mapcar #'(lambda (edge)
-			  (list (lookup-node graph (first (first edge)))
-				(lookup-node graph (second (first edge)))
+			  (list (first (first edge))
+				(second (first edge))
 				(second edge)))
 		      removed-edges))))
 
@@ -224,29 +224,10 @@ edges and clusters based on span."
 	(push edge removed-edges)
 	(delete-edge graph (first (first edge)) (second (first edge)))))
     (nreverse (mapcar #'(lambda (edge)
-			  (list (lookup-node graph (first (first edge)))
-				(lookup-node graph (second (first edge)))
+			  (list (first (first edge))
+				(second (first edge))
 				(second edge)))
 		      removed-edges))))
-
-(defmethod minimal-cut! ((graph graph))
-  (let ((removed-edges nil))
-    (labels ((cut (g)
-	       (cond ((or (< (node-count g) 2)
-			  (= 0 (edge-count g))
-			  (>= (length (find-components g)) 2))
-		      g)
-		     (t
-		      (push (first (cluster graph :edge-span
-						  :edge-removal-count 1))
-			    removed-edges)
-		      (cut graph)))))
-      (cut graph))
-    (nreverse removed-edges)))
-
-(defmethod minimal-cut ((graph graph))
-  (let ((g (copy-graph graph)))
-    (values (minimal-cut! g) g)))
 
 (defmethod compute-page-rank ((graph graph) &key (k 2) (scaling-factor 1)
                               initial-values)

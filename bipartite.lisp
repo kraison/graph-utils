@@ -61,10 +61,7 @@
             (add-edge flow-net node sink :weight 1))
           ;;(visualize flow-net :render? t :file "data/matching.dot")
           (multiple-value-bind (flow edges)
-              (compute-maximum-flow flow-net source sink
-                                    ;;:karvanov)
-                                    :dinic)
-            ;;:edmond-karp)
+              (compute-maximum-flow flow-net source sink :dinic)
             (values
              (mapcar #'(lambda (edge)
                          (subseq edge 0 2))

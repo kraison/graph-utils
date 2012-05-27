@@ -100,7 +100,7 @@
                                             min-edges
                                             :test 'equalp))))))))
     (dbg "Dinic computed ~A loops" loops)
-    (values flow edges-in-flow)))
+    (values flow edges-in-flow gf)))
 
 (defmethod find-maximum-flow ((graph directed-graph) (source integer)
                               (sink integer)
@@ -119,7 +119,7 @@ formulation."
              (progn
                (dbg "Edmond-Karp computed ~A loops" loops)
                (return-from find-maximum-flow
-                 (values flow edges-in-flow))))))))
+                 (values flow edges-in-flow gf))))))))
 
 (defmethod init-karzanov ((gf graph) nodes edges source sink)
   (let ((in (make-hash-table))
@@ -288,17 +288,56 @@ formulation."
              (dbg "Incrementing flow (~A) by ~A to ~A"
                   flow f* (incf flow f*)))))
     (dbg "Computed ~A loops" loops)
-    (values flow edges-in-flow)))
+    (values flow edges-in-flow gf)))
+
+(defmethod expand-node-out ((graph graph) node cap)
+  (let ((new-node (add-node graph (gensym "V"))))
+    (dolist (neighbor (outbound-neighbors graph node))
+      (add-edge graph new-node neighbor
+                :weight (edge-weight graph node neighbor))
+      (delete-edge graph node neighbor))
+    (add-edge graph node new-node :weight cap)))
+
+(defmethod expand-node-in ((graph graph) node cap)
+  (let ((new-node (add-node graph (gensym "V"))))
+    (dolist (neighbor (inbound-neighbors graph node))
+      (add-edge graph neighbor new-node
+                :weight (edge-weight graph neighbor node))
+      (delete-edge graph neighbor node))
+    (add-edge graph new-node node :weight cap)))
+
+(defmethod expand-node-capacities ((graph graph) &optional source sink)
+  (let ((g-prime (copy-graph graph)))
+    (if (and source sink)
+        (maphash
+         #'(lambda (node cap)
+             (cond ((eq node source)
+                    ;; We've got to expand this one differently
+                    ;; in order to preserve the original id as source
+                    (expand-node-out g-prime node cap))
+                   (t
+                    (expand-node-in graph node cap))))
+                 (node-caps g-prime))
+        (maphash #'(lambda (node cap)
+                     (expand-node-in graph node cap))
+                 (node-caps g-prime)))
+    (clrhash (node-caps g-prime))
+    g-prime))
 
 (defmethod compute-maximum-flow ((graph directed-graph) (source integer)
-                                 (sink integer) &optional algorithm)
-  (find-maximum-flow graph source sink (or algorithm :karzanov)))
+                                 (sink integer) &key algorithm
+                                 node-capacities?)
+  (if node-capacities?
+      (let ((g-prime (expand-node-capacities graph source sink)))
+        (find-maximum-flow g-prime source sink (or algorithm :karzanov)))
+      (find-maximum-flow graph source sink (or algorithm :karzanov))))
 
 (defmethod compute-maximum-flow ((graph directed-graph) source sink
-                                 &optional algorithm)
+                                 &key algorithm node-capacities?)
   "Compute max flow for the directed graph.  Algorithm can be one of
 :edmond-karp, :dinic or :karzanov"
-  (find-maximum-flow graph
-                     (gethash source (nodes graph))
-                     (gethash sink (nodes graph))
-                     (or algorithm :karzanov)))
+  (compute-maximum-flow graph
+                        (lookup-node graph source)
+                        (lookup-node graph sink)
+                        :algorithm (or algorithm :karzanov)
+                        :node-capacities? node-capacities?))
