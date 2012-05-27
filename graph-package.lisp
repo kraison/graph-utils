@@ -44,6 +44,8 @@
 	   #:minimal-cut
 	   #:minimal-cut!
            #:compute-maximum-flow
+           #:compute-maximum-matching
+           #:bipartite?
 	   #:visualize
 	   #:generate-random-graph
 	   #:compute-page-rank-distribution
