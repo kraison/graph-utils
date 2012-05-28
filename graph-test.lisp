@@ -2,13 +2,13 @@
 (asdf:oos 'asdf:load-op 'graph-utils)
 (use-package :graph-utils)
 
-(defun graph-test ()
+(defun graph-test-old ()
   (dolist (file '("data/Dining.net" "data/karate.gml"))
     ;;"data/dolphins.gml" "data/adjnoun.gml" "data/football.gml"))
     (format t "Doing graph ~A~%" file)
     (let ((graph (if (cl-ppcre:scan "gml$" file) (parse-gml file) (parse-pajek file)))
 	  (stem (cl-ppcre:regex-replace-all "(\.(net|gml))$" file "")))
-      (with-open-file (out (format nil "~A.log" stem) 
+      (with-open-file (out (format nil "~A.log" stem)
 			   :direction :output
 			   :if-exists :supersede
 			   :if-does-not-exist :create)
@@ -20,7 +20,7 @@
 	(format out "  Components:~%~{    C: ~A~^~%~}~%" (find-components graph))
 	(format out "  Shortest paths:~%")
 	(dolist (path (calculate-shortest-paths graph))
-	  (format out "    Path from ~A to ~A: " 
+	  (format out "    Path from ~A to ~A: "
 		  (lookup-node graph (first path)) (lookup-node graph (second path)))
 	  (dotimes (i (length (third path)))
 	    (format out "~A -> " (lookup-node graph (first (nth i (third path))))))
@@ -40,12 +40,13 @@
 	      (format out "      ~10A ~2,10F~%" (car h) (cdr h)))
 	    (format out "    Authorities:~%")
 	    (dolist (a auths)
-	      (format out "      ~10A ~2,10F~%" (car a) (cdr a)))))	    
+	      (format out "      ~10A ~2,10F~%" (car a) (cdr a)))))
 	(visualize graph :file (format nil "~A.dot" stem) :render? t)
-	(format out "  Minimal cut (removed edges):~%~{    ~A~%~}~%" 
+	(format out "  Minimal cut (removed edges):~%~{    ~A~%~}~%"
 		(mapcar #'(lambda (e)
 			    (format nil "~A -> ~A" (first e) (second e)))
 			(minimal-cut! graph)))
 	(visualize graph :file (format nil "~A-cut.dot" stem) :render? t)))))
 
-(graph-test)
+
+(graph-test-csc525)

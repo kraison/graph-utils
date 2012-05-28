@@ -115,14 +115,9 @@
 
 (defmethod adjust-adjacency-matrix ((graph graph))
   "Grow the adjacency-matrix of the graph to match the number of nodes."
-  (adjust-array (matrix graph) (list (1+ (last-id graph))
-				     (1+ (last-id graph))))
-  #+allegro (loop for i from 0 to (1- (array-dimension (matrix graph) 0))
-	       do
-	       (loop for j from 0 to (1- (array-dimension (matrix graph) 1))
-		  do
-		  (when (null (aref (matrix graph) i j))
-		    (setf (aref (matrix graph) i j) 0)))))
+  (adjust-array (matrix graph)
+                (list (1+ (last-id graph)) (1+ (last-id graph)))
+                :initial-element 0))
 
 (defmethod add-node ((graph graph) value &key no-expand? capacity)
   "Add a node to the graph.  If no-expand? it true, do not grow the
@@ -131,7 +126,8 @@ no-expand? and call adjust-adjacency-matrix after all nodes have been added."
   (or (gethash value (nodes graph))
       (let ((id (incf (last-id graph))))
 	(unless no-expand?
-	  (adjust-array (matrix graph) (list (1+ id) (1+ id))))
+	  (adjust-array (matrix graph) (list (1+ id) (1+ id))
+                        :initial-element 0))
         (when capacity
           (setf (gethash id (node-caps graph)) capacity))
 	(when (directed? graph)

@@ -1,5 +1,14 @@
 (in-package :graph-utils)
 
+(defun position-of-edge (n1 n2 edge-list)
+  (let ((p-edge (if (> n2 n1) (list n1 n2) (list n2 n1))))
+    (let ((p (position p-edge
+                       edge-list
+                       :test #'(lambda (e1 e2)
+                                 (and (eql (first e1) (first e2))
+                                      (eql (second e1) (second e2)))))))
+      (values p p-edge))))
+
 (defmethod push-flow-via-edges ((graph graph) path edges-in-flow)
   (let ((min-cap (apply #'min (mapcar
                                #'(lambda (e)
@@ -8,17 +17,13 @@
     ;;(dbg "min-cap of ~A is ~A" path min-cap)
     (dolist (edge path)
       (destructuring-bind (n1 n2) edge
-        (let ((p-edge (if (> n2 n1) (list n1 n2) (list n2 n1))))
-          (let ((p (position p-edge
-                             edges-in-flow
-                             :test #'(lambda (e1 e2)
-                                       (and (eql (first e1) (first e2))
-                                            (eql (second e1) (second e2)))))))
-            (if p
-                (incf (nth 2 (nth p edges-in-flow)) min-cap)
-                (push (append p-edge (list min-cap)) edges-in-flow))
-            (decf-edge-weight graph n1 n2 min-cap)
-            (incf-edge-weight graph n2 n1 min-cap)))))
+        (multiple-value-bind (p p-edge)
+            (position-of-edge n1 n2 edges-in-flow)
+          (if p
+              (incf (nth 2 (nth p edges-in-flow)) min-cap)
+              (push (append p-edge (list min-cap)) edges-in-flow))
+          (decf-edge-weight graph n1 n2 min-cap)
+          (incf-edge-weight graph n2 n1 min-cap))))
     (values min-cap edges-in-flow)))
 
 (defmethod compute-layered-network ((graph graph) source sink)
@@ -82,7 +87,6 @@
                            (if path
                                (append (list edge) path)
                                (progn
-                                 (dbg "Removing ~A" edge)
                                  (setq l0-edges
                                        (remove edge l0-edges :test 'equalp))
                                  nil))))))))
@@ -100,7 +104,9 @@
                                             min-edges
                                             :test 'equalp))))))))
     (dbg "Dinic computed ~A loops" loops)
-    (values flow edges-in-flow gf)))
+    (values flow
+            (sort edges-in-flow #'> :key 'third)
+            gf)))
 
 (defmethod find-maximum-flow ((graph directed-graph) (source integer)
                               (sink integer)
@@ -119,12 +125,13 @@ formulation."
              (progn
                (dbg "Edmond-Karp computed ~A loops" loops)
                (return-from find-maximum-flow
-                 (values flow edges-in-flow gf))))))))
+                 (values flow
+                         (sort edges-in-flow #'> :key 'third)
+                         gf))))))))
 
 (defmethod init-karzanov ((gf graph) nodes edges source sink)
   (let ((in (make-hash-table))
         (out (make-hash-table)))
-    (dbg "K-INIT NODES: ~A" nodes)
     (dolist (node nodes)
       (setf (gethash node in) 0)
       (setf (gethash node out) 0))
@@ -143,40 +150,41 @@ formulation."
 
 (defmethod karzanov-push ((gf graph) node l0-nodes l0-edges capacities cap
                           source sink edges-in-flow)
-  (dbg "Pushing ~A through node ~A" cap node)
-  (let ((q (make-empty-queue))
-        (flows (make-hash-table)))
+  (let ((q (make-empty-queue)) (flows (make-hash-table)))
     (enqueue q node)
     (setf (gethash node flows) cap)
     (loop until (empty-queue? q) do
          (let* ((u (dequeue q)) (f0 (gethash u flows 0)))
-           (dbg "  Push working on node U = ~A" u)
            (loop while (> f0 0) do
                 (let* ((edge (find u l0-edges :key 'first)) (w (second edge)))
                   (unless edge (return))
-                  (dbg "  Push working on EDGE ~A" edge)
                   (when (and (eql 0 (gethash w flows 0)) (not (eql w sink)))
-                    (dbg "  Push enqueuing node ~A" w)
                     (enqueue q w))
-                  (if (<= (capacity gf u w) f0) ;; Should this be layered cap?
+                  (if (<= (capacity gf u w) f0)
                       (let ((fv (capacity gf u w)))
+                        (multiple-value-bind (p p-edge)
+                            (position-of-edge u w edges-in-flow)
+                          (if p
+                              (incf (nth 2 (nth p edges-in-flow)) fv)
+                              (push (append p-edge (list fv))
+                                    edges-in-flow)))
                         (decf-edge-weight gf u w fv)
-                        (dbg "  New cap~A = ~A" edge (capacity gf u w))
                         (setq l0-edges
                               (remove (list u w) l0-edges :test 'equalp))
-                        (dbg "  Push setting fl(~A) = ~A"
-                             w (+ fv (gethash w flows 0)))
                         (setf (gethash w flows) (+ fv (gethash w flows 0)))
                         (decf f0 fv))
                       (let ((fv f0))
+                        (multiple-value-bind (p p-edge)
+                            (position-of-edge u w edges-in-flow)
+                          (if p
+                              (incf (nth 2 (nth p edges-in-flow)) f0)
+                              (push (append p-edge (list f0))
+                                    edges-in-flow)))
                         (setf (gethash w flows) (+ fv (gethash w flows 0)))
                         (decf-edge-weight gf u w f0)
-                        (dbg "  New cap~A = ~A" edge (capacity gf u w))
                         (setq f0 0)))))
            (when (not (eql u node))
-             (dbg "CAPS: ~A" capacities)
              (let ((cap-u (find u capacities :key 'first)))
-               (dbg "Got cap-u of ~A: ~A" cap-u u)
                (setf (second cap-u) (- (second cap-u) (gethash u flows 0)))
                (when (eq 0 (second cap-u))
                  (setq l0-nodes (remove u l0-nodes))
@@ -195,42 +203,44 @@ formulation."
 
 (defmethod karzanov-pull ((gf graph) node l0-nodes l0-edges capacities cap
                           source sink edges-in-flow)
-  (dbg "Pulling ~A through node ~A" cap node)
   (let ((q (make-empty-queue))
         (flows (make-hash-table)))
     (enqueue q node)
     (setf (gethash node flows) cap)
     (loop until (empty-queue? q) do
          (let* ((u (dequeue q)) (f0 (gethash u flows 0)))
-           (dbg "  Pull working on node U = ~A" u)
            (loop while (> f0 0) do
                 (let* ((edge (find u l0-edges :key 'second))
                        (w (first edge)))
                   (unless edge (return))
-                  (dbg "  Pull working on EDGE ~A" edge)
                   (when (and (eql 0 (gethash w flows 0)) (not (eql w source)))
-                    (dbg "  Pull enqueueing node ~A" w)
                     (enqueue q w))
                   (if (<= (capacity gf w u) f0)
                       (let ((fv (capacity gf w u)))
-                        (dbg "  Pull deleting edge ~A,~A" w u)
+                        (multiple-value-bind (p p-edge)
+                            (position-of-edge u w edges-in-flow)
+                          (if p
+                              (incf (nth 2 (nth p edges-in-flow)) fv)
+                              (push (append p-edge (list fv))
+                                    edges-in-flow)))
                         (decf-edge-weight gf w u fv)
-                        (dbg "  New cap~A = ~A" edge (capacity gf w u))
                         (setq l0-edges
                               (remove (list w u) l0-edges :test 'equalp))
                         (setf (gethash w flows) (+ fv (gethash w flows 0)))
                         (decf f0 fv))
                       (let ((fv f0))
+                        (multiple-value-bind (p p-edge)
+                            (position-of-edge u w edges-in-flow)
+                          (if p
+                              (incf (nth 2 (nth p edges-in-flow)) f0)
+                              (push (append p-edge (list f0))
+                                    edges-in-flow)))
                         (setf (gethash w flows) (+ fv (gethash w flows 0)))
                         (decf-edge-weight gf w u f0)
-                        (dbg "  New cap~A = ~A" edge (capacity gf w u))
                         (setq f0 0)))))
            (let ((cap-u (find u capacities :key 'first)))
-             (dbg "  Pull got cap(~A) = ~A" u cap-u)
              (setf (second cap-u) (- (second cap-u) (gethash u flows 0)))
-             (dbg "  Pull set cap(~A) = ~A" u (second cap-u))
              (when (eq 0 (second cap-u))
-               (dbg "  Removing node ~A" u)
                (setq l0-nodes (remove u l0-nodes))
                (setq l0-edges (remove u l0-edges :key 'second))
                (setq l0-edges (remove u l0-edges :key 'first))
@@ -246,7 +256,7 @@ formulation."
 
 (defmethod karzanov-push-pull ((gf graph) node l0-nodes l0-edges capacities
                                cap source sink edges-in-flow)
-  (multiple-value-bind (l0-nodes l0-edges capacities)
+  (multiple-value-bind (l0-nodes l0-edges capacities edges-in-flow)
       (karzanov-push gf node l0-nodes l0-edges capacities cap source sink
                      edges-in-flow)
     (karzanov-pull gf node l0-nodes l0-edges capacities cap source sink
@@ -259,36 +269,31 @@ formulation."
   (let ((flow 0) (gf (copy-graph graph)) (loops 0) (edges-in-flow nil))
     (loop until (null (find-shortest-path gf source sink)) do
          (incf loops)
-         (dbg "Karzanov loop ~A, flow is ~A" loops flow)
          (multiple-value-bind (l0-nodes l0-edges)
              (compute-layered-network gf source sink)
-           (dbg "L0 = ~A , ~A" l0-nodes l0-edges)
            ;; Karzanov-saturation
            (let ((capacities (init-karzanov gf l0-nodes l0-edges source sink))
                  (f* 0))
-             (dbg "CAPS: ~A" capacities)
              (loop until (or (null l0-nodes) (not (member sink l0-nodes))) do
                   (destructuring-bind (node cap) (first capacities)
                     (if (>= 0 (second (find node capacities :key 'first)))
                         (progn
-                          (dbg "Deleting node ~A" node)
                           (setq l0-nodes (remove node l0-nodes)
                                 l0-edges (remove node l0-edges :key 'first)
                                 l0-edges (remove node l0-edges :key 'second)
                                 capacities (rest capacities)))
                         (progn
-                          (dbg "Using node ~A of cap ~A" node cap)
                           (multiple-value-setq
                               (l0-nodes l0-edges capacities edges-in-flow)
                             (karzanov-push-pull gf node l0-nodes l0-edges
                                                 capacities cap source sink
                                                 edges-in-flow))
-                          (dbg "Incrementing f* (~A) by ~A" f* cap)
                           (incf f* cap)))))
-             (dbg "Incrementing flow (~A) by ~A to ~A"
-                  flow f* (incf flow f*)))))
-    (dbg "Computed ~A loops" loops)
-    (values flow edges-in-flow gf)))
+             (incf flow f*))))
+    (dbg "Karzanov computed ~A loops" loops)
+    (values flow
+            (sort edges-in-flow #'> :key 'third)
+            gf)))
 
 (defmethod expand-node-out ((graph graph) node cap)
   (let ((new-node (add-node graph (gensym "V"))))
