@@ -61,7 +61,7 @@
         (add-edge flow-net source node :weight 1))
       (dolist (node v2)
         (add-edge flow-net node sink :weight 1))
-      ;;(visualize flow-net :render? t :file "data/matching.dot")
+      (visualize flow-net :render? t :file "data/matching.dot")
       (multiple-value-bind (flow edges)
           (compute-maximum-flow flow-net source sink :algorithm algorithm)
         (values
@@ -78,18 +78,20 @@
          v2
          flow)))))
 
-(defun test-bp (graph)
-  (multiple-value-bind (black white) (bipartite? graph :show-partitions? t)
-    (if (and black white)
-        (if (every #'evenp black)
-            (multiple-value-bind (matching black white flow)
-                (compute-maximum-matching graph black white
-                                          :algorithm :karzanov)
-              (dbg "~A~%~A~%~A~%~A" matching black white flow)
-              matching)
-            (multiple-value-bind (matching black white flow)
-                (compute-maximum-matching graph white black
-                                          :algorithm :karzanov)
-              (dbg "~A~%~A~%~A~%~A" matching black white flow)
-              matching))
-        (error "~A is not bipartite!" graph))))
+(defun test-bp ()
+  (let ((graph
+         (parse-pajek "/home/raison/work/graph-utils/data/bipartite1.net")))
+    (multiple-value-bind (black white) (bipartite? graph :show-partitions? t)
+      (if (and black white)
+          (if (every #'evenp black)
+              (multiple-value-bind (matching black white flow)
+                  (compute-maximum-matching graph black white
+                                            :algorithm :karzanov)
+                (dbg "~A~%~A~%~A~%~A" matching black white flow)
+                matching)
+              (multiple-value-bind (matching black white flow)
+                  (compute-maximum-matching graph white black
+                                            :algorithm :karzanov)
+                (dbg "~A~%~A~%~A~%~A" matching black white flow)
+                matching))
+          (error "~A is not bipartite!" graph)))))

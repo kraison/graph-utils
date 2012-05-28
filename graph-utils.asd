@@ -13,8 +13,7 @@
 	       :dso-lex
 	       :yacc
 	       :trivial-shell
-	       :parse-number
-	       :simple-rgb)
+	       :parse-number)
   :components ((:file "graph-package")
                (:file "queue" :depends-on ("graph-package"))
                (:file "utilities" :depends-on ("queue"))

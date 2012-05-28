@@ -1,7 +1,7 @@
 (in-package #:cl-user)
 
 (defpackage #:graph-utils
-  (:use #:cl #:cl-ppcre #:dso-lex #:yacc #:simple-rgb)
+  (:use #:cl #:cl-ppcre #:dso-lex #:yacc)
   (:export #:make-graph
 	   #:graph
 	   #:copy-graph
