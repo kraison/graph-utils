@@ -1,4 +1,5 @@
-Graph of data/Dining: #<DIRECTED-GRAPH directed (26 vertices & 52 edges)>
+Graph of data/Dining: #<DIRECTED-GRAPH
+                        directed (26 vertices & 52 edges)>
   Density: 0.16
   Degree distribution:
      (2 . 26)
@@ -10,9 +11,8 @@ Graph of data/Dining: #<DIRECTED-GRAPH directed (26 vertices & 52 edges)>
      (4 . 2)
      (6 . 2)
   Components:
-    C: (Mary Betty Ruth Hilda Irene Alice Maxine Laura Edna Jane Hazel Ellen
-        Ella Martha Frances Eva Adele Anna Helen Robin Marion Lena Jean Cora
-        Louise Ada)
+    C: (15 12 0 18 11 20 21 25 5 2 10 17 19 16 1 23 8 9 6 13 24 3 22 4
+        14 7)
   Shortest paths:
     Path from Ada to Cora: Ada -> Cora
     Path from Ada to Louise: Ada -> Louise
@@ -22,15 +22,15 @@ Graph of data/Dining: #<DIRECTED-GRAPH directed (26 vertices & 52 edges)>
     Path from Ada to Alice: Alice
     Path from Ada to Robin: Ada -> Cora -> Jean -> Robin
     Path from Ada to Marion: Ada -> Louise -> Marion
-    Path from Ada to Maxine: Ada -> Cora -> Jean -> Helen -> Eva -> Maxine
+    Path from Ada to Maxine: Ada -> Louise -> Marion -> Martha -> Anna -> Maxine
     Path from Ada to Lena: Ada -> Louise -> Lena
     Path from Ada to Hazel: Hazel
     Path from Ada to Hilda: Hilda
     Path from Ada to Frances: Ada -> Louise -> Marion -> Frances
-    Path from Ada to Eva: Ada -> Cora -> Jean -> Helen -> Eva
+    Path from Ada to Eva: Ada -> Louise -> Marion -> Frances -> Eva
     Path from Ada to Ruth: Ruth
     Path from Ada to Edna: Edna
-    Path from Ada to Adele: Ada -> Cora -> Jean -> Helen -> Eva -> Maxine -> Adele
+    Path from Ada to Adele: Ada -> Louise -> Marion -> Martha -> Anna -> Maxine -> Adele
     Path from Ada to Jane: Jane
     Path from Ada to Anna: Ada -> Louise -> Marion -> Martha -> Anna
     Path from Ada to Mary: Mary
@@ -47,15 +47,15 @@ Graph of data/Dining: #<DIRECTED-GRAPH directed (26 vertices & 52 edges)>
     Path from Cora to Alice: Alice
     Path from Cora to Robin: Cora -> Jean -> Robin
     Path from Cora to Marion: Cora -> Ada -> Louise -> Marion
-    Path from Cora to Maxine: Cora -> Jean -> Helen -> Eva -> Maxine
+    Path from Cora to Maxine: Cora -> Jean -> Robin -> Eva -> Maxine
     Path from Cora to Lena: Cora -> Ada -> Louise -> Lena
     Path from Cora to Hazel: Hazel
     Path from Cora to Hilda: Hilda
     Path from Cora to Frances: Cora -> Ada -> Louise -> Marion -> Frances
-    Path from Cora to Eva: Cora -> Jean -> Helen -> Eva
+    Path from Cora to Eva: Cora -> Jean -> Robin -> Eva
     Path from Cora to Ruth: Ruth
     Path from Cora to Edna: Edna
-    Path from Cora to Adele: Cora -> Jean -> Helen -> Eva -> Maxine -> Adele
+    Path from Cora to Adele: Cora -> Jean -> Robin -> Eva -> Maxine -> Adele
     Path from Cora to Jane: Jane
     Path from Cora to Anna: Cora -> Ada -> Louise -> Marion -> Martha -> Anna
     Path from Cora to Mary: Mary
@@ -91,23 +91,23 @@ Graph of data/Dining: #<DIRECTED-GRAPH directed (26 vertices & 52 edges)>
     Path from Louise to Irene: Irene
     Path from Jean to Ada: Ada
     Path from Jean to Cora: Cora
-    Path from Jean to Louise: Jean -> Helen -> Eva -> Marion -> Martha -> Anna -> Lena -> Louise
+    Path from Jean to Louise: Jean -> Robin -> Eva -> Marion -> Martha -> Anna -> Lena -> Louise
     Path from Jean to Helen: Jean -> Helen
-    Path from Jean to Martha: Jean -> Helen -> Eva -> Marion -> Martha
+    Path from Jean to Martha: Jean -> Robin -> Eva -> Marion -> Martha
     Path from Jean to Alice: Alice
     Path from Jean to Robin: Jean -> Robin
-    Path from Jean to Marion: Jean -> Helen -> Eva -> Marion
-    Path from Jean to Maxine: Jean -> Helen -> Eva -> Maxine
-    Path from Jean to Lena: Jean -> Helen -> Eva -> Marion -> Martha -> Anna -> Lena
+    Path from Jean to Marion: Jean -> Robin -> Eva -> Marion
+    Path from Jean to Maxine: Jean -> Robin -> Eva -> Maxine
+    Path from Jean to Lena: Jean -> Robin -> Eva -> Marion -> Martha -> Anna -> Lena
     Path from Jean to Hazel: Hazel
     Path from Jean to Hilda: Hilda
-    Path from Jean to Frances: Jean -> Helen -> Eva -> Marion -> Frances
-    Path from Jean to Eva: Jean -> Helen -> Eva
+    Path from Jean to Frances: Jean -> Robin -> Eva -> Marion -> Frances
+    Path from Jean to Eva: Jean -> Robin -> Eva
     Path from Jean to Ruth: Ruth
     Path from Jean to Edna: Edna
-    Path from Jean to Adele: Jean -> Helen -> Eva -> Maxine -> Adele
+    Path from Jean to Adele: Jean -> Robin -> Eva -> Maxine -> Adele
     Path from Jean to Jane: Jane
-    Path from Jean to Anna: Jean -> Helen -> Eva -> Marion -> Martha -> Anna
+    Path from Jean to Anna: Jean -> Robin -> Eva -> Marion -> Martha -> Anna
     Path from Jean to Mary: Mary
     Path from Jean to Betty: Betty
     Path from Jean to Ella: Ella
@@ -152,7 +152,7 @@ Graph of data/Dining: #<DIRECTED-GRAPH directed (26 vertices & 52 edges)>
     Path from Martha to Hazel: Hazel
     Path from Martha to Hilda: Hilda
     Path from Martha to Frances: Martha -> Marion -> Frances
-    Path from Martha to Eva: Martha -> Marion -> Frances -> Eva
+    Path from Martha to Eva: Martha -> Anna -> Maxine -> Eva
     Path from Martha to Ruth: Ruth
     Path from Martha to Edna: Edna
     Path from Martha to Adele: Martha -> Anna -> Maxine -> Adele
@@ -301,7 +301,7 @@ Graph of data/Dining: #<DIRECTED-GRAPH directed (26 vertices & 52 edges)>
     Path from Hazel to Maxine: Hazel -> Anna -> Maxine
     Path from Hazel to Lena: Hazel -> Anna -> Lena
     Path from Hazel to Hilda: Hazel -> Hilda
-    Path from Hazel to Frances: Hazel -> Anna -> Maxine -> Adele -> Frances
+    Path from Hazel to Frances: Hazel -> Anna -> Lena -> Marion -> Frances
     Path from Hazel to Eva: Hazel -> Anna -> Maxine -> Eva
     Path from Hazel to Ruth: Ruth
     Path from Hazel to Edna: Hazel -> Hilda -> Betty -> Edna
@@ -404,7 +404,7 @@ Graph of data/Dining: #<DIRECTED-GRAPH directed (26 vertices & 52 edges)>
     Path from Ruth to Hilda: Ruth -> Hilda
     Path from Ruth to Frances: Ruth -> Jane -> Adele -> Frances
     Path from Ruth to Eva: Ruth -> Jane -> Adele -> Frances -> Eva
-    Path from Ruth to Edna: Ruth -> Hilda -> Betty -> Edna
+    Path from Ruth to Edna: Ruth -> Jane -> Mary -> Edna
     Path from Ruth to Adele: Ruth -> Jane -> Adele
     Path from Ruth to Jane: Ruth -> Jane
     Path from Ruth to Anna: Ruth -> Hilda -> Hazel -> Anna
@@ -502,7 +502,7 @@ Graph of data/Dining: #<DIRECTED-GRAPH directed (26 vertices & 52 edges)>
     Path from Anna to Lena: Anna -> Lena
     Path from Anna to Hazel: Hazel
     Path from Anna to Hilda: Hilda
-    Path from Anna to Frances: Anna -> Maxine -> Adele -> Frances
+    Path from Anna to Frances: Anna -> Lena -> Marion -> Frances
     Path from Anna to Eva: Anna -> Maxine -> Eva
     Path from Anna to Ruth: Ruth
     Path from Anna to Edna: Edna
@@ -573,11 +573,11 @@ Graph of data/Dining: #<DIRECTED-GRAPH directed (26 vertices & 52 edges)>
     Path from Ella to Alice: Alice
     Path from Ella to Robin: Ella -> Helen -> Jean -> Robin
     Path from Ella to Marion: Ella -> Helen -> Eva -> Marion
-    Path from Ella to Maxine: Ella -> Helen -> Eva -> Maxine
+    Path from Ella to Maxine: Ella -> Ellen -> Anna -> Maxine
     Path from Ella to Lena: Ella -> Ellen -> Anna -> Lena
     Path from Ella to Hazel: Hazel
     Path from Ella to Hilda: Hilda
-    Path from Ella to Frances: Ella -> Helen -> Eva -> Marion -> Frances
+    Path from Ella to Frances: Ella -> Ellen -> Edna -> Adele -> Frances
     Path from Ella to Eva: Ella -> Helen -> Eva
     Path from Ella to Ruth: Ruth
     Path from Ella to Edna: Ella -> Ellen -> Edna
@@ -627,7 +627,7 @@ Graph of data/Dining: #<DIRECTED-GRAPH directed (26 vertices & 52 edges)>
     Path from Laura to Lena: Laura -> Eva -> Marion -> Martha -> Anna -> Lena
     Path from Laura to Hazel: Hazel
     Path from Laura to Hilda: Hilda
-    Path from Laura to Frances: Laura -> Eva -> Marion -> Frances
+    Path from Laura to Frances: Laura -> Edna -> Adele -> Frances
     Path from Laura to Eva: Laura -> Eva
     Path from Laura to Ruth: Ruth
     Path from Laura to Edna: Laura -> Edna
@@ -710,14 +710,14 @@ Graph of data/Dining: #<DIRECTED-GRAPH directed (26 vertices & 52 edges)>
       Mary       .0334370140
       Ruth       .0303265940
       Irene      .0295489900
+      Ella       .0225505440
       Edna       .0225505440
       Jane       .0225505440
-      Ella       .0225505440
-      Marion     .0186625200
       Anna       .0186625200
+      Marion     .0186625200
       Jean       .0171073100
-      Ada        .0108864700
       Cora       .0108864700
+      Ada        .0108864700
       Hilda      .0031104200
     Authorities:
       Eva        .1627907000
@@ -727,43 +727,43 @@ Graph of data/Dining: #<DIRECTED-GRAPH directed (26 vertices & 52 edges)>
       Anna       .0668604700
       Adele      .0552325600
       Helen      .0523255800
-      Martha     .0348837230
-      Maxine     .0348837230
       Lena       .0348837230
-      Frances    .0348837230
+      Maxine     .0348837230
       Jane       .0348837230
+      Martha     .0348837230
+      Frances    .0348837230
+      Ellen      .0319767450
       Louise     .0319767450
       Jean       .0319767450
-      Ellen      .0319767450
       Mary       .0290697680
       Robin      .0116279070
-      Ada        .0087209310
       Cora       .0087209310
+      Ada        .0087209310
       Hazel      .0058139535
       Betty      .0058139535
-      Alice      .0000000000
-      Ruth       .0000000000
       Ella       .0000000000
       Laura      .0000000000
+      Ruth       .0000000000
+      Alice      .0000000000
       Irene      .0000000000
   Minimal cut (removed edges):
-    Ada -> Louise
-    Hazel -> Anna
-    Ellen -> Anna
-    Anna -> Maxine
-    Ruth -> Jane
-    Laura -> Eva
-    Alice -> Eva
-    Louise -> Lena
-    Jane -> Adele
-    Eva -> Marion
-    Frances -> Marion
-    Maxine -> Eva
-    Martha -> Marion
-    Helen -> Eva
-    Adele -> Frances
-    Lena -> Marion
-    Jean -> Helen
-    Irene -> Ellen
-    Irene -> Hilda
+    25 -> 12
+    25 -> 23
+    3 -> 4
+    10 -> 8
+    17 -> 13
+    4 -> 14
+    5 -> 8
+    9 -> 14
+    13 -> 8
+    14 -> 8
+    18 -> 17
+    2 -> 10
+    6 -> 14
+    24 -> 14
+    15 -> 18
+    19 -> 9
+    23 -> 19
+    11 -> 19
+    0 -> 2
 
