@@ -1,0 +1,22 @@
+digraph graphutils
+{
+  splines=true;
+  node [ color = black, fillcolor = white, style = filled ];
+  "0" -> "1" [w=7,label=7];
+  "0" -> "3" [w=2,label=2];
+  "0" [fillcolor="#ffff00"];
+  "1" -> "2" [w=4,label=4];
+  "1" [fillcolor="#ffff00"];
+  "2" -> "3" [w=4,label=4];
+  "2" -> "5" [w=2,label=2];
+  "2" -> "6" [w=10,label=10];
+  "2" [fillcolor="#ffff00"];
+  "3" -> "4" [w=4,label=4];
+  "3" [fillcolor="#ffff00"];
+  "4" -> "5" [w=8,label=8];
+  "4" [fillcolor="#ffff00"];
+  "5" [fillcolor="#ffff00"];
+  "6" -> "7" [w=2,label=2];
+  "6" [fillcolor="#ffff00"];
+  "7" [fillcolor="#ffff00"];
+}

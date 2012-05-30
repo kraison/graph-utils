@@ -1,6 +1,8 @@
 (in-package :graph-utils)
 
 (defmethod bipartite? ((graph graph) &key show-partitions?)
+  "Checks if a graph is bipartite.  If show-partitions? is T, return the
+partitions."
   (let ((color-table (make-hash-table))
         (partition-table (make-hash-table))
         (queue (make-empty-queue))
@@ -45,6 +47,8 @@
 
 (defmethod compute-maximum-matching ((graph graph) v1 v2
                                      &key (algorithm :dinic))
+  "Compute a maximum matching for the bipartite graph with partitions v1 and
+v2."
   (let* ((flow-net (make-graph :directed? t)))
     (map-nodes #'(lambda (name id)
                    (declare (ignore name))
@@ -95,3 +99,4 @@
                 (dbg "~A~%~A~%~A~%~A" matching black white flow)
                 matching))
           (error "~A is not bipartite!" graph)))))
+

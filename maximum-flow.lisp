@@ -1,6 +1,8 @@
 (in-package :graph-utils)
 
 (defun position-of-edge (n1 n2 edge-list)
+  "Find an edge in a list, always sorting vertices from low to high in the
+representation."
   (let ((p-edge (if (> n2 n1) (list n1 n2) (list n2 n1))))
     (let ((p (position p-edge
                        edge-list
@@ -10,11 +12,11 @@
       (values p p-edge))))
 
 (defmethod push-flow-via-edges ((graph graph) path edges-in-flow)
+  "Push the maximum amount of flow through edges in path."
   (let ((min-cap (apply #'min (mapcar
                                #'(lambda (e)
                                    (capacity graph (nth 0 e) (nth 1 e)))
                                path))))
-    ;;(dbg "min-cap of ~A is ~A" path min-cap)
     (dolist (edge path)
       (destructuring-bind (n1 n2) edge
         (multiple-value-bind (p p-edge)
@@ -103,7 +105,7 @@
                             (set-difference l0-edges
                                             min-edges
                                             :test 'equalp))))))))
-    (dbg "Dinic computed ~A loops" loops)
+    ;;(dbg "Dinic computed ~A loops" loops)
     (values flow
             (sort edges-in-flow #'> :key 'third)
             gf)))
@@ -123,13 +125,14 @@ formulation."
                (incf flow pushed-flow)
                (setq edges-in-flow eif))
              (progn
-               (dbg "Edmond-Karp computed ~A loops" loops)
+               ;;(dbg "Edmond-Karp computed ~A loops" loops)
                (return-from find-maximum-flow
                  (values flow
                          (sort edges-in-flow #'> :key 'third)
                          gf))))))))
 
 (defmethod init-karzanov ((gf graph) nodes edges source sink)
+  "Compute the node capacity for each node in gf."
   (let ((in (make-hash-table))
         (out (make-hash-table)))
     (dolist (node nodes)
@@ -150,6 +153,7 @@ formulation."
 
 (defmethod karzanov-push ((gf graph) node l0-nodes l0-edges capacities cap
                           source sink edges-in-flow)
+  ""
   (let ((q (make-empty-queue)) (flows (make-hash-table)))
     (enqueue q node)
     (setf (gethash node flows) cap)
@@ -203,6 +207,7 @@ formulation."
 
 (defmethod karzanov-pull ((gf graph) node l0-nodes l0-edges capacities cap
                           source sink edges-in-flow)
+  ""
   (let ((q (make-empty-queue))
         (flows (make-hash-table)))
     (enqueue q node)
@@ -256,6 +261,7 @@ formulation."
 
 (defmethod karzanov-push-pull ((gf graph) node l0-nodes l0-edges capacities
                                cap source sink edges-in-flow)
+  ""
   (multiple-value-bind (l0-nodes l0-edges capacities edges-in-flow)
       (karzanov-push gf node l0-nodes l0-edges capacities cap source sink
                      edges-in-flow)
@@ -290,7 +296,7 @@ formulation."
                                                 edges-in-flow))
                           (incf f* cap)))))
              (incf flow f*))))
-    (dbg "Karzanov computed ~A loops" loops)
+    ;;(dbg "Karzanov computed ~A loops" loops)
     (values flow
             (sort edges-in-flow #'> :key 'third)
             gf)))
@@ -330,19 +336,20 @@ formulation."
     g-prime))
 
 (defmethod compute-maximum-flow ((graph directed-graph) (source integer)
-                                 (sink integer) &key algorithm
-                                 node-capacities?)
+                                 (sink integer) &key node-capacities?
+                                 (algorithm :karzanov))
   (if node-capacities?
       (let ((g-prime (expand-node-capacities graph source sink)))
-        (find-maximum-flow g-prime source sink (or algorithm :karzanov)))
-      (find-maximum-flow graph source sink (or algorithm :karzanov))))
+        (find-maximum-flow g-prime source sink algorithm))
+      (find-maximum-flow graph source sink algorithm)))
 
 (defmethod compute-maximum-flow ((graph directed-graph) source sink
-                                 &key algorithm node-capacities?)
+                                 &key node-capacities?
+                                 (algorithm :karzanov))
   "Compute max flow for the directed graph.  Algorithm can be one of
 :edmond-karp, :dinic or :karzanov"
   (compute-maximum-flow graph
                         (lookup-node graph source)
                         (lookup-node graph sink)
-                        :algorithm (or algorithm :karzanov)
+                        :algorithm algorithm
                         :node-capacities? node-capacities?))
