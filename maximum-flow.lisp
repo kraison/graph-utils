@@ -301,6 +301,68 @@ formulation."
             (sort edges-in-flow #'> :key 'third)
             gf)))
 
+(defmethod find-gt-candidate ((graph graph) source sink e)
+  (dotimes (i (length e))
+    (unless (or (eq i source) (eq i sink))
+      (when (> (aref e i) 0)
+        (return-from find-gt-candidate i)))))
+
+(defmethod gt-push ((graph graph) f h e v w)
+  (let ((f0 (min (aref e v) (- (capacity graph v w) (aref f v w)))))
+    ;; capf (u, v) = cap(u, v) − f(u, v) in Gf
+    ;;(dbg "    Pushing ~A through ~A,~A" f0 v w)
+    (incf (aref f v w) f0)
+    (decf (aref f w v) f0)
+    (incf (aref e w) f0)
+    (decf (aref e v) f0)
+    f0))
+
+(defmethod gt-lift ((graph graph) f h e v)
+  (let ((min most-positive-fixnum))
+    (dolist (w (node-ids graph)) ;;(outbound-neighbors graph v))
+      (when (> (- (capacity graph v w) (aref f v w)) 0)
+        (setf (aref h v) (1+ (min min (aref h w))))))))
+
+(defmethod gt-discharge ((graph graph) f h e v sink)
+  (let ((neighbors (node-ids graph))) ;;(outbound-neighbors graph v))
+    (loop while (and neighbors (> (aref e v) 0)) do
+         (let ((w (pop neighbors)))
+           (when (and w
+                      (> (- (capacity graph v w) (aref f v w)) 0)
+                      (> (aref h v) (aref h w)))
+             (gt-push graph f h e v w))))
+    (when (> (aref e v) 0)
+      (gt-lift graph f h e v))))
+
+(defmethod find-maximum-flow ((graph directed-graph) (source integer)
+                              (sink integer) (algorithm (eql :goldberg-tarjan)))
+  "This implements the push-relabel method of Goldberg and Tarjan."
+  (let* ((flow 0) (gf (copy-graph graph)) (loops 0) (edges-in-flow nil)
+         (h (make-array (list (node-count gf)) :initial-element 0))
+         (e (make-array (list (node-count gf)) :initial-element 0))
+         (f (make-array (list (node-count gf) (node-count gf))
+                        :initial-element 0))
+         (q (remove-if #'(lambda (n) (or (eq n source) (eq n sink)))
+                       (node-ids gf))))
+    (setf (aref h source) (node-count gf))
+    (setf (aref e source) most-positive-fixnum)
+    (dolist (n (node-ids gf)) ;;(outbound-neighbors gf source))
+      (gt-push gf f h e source n))
+    (let ((p 0))
+      (loop while (< p (length q)) do
+           (incf loops)
+           (let* ((v (nth p q)) (old-height (aref h v)))
+             (gt-discharge gf f h e v sink)
+             (if (> (aref h v) old-height)
+                 (progn
+                   (setq q (nconc (list v) (remove v q)))
+                   (setq p 0))
+                 (incf p)))))
+    (setq flow (loop for i from 0 to (1- (array-dimension f 1))
+                  summing (aref f source i) into total
+                  finally (return total)))
+    (values flow edges-in-flow)))
+
 (defmethod expand-node-out ((graph graph) node cap)
   (let ((new-node (add-node graph (gensym "V"))))
     (dolist (neighbor (outbound-neighbors graph node))
