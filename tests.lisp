@@ -25,12 +25,6 @@
                     (compute-maximum-matching bgraph p2 p1 :algorithm alg))
                 #'< :key 'first)))
           (dbg "graph bipartite1: ~A says matching is~% ~A" alg matching)
-          (push (list alg matching) results))))
+          (push (list alg :matching matching) results))))
     results))
 
-(defun bp ()
-  (multiple-value-bind (flow-dinic edges-dinic)
-      (compute-maximum-flow *bp* 12 13 :algorithm :dinic)
-    (multiple-value-bind (flow-gt edges-gt)
-        (compute-maximum-flow *bp* 12 13 :algorithm :goldberg-tarjan)
-      (set-difference edges-dinic edges-gt :test 'equalp))))
