@@ -67,7 +67,6 @@ v2."
         (add-edge flow-net node sink :weight 1))
       ;;(visualize flow-net :render? t
       ;;:file (format nil "data/matching-~A.dot" algorithm))
-      (setq *bp* flow-net)
       (multiple-value-bind (flow edges)
           (compute-maximum-flow flow-net source sink :algorithm algorithm)
         (values
