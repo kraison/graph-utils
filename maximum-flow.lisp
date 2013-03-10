@@ -24,8 +24,8 @@ representation."
           (if p
               (incf (nth 2 (nth p edges-in-flow)) min-cap)
               (push (append p-edge (list min-cap)) edges-in-flow))
-          (decf-edge-weight graph n1 n2 min-cap)
-          (incf-edge-weight graph n2 n1 min-cap))))
+          (decf-edge-weight graph n1 n2 :delta min-cap)
+          (incf-edge-weight graph n2 n1 :delta min-cap))))
     (values min-cap edges-in-flow)))
 
 (defmethod compute-layered-network ((graph graph) source sink)
@@ -174,7 +174,7 @@ formulation."
                               (incf (nth 2 (nth p edges-in-flow)) fv)
                               (push (append p-edge (list fv))
                                     edges-in-flow)))
-                        (decf-edge-weight gf u w fv)
+                        (decf-edge-weight gf u w :delta fv)
                         (setq l0-edges
                               (remove (list u w) l0-edges :test 'equalp))
                         (setf (gethash w flows) (+ fv (gethash w flows 0)))
@@ -187,7 +187,7 @@ formulation."
                               (push (append p-edge (list f0))
                                     edges-in-flow)))
                         (setf (gethash w flows) (+ fv (gethash w flows 0)))
-                        (decf-edge-weight gf u w f0)
+                        (decf-edge-weight gf u w :delta f0)
                         (setq f0 0)))))
            (when (not (eql u node))
              (let ((cap-u (find u capacities :key 'first)))
@@ -230,7 +230,7 @@ formulation."
                               (incf (nth 2 (nth p edges-in-flow)) fv)
                               (push (append p-edge (list fv))
                                     edges-in-flow)))
-                        (decf-edge-weight gf w u fv)
+                        (decf-edge-weight gf w u :delta fv)
                         (setq l0-edges
                               (remove (list w u) l0-edges :test 'equalp))
                         (setf (gethash w flows) (+ fv (gethash w flows 0)))
@@ -243,7 +243,7 @@ formulation."
                               (push (append p-edge (list f0))
                                     edges-in-flow)))
                         (setf (gethash w flows) (+ fv (gethash w flows 0)))
-                        (decf-edge-weight gf w u f0)
+                        (decf-edge-weight gf w u :delta f0)
                         (setq f0 0)))))
            (let ((cap-u (find u capacities :key 'first)))
              (setf (second cap-u) (- (second cap-u) (gethash u flows 0)))

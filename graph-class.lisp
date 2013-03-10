@@ -15,8 +15,6 @@
    (comparator   :accessor comparator :initarg :comparator :initform 'equal)
    (degree-table :accessor degree-table :initarg :degree-table
                  :initform (make-hash-table))
-;   (edge-index   :accessor edge-index :initarg :edge-index
-;                 :initform (make-edge-index))
    (matrix       :accessor matrix     :initarg :matrix
                  :initform (make-sparse-array '(0 0)
                                               :adjustable t
@@ -48,7 +46,8 @@
 
 (defun make-graph (&key directed? (node-comparator #'equal)
                    (saturation-point 0))
-  "Create a new graph object"
+  "Create a new graph object. You are responsible for making sure that
+node-comparator is a valid hash table test."
   (make-instance (if directed? 'directed-graph 'graph)
 		 :comparator node-comparator
 		 :s-point saturation-point
@@ -176,7 +175,9 @@
   "Return the node count."
   (hash-table-count (nodes graph)))
 
-(defmethod neighbors ((graph graph) (node integer) &key (return-ids? t))
+(defgeneric neighbors (graph node &key return-ids? edge-type))
+(defmethod neighbors ((graph graph) (node integer) &key (return-ids? t)
+                      &allow-other-keys)
   "Return a list of ids for this node's neighbors. Returns inbound and
 outbound neighbors for a directed graph."
   (let ((neighbors nil))
@@ -191,20 +192,23 @@ outbound neighbors for a directed graph."
                       (matrix graph) node))
     (if return-ids?
 	(nreverse neighbors)
-	(mapcar #'lookup-node (nreverse neighbors)))))
+	(mapcar #'(lambda (id)
+                    (lookup-node graph id))
+                (nreverse neighbors)))))
 
-(defmethod neighbors ((graph graph) node &key (return-ids? t))
+(defmethod neighbors ((graph graph) node &key (return-ids? t) &allow-other-keys)
   "Return a list of ids for this node's neighbors."
   (neighbors graph (gethash node (nodes graph)) :return-ids? return-ids?))
 
+(defgeneric inbound-neighbors (graph node &key return-ids? edge-type))
 (defmethod inbound-neighbors ((graph directed-graph) node &key
-                              (return-ids? t))
+                              (return-ids? t) &allow-other-keys)
   (inbound-neighbors graph
                      (gethash node (nodes graph))
                      :return-ids? return-ids?))
 
 (defmethod inbound-neighbors ((graph directed-graph) (node integer) &key
-                              (return-ids? t))
+                              (return-ids? t) &allow-other-keys)
   (let ((neighbors nil))
     (map-sarray-col #'(lambda (row-id value)
                         (when (> value 0)
@@ -212,16 +216,19 @@ outbound neighbors for a directed graph."
                     (matrix graph) node)
     (if return-ids?
 	(nreverse neighbors)
-	(mapcar #'lookup-node (nreverse neighbors)))))
+	(mapcar #'(lambda (id)
+                    (lookup-node graph id))
+                (nreverse neighbors)))))
 
+(defgeneric outbound-neighbors (graph node &key return-ids? edge-type))
 (defmethod outbound-neighbors ((graph directed-graph) node &key
-                               (return-ids? t))
+                               (return-ids? t) &allow-other-keys)
   (outbound-neighbors graph
                       (gethash node (nodes graph))
                       :return-ids? return-ids?))
 
 (defmethod outbound-neighbors ((graph directed-graph) (node integer) &key
-                               (return-ids? t))
+                               (return-ids? t) &allow-other-keys)
   (let ((neighbors nil))
     (map-sarray-row #'(lambda (col-id value)
                         (when (> value 0)
@@ -229,17 +236,23 @@ outbound neighbors for a directed graph."
                     (matrix graph) node)
     (if return-ids?
 	(nreverse neighbors)
-	(mapcar #'lookup-node (nreverse neighbors)))))
+	(mapcar #'(lambda (id)
+                    (lookup-node graph id))
+                (nreverse neighbors)))))
 
-(defmethod edge-exists? ((graph graph) (n1 integer) (n2 integer))
+(defgeneric edge-exists? (graph n1 n2 &key edge-type))
+(defmethod edge-exists? ((graph graph) (n1 integer) (n2 integer)
+                         &key &allow-other-keys)
   "Is there an edge between n1 and n2?"
   (when (> (saref (matrix graph) n1 n2) 0) (saref (matrix graph) n1 n2)))
 
-(defmethod edge-exists? ((graph graph) n1 n2)
+(defmethod edge-exists? ((graph graph) n1 n2 &key &allow-other-keys)
   "Is there an edge between n1 and n2?"
-  (edge-exists? graph (gethash n1 (nodes graph)) (gethash n2 (nodes graph))))
+  (edge-exists? graph (lookup-node graph n1) (lookup-node graph n2)))
 
-(defmethod add-edge ((graph graph) (n1 integer) (n2 integer) &key (weight 1))
+(defgeneric add-edge (graph n1 n2 &key weight edge-type))
+(defmethod add-edge ((graph graph) (n1 integer) (n2 integer) &key (weight 1)
+                     &allow-other-keys)
   "Add an edge between n1 and n2."
   (unless (= n1 n2)
     (unless (> (saref (matrix graph) n1 n2) 0)
@@ -250,13 +263,8 @@ outbound neighbors for a directed graph."
     (setf (saref (matrix graph) n2 n1) weight))
   (list n1 n2))
 
-(defmethod add-edge ((graph graph) n1 n2 &key (weight 1))
-  "Add an edge between n1 and n2."
-  (add-edge graph (gethash n1 (nodes graph)) (gethash n2 (nodes graph))
-            :weight weight))
-
 (defmethod add-edge ((graph directed-graph) (n1 integer) (n2 integer) &key
-                     (weight 1))
+                     (weight 1) &allow-other-keys)
   (unless (= n1 n2)
     (unless (> (saref (matrix graph) n1 n2) 0)
       (incf (gethash n1 (out-degree-table graph)))
@@ -265,13 +273,21 @@ outbound neighbors for a directed graph."
     (setf (saref (matrix graph) n1 n2) weight)
     (list n1 n2)))
 
-(defmethod add-edge ((graph directed-graph) n1 n2 &key (weight 1))
+(defmethod add-edge ((graph graph) n1 n2 &key (weight 1) &allow-other-keys)
   "Add an edge between n1 and n2."
   (add-edge graph (gethash n1 (nodes graph)) (gethash n2 (nodes graph))
             :weight weight))
 
-(defmethod delete-edge ((graph graph) (n1 integer) (n2 integer))
+(defmethod add-edge ((graph directed-graph) n1 n2 &key (weight 1)
+                     &allow-other-keys)
+  "Add an edge between n1 and n2."
+  (add-edge graph (gethash n1 (nodes graph)) (gethash n2 (nodes graph))
+            :weight weight))
+
+(defgeneric delete-edge (graph n1 n2 &optional edge-type))
+(defmethod delete-edge ((graph graph) (n1 integer) (n2 integer) &optional et)
   "Remove an edge from the graph."
+  (declare (ignore et))
   (unless (= n1 n2)
     (when (> (saref (matrix graph) n1 n2) 0)
       (decf (gethash n1 (degree-table graph)))
@@ -280,8 +296,10 @@ outbound neighbors for a directed graph."
       (setf (saref (matrix graph) n1 n2) 0))
     (setf (saref (matrix graph) n2 n1) 0)))
 
-(defmethod delete-edge ((graph directed-graph) (n1 integer) (n2 integer))
+(defmethod delete-edge ((graph directed-graph) (n1 integer) (n2 integer)
+                        &optional et)
   "Remove an edge from the graph."
+  (declare (ignore et))
   (unless (= n1 n2)
     ;;(dbg "Deleting edge (~A,~A)" n1 n2)
     (when (> (saref (matrix graph) n1 n2) 0)
@@ -294,7 +312,8 @@ outbound neighbors for a directed graph."
       (decf (edges graph))
       (setf (saref (matrix graph) n1 n2) 0))))
 
-(defmethod delete-edge ((graph graph) n1 n2)
+(defmethod delete-edge ((graph graph) n1 n2 &optional et)
+  (declare (ignore et))
   (delete-edge graph (gethash n1 (nodes graph)) (gethash n2 (nodes graph))))
 
 (defmethod map-edges ((fn function) (graph graph) &key collect? remove-nulls?)
@@ -315,8 +334,7 @@ outbound neighbors for a directed graph."
   "Return all edges as pairs of nodes."
   (let ((r nil))
     (fast-map-sarray #'(lambda (n1 n2 w)
-                         (format t "GOT EDGE (~A, ~A, ~A)~%" n1 n2 w)
-                         ;;(declare (ignore w))
+                         (declare (ignore w))
                          (push (if nodes-as-ids
                                    (list n1 n2)
                                    (list (gethash n1 (ids graph))
@@ -325,34 +343,41 @@ outbound neighbors for a directed graph."
                      (matrix graph))
     (nreverse r)))
 
-(defmethod set-edge-weight ((graph graph) (n1 integer) (n2 integer) weight)
+(defgeneric set-edge-weight (graph n1 n2 weight &key edge-type))
+(defmethod set-edge-weight ((graph graph) (n1 integer) (n2 integer) weight
+                            &key &allow-other-keys)
   (setf (saref (matrix graph) n1 n2) weight))
 
-(defmethod edge-weight ((graph graph) (n1 integer) (n2 integer))
+(defgeneric edge-weight (graph n1 n2 &optional edge-type))
+(defmethod edge-weight ((graph graph) (n1 integer) (n2 integer) &optional et)
+  (declare (ignore et))
   (saref (matrix graph) n1 n2))
 
-(defmethod edge-weight ((graph graph) n1 n2)
+(defmethod edge-weight ((graph graph) n1 n2 &optional et)
+  (declare (ignore et))
   (edge-weight graph (gethash n1 (nodes graph)) (gethash n2 (nodes graph))))
 
+(defgeneric incf-edge-weight (graph n1 n2 &key edge-type delta))
 (defmethod incf-edge-weight ((graph graph) (n1 integer) (n2 integer)
-                             &optional (delta 1))
+                             &key (delta 1) &allow-other-keys)
   (incf-sarray (matrix graph) (list n1 n2) delta))
 
-(defmethod incf-edge-weight ((graph graph) n1 n2 &optional delta)
+(defmethod incf-edge-weight ((graph graph) n1 n2 &key delta &allow-other-keys)
   (incf-edge-weight graph
-                    (gethash n1 (nodes graph))
-                    (gethash n2 (nodes graph))
-                    delta))
+                    (lookup-node graph n1)
+                    (lookup-node graph n2)
+                    :delta delta))
 
+(defgeneric decf-edge-weight (graph n1 n2 &key edge-type delta))
 (defmethod decf-edge-weight ((graph graph) (n1 integer) (n2 integer)
-                             &optional (delta 1))
+                             &key (delta 1) &allow-other-keys)
   (decf-sarray (matrix graph) (list n1 n2) delta))
 
-(defmethod decf-edge-weight ((graph graph) n1 n2 &optional delta)
+(defmethod decf-edge-weight ((graph graph) n1 n2 &key delta &allow-other-keys)
   (decf-edge-weight graph
                     (gethash n1 (nodes graph))
                     (gethash n2 (nodes graph))
-                    delta))
+                    :delta delta))
 
 (defmethod capacity ((graph graph) n1 n2)
   (or (edge-weight graph n1 n2) 0))
@@ -383,7 +408,9 @@ outbound neighbors for a directed graph."
     (map-edges #'(lambda (n1 n2 w) (declare (ignore n1 n2 w)) (incf count)) graph)
     count))
 
-(defmethod random-edge ((graph graph))
+(defgeneric random-edge (graph &optional edge-type))
+(defmethod random-edge ((graph graph) &optional et)
+  (declare (ignore et))
   (let (n1 n2 (w 0))
     (loop until (> w 0) do
 	 (setq n1 (random (row-count (matrix graph)))
@@ -397,7 +424,9 @@ outbound neighbors for a directed graph."
   (add-edge graph (first e1) (first e2))
   (add-edge graph (second e1) (second e2)))
 
-(defmethod reverse-edge ((graph graph) n1 n2)
+(defgeneric reverse-edge (graph n1 n2 &optional edge-type))
+(defmethod reverse-edge ((graph graph) n1 n2 &optional edge-type)
+  (declare (ignore edge-type))
   (let ((weight (edge-weight graph n1 n2)))
     (delete-edge graph n1 n2)
     (add-edge graph n2 n1 :weight weight)))

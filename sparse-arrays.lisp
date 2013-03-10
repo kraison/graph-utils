@@ -12,6 +12,11 @@
    (element-type :accessor element-type :initarg :element-type :initform nil)
    (array-lock :accessor array-lock :initform (make-recursive-lock))))
 
+(defgeneric sparse-array? (thing)
+  (:documentation "sparse array predicate")
+  (:method ((thing sparse-array)) t)
+  (:method (thing) nil))
+
 (defmethod print-object ((array sparse-array) stream)
   (format stream "#<SPARSE-ARRAY (~D" (row-count array))
   (when (> (col-count array) 0)
@@ -142,24 +147,23 @@
                  (remhash (nth 1 indices) table)
                  (setf (gethash (nth 1 indices) table) value)))))))
 
-(defsetf saref (a &rest indices) (value)
-  `(set-sparse-array ,a (list ,@(mapcar #'(lambda (i) i) indices)) ,value))
+;;(defsetf saref (a &rest indices) (value)
+;;  `(set-sparse-array ,a (list ,@(mapcar #'(lambda (i) i) indices)) ,value))
+
+(defun (setf saref) (value array &rest indices)
+  (set-sparse-array array indices value))
 
 (defun incf-svector (vector index &optional (delta 1))
   (incf (gethash index (matrix vector)) delta))
 
 (defun incf-sarray (array indices &optional (delta 1))
-  (with-recursive-lock-held ((array-lock array))
-    (let ((value (apply #'saref array indices)))
-      (set-sparse-array array indices (+ delta value)))))
+  (incf (apply #'saref array indices) delta))
 
 (defun decf-svector (vector index &optional (delta 1))
   (decf (gethash index (matrix vector)) delta))
 
 (defun decf-sarray (array indices &optional (delta 1))
-  (with-recursive-lock-held ((array-lock array))
-    (let ((value (apply #'saref array indices)))
-      (set-sparse-array array indices (- value delta)))))
+  (decf (apply #'saref array indices) delta))
 
 (defun hash-keys (ht &optional (sort-fn #'<))
   (sort (loop for k being the hash-keys in ht collecting k) sort-fn))

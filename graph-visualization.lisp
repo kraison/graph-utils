@@ -38,8 +38,8 @@ Graphviz tool."
 				   name
 				   connector
 				   (gethash n (ids graph))
-				   (aref (matrix graph) id n)
-				   (aref (matrix graph) id n))))
+				   (saref (matrix graph) id n)
+				   (saref (matrix graph) id n))))
 		       (format out "  \"~A\" [fillcolor=\"~A\""
 			       name
 			       (if (hash-table-p colors)

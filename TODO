@@ -1,10 +1,10 @@
 TODO:
--  Add typed edges.
 -  Add a node class to make life easier.
 -  Add an edge class to make life easier.
 -  Optimize!
 
 DONE:
+-  Add typed edges.
 -  Get rid of the adjacency matrix and replace with sparse representation.
 -  Create a directed graph subclass and update methods for it.
 -  Add maximum flow methods for directed graphs

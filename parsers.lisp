@@ -124,14 +124,6 @@
 	  (setq graph (build-graph (second (second (first branch))))))))
     graph))
 
-(defun check-nodes (graph vertex-count)
-  ;;(format t "Checking nodes~%")
-  (unless (= vertex-count (node-count graph))
-    (dotimes (i vertex-count)
-      (add-node graph i)))
-  ;;(format t "Done checking nodes~%")
-  (adjust-adjacency-matrix graph))
-
 (defun parse-pajek (file)
   "Parse a .net file and make a graph out of it."
   (let ((graph nil)
@@ -154,13 +146,11 @@
 	       (setq graph (make-graph :directed? t))
 	       (dolist (value (nreverse vertex-queue))
 		 (add-node graph value))
-	       (check-nodes graph vertex-count)
                (setq arcs? t vertices? nil))
               ((scan "^\*[Ee]dge" line)
 	       (setq graph (make-graph :directed? nil))
 	       (dolist (value (nreverse vertex-queue))
 		 (add-node graph value))
-	       (check-nodes graph vertex-count)
                (setq arcs? t vertices? nil))
               (vertices?
 	       (do-register-groups (id value rest)

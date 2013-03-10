@@ -16,7 +16,8 @@
 		   id))
 	     graph :collect? t :remove-nulls? t))
 
-(defmethod in-degree ((graph graph) (node integer))
+(defgeneric in-degree (graph node &key edge-type))
+(defmethod in-degree ((graph graph) (node integer) &key &allow-other-keys)
   (if (directed? graph)
       (let ((degree 0))
         (map-sarray-col #'(lambda (i w)
@@ -26,7 +27,8 @@
 	degree)
       (error "Cannot calculate in-degree on an undirected graph")))
 
-(defmethod out-degree ((graph graph) (node integer))
+(defgeneric out-degree (graph node &key edge-type))
+(defmethod out-degree ((graph graph) (node integer) &key &allow-other-keys)
   (if (directed? graph)
       (let ((degree 0))
         (map-sarray-row #'(lambda (i w)
@@ -36,7 +38,8 @@
 	degree)
       (error "Cannot calculate out-degree on an undirected graph")))
 
-(defmethod degree-distribution ((graph graph))
+(defgeneric degree-distribution (graph &key edge-type))
+(defmethod degree-distribution ((graph graph) &key &allow-other-keys)
   "Generate the degree distribution for the graph. For a directed graph,
 returns the out-degree distribution."
   (let ((dist nil))
@@ -55,7 +58,8 @@ returns the out-degree distribution."
 	     (nodes graph))
     (sort dist #'< :key 'car)))
 
-(defmethod in-degree-distribution ((graph graph))
+(defgeneric in-degree-distribution (graph &key edge-type))
+(defmethod in-degree-distribution ((graph graph) &key &allow-other-keys)
   "Generate the degree distribution for the graph. For a directed graph,
 returns the out-degree distribution."
   (unless (directed? graph)

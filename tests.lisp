@@ -1,13 +1,47 @@
 (in-package #:graph-utils)
 
 (defun simple-test ()
-  (let ((graph (make-graph :directed? t)))
+  ;;(let ((graph (make-graph :directed? t)))
+  (let ((graph (make-graph :directed? nil)))
     (add-node graph "node1")
     (add-node graph "node2")
     (add-node graph "node3")
     (add-node graph "node4")
     (add-edge graph "node1" "node2")
     graph))
+
+(defun typed-test ()
+  (time
+   (let ((graph (make-typed-graph)))
+     (dotimes (i 1000)
+       (add-edge-type graph (intern (format nil "~@R" (1+ i)) :keyword)))
+     (dotimes (x 2500000)
+       (add-node graph (format nil "~B" x)))
+     (dotimes (x 10000)
+       (dotimes (y 10000)
+         (unless (= x y)
+           (let ((r (random 3)))
+             (when (or (= 1 r) (= 0 r))
+               (add-edge graph x y
+                         :edge-type
+                         (intern (format nil "~@R" (1+ (random 1000)))
+                                 :keyword)))))))
+     graph)))
+#|
+  (let ((graph (make-typed-graph :initial-edge-types '(:is-a :has-name))))
+    (add-node graph "Person")
+    (add-node graph "Human")
+    (add-node graph "Kevin")
+    (add-node graph "No one")
+    (add-edge graph "Person" "Human" :edge-type :is-a)
+    (add-edge graph "Person" "Kevin" :edge-type :has-name)
+    (add-edge graph "No one" "Person" :edge-type :owns)
+    (values graph
+            (list-edges graph)
+            (cons "Person" (neighbors graph "Person"))
+            (cons "Person" (inbound-neighbors graph "Person"))
+            (cons "Person" (outbound-neighbors graph "Person")))))
+|#
 
 (defun run-tests ()
   (let ((flow1 (parse-pajek "data/flow1.net"))

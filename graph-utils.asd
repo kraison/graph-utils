@@ -21,8 +21,11 @@
                (:file "node" :depends-on ("utilities"))
                ;;(:file "edge" :depends-on ("node"))
                (:file "sparse-arrays" :depends-on ("utilities"))
-	       (:file "graph-class" :depends-on ("node"))
+	       (:file "graph-class" :depends-on ("sparse-arrays" "node"))
+	       (:file "typed-edge-graph-class" :depends-on ("graph-class"))
 	       (:file "graph-methods" :depends-on ("queue" "graph-class"))
+	       (:file "typed-edge-graph-methods"
+                      :depends-on ("typed-edge-graph-class" "graph-methods"))
                (:file "maximum-flow" :depends-on ("graph-methods"))
                (:file "bipartite" :depends-on ("maximum-flow"))
                (:file "cut" :depends-on ("maximum-flow"))
