@@ -1,7 +1,7 @@
 (in-package #:cl-user)
 
 (defpackage #:graph-utils
-  (:use #:cl #:cl-ppcre #:dso-lex #:yacc)
+  (:use #:cl #:cl-ppcre #:dso-lex #:yacc #:bordeaux-threads)
   (:export #:make-graph
 	   #:graph
 	   #:copy-graph

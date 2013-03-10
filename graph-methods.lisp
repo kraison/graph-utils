@@ -19,18 +19,20 @@
 (defmethod in-degree ((graph graph) (node integer))
   (if (directed? graph)
       (let ((degree 0))
-	(loop for i from 0 to (1- (array-dimension (matrix graph) 1)) do
-	     (when (> (aref (matrix graph) i node) 0)
-	       (incf degree)))
+        (map-sarray-col #'(lambda (i w)
+                            (when (> w 0)
+                              (incf degree)))
+                        (matrix graph) node)
 	degree)
       (error "Cannot calculate in-degree on an undirected graph")))
 
 (defmethod out-degree ((graph graph) (node integer))
   (if (directed? graph)
       (let ((degree 0))
-	(loop for i from 0 to (1- (array-dimension (matrix graph) 0)) do
-	     (when (> (aref (matrix graph) node i) 0)
-	       (incf degree)))
+        (map-sarray-row #'(lambda (i w)
+                            (when (> w 0)
+                              (incf degree)))
+                        (matrix graph) node)
 	degree)
       (error "Cannot calculate out-degree on an undirected graph")))
 
@@ -44,8 +46,8 @@ returns the out-degree distribution."
 		   (loop
                       for i
                       from 0
-                      to (1- (array-dimension (matrix graph) 0)) do
-			(when (not (zerop (aref (matrix graph) id i)))
+                      to (row-count (matrix graph)) do
+			(when (not (zerop (saref (matrix graph) id i)))
 			  (incf degree)))
 		   (if (assoc degree dist)
 		       (incf (cdr (assoc degree dist)))
@@ -65,8 +67,8 @@ returns the out-degree distribution."
 		   (loop
                       for i
                       from 0
-                      to (1- (array-dimension (matrix graph) 1)) do
-			(when (not (zerop (aref (matrix graph) i id)))
+                      to (col-count (matrix graph)) do
+			(when (not (zerop (saref (matrix graph) i id)))
 			  (incf degree)))
 		   (if (assoc degree dist)
 		       (incf (cdr (assoc degree dist)))
@@ -158,14 +160,13 @@ returns it as a list of edges as pairs of nodes."
 
 (defmethod calculate-shortest-paths ((graph graph))
   (let ((paths nil))
-    (loop for i from 0 to (1- (array-dimension (matrix graph) 0)) do
-	 (loop for j from (if (directed? graph) 0 i) to
-	      (1- (array-dimension (matrix graph) 1))
-	    do
-	      (unless (= i j)
-		(push (list i j (find-shortest-path graph i j)) paths))))
+    (dotimes (i (row-count (matrix graph)))
+      (loop
+         for j from (if (directed? graph) 0 i) to (1- (col-count (matrix graph)))
+         do
+           (unless (= i j)
+             (push (list i j (find-shortest-path graph i j)) paths))))
     (nreverse paths)))
-
 
 (defmethod cluster ((graph graph) (method (eql :edge-betweenness))
 		    &key (edge-removal-count 0))
@@ -176,7 +177,8 @@ dense areas of the graph."
   (let* ((shortest-paths (calculate-shortest-paths graph))
 	 (between-table (sort
 			 (map-edges
-			  #'(lambda (i j)
+			  #'(lambda (i j w)
+                              (declare (ignore w))
 			      (let ((coord (list i j)))
 				(list coord
 				      (reduce #'+ (mapcar
@@ -200,13 +202,12 @@ dense areas of the graph."
 
 (defmethod score-edges ((graph graph) &key sort?)
   (let ((span-map nil))
-    (map-edges #'(lambda (n1 n2)
-		   (let ((w (edge-weight graph n1 n2)))
-		     (delete-edge graph n1 n2)
-		     (push (list (list n1 n2)
-				 (length (find-shortest-path graph n1 n2)))
-			   span-map)
-		     (add-edge graph n1 n2 :weight w)))
+    (map-edges #'(lambda (n1 n2 w)
+                   (delete-edge graph n1 n2)
+                   (push (list (list n1 n2)
+                               (length (find-shortest-path graph n1 n2)))
+                         span-map)
+                   (add-edge graph n1 n2 :weight w))
 	       graph)
     (if sort?
 	(sort span-map #'> :key #'second)

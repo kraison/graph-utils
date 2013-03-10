@@ -13,12 +13,14 @@
 	       :dso-lex
 	       :yacc
 	       :trivial-shell
-	       :parse-number)
+	       :parse-number
+               :bordeaux-threads)
   :components ((:file "graph-package")
                (:file "queue" :depends-on ("graph-package"))
                (:file "utilities" :depends-on ("queue"))
                (:file "node" :depends-on ("utilities"))
                ;;(:file "edge" :depends-on ("node"))
+               (:file "sparse-arrays" :depends-on ("utilities"))
 	       (:file "graph-class" :depends-on ("node"))
 	       (:file "graph-methods" :depends-on ("queue" "graph-class"))
                (:file "maximum-flow" :depends-on ("graph-methods"))

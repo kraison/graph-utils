@@ -1,5 +1,14 @@
 (in-package #:graph-utils)
 
+(defun simple-test ()
+  (let ((graph (make-graph :directed? t)))
+    (add-node graph "node1")
+    (add-node graph "node2")
+    (add-node graph "node3")
+    (add-node graph "node4")
+    (add-edge graph "node1" "node2")
+    graph))
+
 (defun run-tests ()
   (let ((flow1 (parse-pajek "data/flow1.net"))
         (flow2 (parse-pajek "data/flow.net"))
