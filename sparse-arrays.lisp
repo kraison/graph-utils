@@ -25,19 +25,21 @@
       (format stream ">")))
 
 (defmethod incf-sarray-dimensions ((array sparse-array) &optional (delta 1))
-  (if (= 1 (dimensions array))
-      (incf (row-count array) delta)
-      (values
+  (with-recursive-lock-held ((array-lock array))
+    (if (= 1 (dimensions array))
         (incf (row-count array) delta)
-        (incf (col-count array) delta))))
+        (values
+         (incf (row-count array) delta)
+         (incf (col-count array) delta)))))
 
 (defmethod adjust-sarray ((array sparse-array) &rest dimensions)
   "FIXME: handle shrinking by deleting just like adjust-array"
   (if (adjustable? array)
-      (if (= 1 (dimensions array))
-          (setf (row-count array) (first dimensions))
-          (setf (row-count array) (first dimensions)
-                (col-count array) (second dimensions)))
+      (with-recursive-lock-held ((array-lock array))
+        (if (= 1 (dimensions array))
+            (setf (row-count array) (first dimensions))
+            (setf (row-count array) (first dimensions)
+                  (col-count array) (second dimensions))))
       (error "Sparse array not adjustable.")))
 
 (defmethod make-sparse-array (dimensions &key initial-element adjustable
@@ -177,38 +179,6 @@
            (incf count)))
     count))
 
-(defmethod fast-map-sarray ((fn function) (array sparse-array))
-  (if (= 1 (dimensions array))
-      (map nil #'(lambda (key)
-                   (apply fn key (gethash key (matrix array))))
-           (hash-keys (matrix array)))
-      (dolist (row (hash-keys (matrix array)))
-        (let ((table (gethash row (matrix array))))
-          ;;(dbg "ROW ~A: ~A" row table)
-          (dolist (col (hash-keys table))
-            ;;(dbg "  COL ~A: ~A" col (gethash col table))
-            (funcall fn row col (gethash col table)))))))
-
-(defmethod map-sarray-row ((fn function) (array sparse-array) row)
-  (if (= 2 (dimensions array))
-      (let ((table (gethash row (matrix array))))
-        (when (hash-table-p table)
-          (sb-ext:with-locked-hash-table (table)
-            (loop for v being the hash-values in table using (hash-key k) do
-                 (funcall fn k v)))))
-      (error "Cannot map rows of a single dimensional array.")))
-
-(defmethod map-sarray-col ((fn function) (array sparse-array) col)
-  (if (= 2 (dimensions array))
-      (sb-ext:with-locked-hash-table ((matrix array))
-        (maphash #'(lambda (row table)
-                     (multiple-value-bind (v p?)
-                         (gethash col table (initial-element array))
-                       (when p?
-                         (funcall fn row v))))
-                 (matrix array)))
-      (error "Cannot map columns of single dimensional arrays.")))
-
 (defmethod sum-svector ((vector sparse-array))
   (if (= 1 (dimensions vector))
       (sb-ext:with-locked-hash-table ((matrix vector))
@@ -261,6 +231,36 @@
               (loop for v being the hash-values in table summing (square v)))
             0))
       (error "Please use sum-svector for 1D sparse arrays.")))
+
+(defmethod fast-map-sarray ((fn function) (array sparse-array))
+  (if (= 1 (dimensions array))
+      (map nil #'(lambda (key)
+                   (apply fn key (gethash key (matrix array))))
+           (hash-keys (matrix array)))
+      (dolist (row (hash-keys (matrix array)))
+        (let ((table (gethash row (matrix array))))
+          (dolist (col (hash-keys table))
+            (funcall fn row col (gethash col table)))))))
+
+(defmethod map-sarray-row ((fn function) (array sparse-array) row)
+  (if (= 2 (dimensions array))
+      (let ((table (gethash row (matrix array))))
+        (when (hash-table-p table)
+          (sb-ext:with-locked-hash-table (table)
+            (loop for v being the hash-values in table using (hash-key k) do
+                 (funcall fn k v)))))
+      (error "Cannot map rows of a single dimensional array.")))
+
+(defmethod map-sarray-col ((fn function) (array sparse-array) col)
+  (if (= 2 (dimensions array))
+      (sb-ext:with-locked-hash-table ((matrix array))
+        (maphash #'(lambda (row table)
+                     (multiple-value-bind (v p?)
+                         (gethash col table (initial-element array))
+                       (when p?
+                         (funcall fn row v))))
+                 (matrix array)))
+      (error "Cannot map columns of single dimensional arrays.")))
 
 (defmethod map-sarray ((fn function) (array sparse-array) &key collect?)
   (let ((result nil))

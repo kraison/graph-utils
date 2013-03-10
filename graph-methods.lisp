@@ -46,7 +46,7 @@ returns the out-degree distribution."
 		   (loop
                       for i
                       from 0
-                      to (row-count (matrix graph)) do
+                      to (1- (row-count (matrix graph))) do
 			(when (not (zerop (saref (matrix graph) id i)))
 			  (incf degree)))
 		   (if (assoc degree dist)
@@ -67,7 +67,7 @@ returns the out-degree distribution."
 		   (loop
                       for i
                       from 0
-                      to (col-count (matrix graph)) do
+                      to (1- (col-count (matrix graph))) do
 			(when (not (zerop (saref (matrix graph) i id)))
 			  (incf degree)))
 		   (if (assoc degree dist)
