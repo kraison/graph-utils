@@ -116,9 +116,8 @@
   "Grow the adjacency-matrix of the graph to match the number of nodes."
   nil)
 
-(defmethod add-node ((graph graph) value &key no-expand? capacity)
+(defmethod add-node ((graph graph) value &key capacity)
   "Add a node to the graph."
-  (declare (ignore no-expand?))
   (or (gethash value (nodes graph))
       (let ((id (incf (last-id graph))))
         (incf-sarray-dimensions (matrix graph))
