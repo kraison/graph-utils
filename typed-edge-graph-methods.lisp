@@ -42,8 +42,6 @@
     (sort dist #'< :key 'car)))
 
 (defmethod in-degree-distribution ((graph typed-graph) &key edge-type)
-  "Generate the degree distribution for the graph. For a directed graph,
-returns the out-degree distribution."
   (let ((dist nil) (matrix (gethash edge-type (matrix graph))))
     (maphash #'(lambda (node id)
 		 (declare (ignore node))
@@ -60,3 +58,5 @@ returns the out-degree distribution."
 	     (nodes graph))
     (sort dist #'< :key 'car)))
 
+(defmethod sim-rank ((graph typed-graph) n1 n2 &key edge-type)
+  )

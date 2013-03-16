@@ -147,8 +147,9 @@ outbound neighbors for a directed graph."
                          &key edge-type)
   "Is there an edge between n1 and n2 of type edge-type?"
   (let ((matrix (gethash edge-type (matrix graph))))
-    (when (sparse-array? matrix)
-      (> (saref matrix n1 n2) 0))))
+    (when (and (sparse-array? matrix)
+               (> (saref matrix n1 n2) 0))
+      (saref matrix n1 n2))))
 
 (defmethod edge-exists? ((graph typed-graph) n1 n2 &key edge-type)
   "Is there an edge between n1 and n2 of type edge-type?"

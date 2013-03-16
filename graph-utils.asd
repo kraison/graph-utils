@@ -26,6 +26,8 @@
 	       (:file "graph-methods" :depends-on ("queue" "graph-class"))
 	       (:file "typed-edge-graph-methods"
                       :depends-on ("typed-edge-graph-class" "graph-methods"))
+               (:file "prologc" :depends-on ("typed-edge-graph-methods"))
+               (:file "prolog-functors" :depends-on ("prologc"))
                (:file "maximum-flow" :depends-on ("graph-methods"))
                (:file "bipartite" :depends-on ("maximum-flow"))
                (:file "cut" :depends-on ("maximum-flow"))

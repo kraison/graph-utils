@@ -3,6 +3,9 @@
 (defpackage #:graph-utils
   (:use #:cl #:cl-ppcre #:dso-lex #:yacc #:bordeaux-threads)
   (:export #:make-graph
+           #:make-typed-graph
+           #:typed-graph?
+           #:add-edge-type
 	   #:graph
 	   #:copy-graph
 	   #:graph=
