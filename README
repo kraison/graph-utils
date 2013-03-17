@@ -24,4 +24,5 @@ Implements the following functionality:
     18. Maximum flow calculation for directed graphs using The Push-Relabel method, Karzanov's algorithm, Dinic's algorithm, and the Edmond/Karp method
     19. Maximum matching for bipartite graphs using the max-flow method
     20. GML and Pajek .net graph file format parsers
+    21. A prolog implementation for searching graphs based on PAIP
 
