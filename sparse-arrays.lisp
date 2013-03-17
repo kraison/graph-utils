@@ -251,19 +251,21 @@
       (let ((table (gethash row (matrix array))))
         (when (hash-table-p table)
           (sb-ext:with-locked-hash-table (table)
-            (loop for v being the hash-values in table using (hash-key k) do
-                 (funcall fn k v)))))
+            (loop for v being the hash-values in table using (hash-key k)
+                 collecting (funcall fn k v)))))
       (error "Cannot map rows of a single dimensional array.")))
 
 (defmethod map-sarray-col ((fn function) (array sparse-array) col)
   (if (= 2 (dimensions array))
-      (sb-ext:with-locked-hash-table ((matrix array))
-        (maphash #'(lambda (row table)
-                     (multiple-value-bind (v p?)
-                         (gethash col table (initial-element array))
-                       (when p?
-                         (funcall fn row v))))
-                 (matrix array)))
+      (let ((result nil))
+        (sb-ext:with-locked-hash-table ((matrix array))
+          (maphash #'(lambda (row table)
+                       (multiple-value-bind (v p?)
+                           (gethash col table (initial-element array))
+                         (when p?
+                           (push (funcall fn row v) result))))
+                   (matrix array)))
+        (nreverse result))
       (error "Cannot map columns of single dimensional arrays.")))
 
 (defmethod map-sarray ((fn function) (array sparse-array) &key collect?)

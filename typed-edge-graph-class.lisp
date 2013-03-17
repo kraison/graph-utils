@@ -153,10 +153,10 @@ outbound neighbors for a directed graph."
 
 (defmethod edge-exists? ((graph typed-graph) n1 n2 &key edge-type)
   "Is there an edge between n1 and n2 of type edge-type?"
-  (edge-exists? graph
-                (lookup-node graph n1)
-                (lookup-node graph n2)
-                :edge-type edge-type))
+  (let ((node1 (lookup-node graph n1))
+        (node2 (lookup-node graph n2)))
+    (when (and node1 node2)
+      (edge-exists? graph node1 node2 :edge-type edge-type))))
 
 (defmethod add-edge ((graph typed-graph) (n1 integer) (n2 integer) &key
                      (weight 1) edge-type)
@@ -174,11 +174,14 @@ outbound neighbors for a directed graph."
 
 (defmethod add-edge ((graph typed-graph) n1 n2 &key (weight 1) edge-type)
   "Add an edge between n1 and n2 of type edge-type."
-  (add-edge graph
-            (lookup-node graph n1)
-            (lookup-node graph n2)
-            :edge-type edge-type
-            :weight weight))
+  (let ((node1 (or (lookup-node graph n1) (add-node graph n1)))
+        (node2 (or (lookup-node graph n2) (add-node graph n2))))
+    (when (and node1 node2)
+      (add-edge graph
+                node1
+                node2
+                :edge-type edge-type
+                :weight weight))))
 
 (defmethod delete-edge ((graph typed-graph) (n1 integer) (n2 integer)
                         &optional edge-type)
@@ -193,20 +196,21 @@ outbound neighbors for a directed graph."
           (setf (saref matrix n1 n2) 0))))))
 
 (defmethod delete-edge ((graph typed-graph) n1 n2 &optional edge-type)
-  (delete-edge graph
-               (lookup-node graph n1)
-               (lookup-node graph n2)
-               edge-type))
+  (let ((node1 (or (lookup-node graph n1) (add-node graph n1)))
+        (node2 (or (lookup-node graph n2) (add-node graph n2))))
+    (when (and node1 node2)
+      (delete-edge graph node1 node2 edge-type))))
 
 (defmethod map-edges ((fn function) (graph typed-graph) &key
                       edge-type collect? remove-nulls?)
-  "Apply a function to all edges (possibly only of a single type."
+  "Apply a function to all edges (possibly only of a single type)."
   (let ((r nil))
     (flet ((map-it (matrix etype)
              (fast-map-sarray #'(lambda (n1 n2 w)
-                                  (let ((v (funcall fn n1 n2 w)))
+                                  (let ((v (funcall fn n1 n2 w etype)))
                                     (when collect?
-                                      (push (list n1 n2 v etype) r))))
+                                      (push v r))))
+                                      ;;(push (list n1 n2 v etype) r))))
                               matrix)))
       (if edge-type
           (map-it (gethash edge-type (matrix graph)) edge-type)

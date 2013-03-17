@@ -56,4 +56,36 @@
 	   #:compute-hub-authority-values
 	   #:compute-center-nodes
 	   #:parse-pajek
-	   #:parse-gml))
+	   #:parse-gml
+
+           ;; Prolog
+           #:select
+           #:?-
+           #:add-triple
+           #:make-triple
+           #:replace-?-vars
+           #:variables-in
+           #:make-functor-symbol
+           #:*trail*
+           #:*var-counter*
+           #:*functor*
+           #:make-functor
+           #:maybe-add-undo-bindings
+           #:compile-clause
+           #:show-prolog-vars
+           #:prolog-error
+           #:prolog-ignore
+           #:delete-functor
+           #:set-functor-fn
+           #:*select-list*
+           #:select-flat
+           #:select-first
+           #:do-query
+           #:map-query
+           #:valid-prolog-query?
+           #:init-prolog
+           #:*prolog-graph*
+           #:*prolog-trace*
+           #:trace-prolog
+           #:untrace-prolog
+           ))

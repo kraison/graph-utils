@@ -207,7 +207,7 @@ query."
       (funcall cont)
       (throw 'top-level-prove nil)))
 
-(let ((graph-pkg (find-package :graph-words)))
+(let ((graph-pkg (find-package :graph-utils)))
   (def-global-prolog-functor select/2 (var-names vars cont)
     (if (null vars)
 	nil
@@ -250,9 +250,11 @@ query."
   (let ((triples
 	 (get-triples
 	  :p (and (or (not (var-p p))
-                      (and (var-p p) (bound-p p))) (var-deref p))
+                      (and (var-p p) (bound-p p)))
+                  (var-deref p))
 	  :s (and (or (not (var-p s))
-                      (and (var-p s) (bound-p s))) (var-deref s))
+                      (and (var-p s) (bound-p s)))
+                  (var-deref s))
 	  :o (or (and (not (consp o))
                       (or (not (var-p o)) (and (var-p o) (bound-p o)))
 		      (var-deref o))
@@ -268,6 +270,35 @@ query."
                     (funcall cont))
                   (when (unify o (object triple))
                     (funcall cont)))))
+          (undo-bindings old-trail))))))
+
+(def-global-prolog-functor q-/4 (s p o w cont)
+  (when *prolog-trace* (format t "TRACE: Q-/4(~A ~A ~A ~A)~%" s p o w))
+  (let ((triples
+	 (get-triples
+	  :p (and (or (not (var-p p))
+                      (and (var-p p) (bound-p p)))
+                  (var-deref p))
+	  :s (and (or (not (var-p s))
+                      (and (var-p s) (bound-p s)))
+                  (var-deref s))
+	  :o (or (and (not (consp o))
+                      (or (not (var-p o)) (and (var-p o) (bound-p o)))
+		      (var-deref o))
+		 (and (consp o) (cdr o))))))
+    (dolist (triple triples)
+      (let ((old-trail (fill-pointer *trail*)))
+        (when (triple? triple)
+          (when (unify p (predicate triple))
+            (when (unify s (subject triple))
+              (if (consp o)
+                  (when (unify (car o)
+                               (object triple))
+                    (when (unify w (weight triple))
+                      (funcall cont)))
+                  (when (unify o (object triple))
+                    (when (unify w (weight triple))
+                      (funcall cont))))))
           (undo-bindings old-trail))))))
 
 (def-global-prolog-functor assert/1 (clause cont)
@@ -320,7 +351,7 @@ query."
 		 (= (length clause) 4))
 	     (not (some #'var-p clause)))
 	(handler-case
-	    (with-graph-transaction (*store*)
+            (progn
 	      (when *prolog-trace*
 		(format t "TRACE: Retracting fact ~A~%" clause))
 	      (let ((triple (lookup-triple (first clause)
@@ -348,7 +379,7 @@ query."
   "Mark a triple as VALID and remove an INVALID marker."
   (var-deref item)
   (with-graph-transaction (*store*)
-    (let ((triple (lookup-triple item :has-property "invalid" *graph*)))
+    (let ((triple (lookup-triple item :has-property "invalid")))
       (when (triple? triple)
 	(delete-triple triple)))
     (and (add-triple item :has-property "valid")
@@ -357,7 +388,7 @@ query."
 (def-global-prolog-functor is-valid?/1 (item cont)
   "Ask if a triple is valid."
   (var-deref item)
-  (let ((triple (lookup-triple item :has-property "valid" *graph*)))
+  (let ((triple (lookup-triple item :has-property "valid")))
     (when (triple? triple)
       (funcall cont))))
 
@@ -368,16 +399,17 @@ query."
     (let ((triple (lookup-triple item :has-property "valid")))
       (when (triple? triple)
 	(delete-triple triple)))
-    (and (add-triple item "has-property" "invalid")
+    (and (add-triple item :has-property "invalid")
 	 (funcall cont))))
 
 (def-global-prolog-functor is-invalid?/1 (item cont)
   "Ask if a triple is invalid."
   (var-deref item)
-  (let ((triple (lookup-triple item "has-property" "invalid" *graph*)))
+  (let ((triple (lookup-triple item :has-property "invalid")))
     (when (triple? triple)
       (funcall cont))))
 
+#|
 (defmethod reify (node)
   (declare (special node))
   (select (?p ?o)
@@ -396,4 +428,4 @@ query."
 						    :level (1+ level)))
 			    relation))
 		    relations)))))
-
+|#

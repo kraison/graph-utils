@@ -6,50 +6,11 @@
 (defun trace-prolog () (setq *prolog-trace* t))
 (defun untrace-prolog () (setq *prolog-trace* nil))
 
-(defvar *graph* nil)
-
-(defun init-prolog (&optional graph)
-  (if (typed-graph? graph)
-      (setq *graph* graph)
-      (setq *graph* (make-typed-graph))))
-
-(defstruct (triple
-             (:constructor %make-triple)
-             (:predicate triple?)
-             (:conc-name nil))
-  subject predicate object (weight 1))
-
-(defun lookup-triple (s p o)
-  (let ((w (edge-exists? *graph* subject object :edge-type predicate)))
-    (when (and (numberp w) (/= 0 w))
-      (%make-triple :subject subject
-                    :predicate predicate
-                    :object object
-                    :weight w))))
-
-(defun make-triple (subject predicate object &optional weight)
-  (or (lookup-triple subject predicate object)
-      (progn
-        (add-node *graph* subject)
-        (add-node *graph* object)
-        (add-edge-type *graph* predicate)
-        (add-edge *graph* subject object :edge-type predicate :weight weight)
-        (%make-triple :subject subject
-                      :predicate predicate
-                      :object object
-                      :weight weight))))
-
-(defun add-triple (s p o &optional w)
-  (make-triple s p o w))
-
-(defun delete-triple (s p o)
-  (when (edge-exists? *graph* s o :edge-type p)
-    (delete-edge *graph* s o :edge-type p)))
-
-(defun triple-equal (t1 t2)
-  (and (funcall (comparator *graph*) (subject t1) (subject t2))
-       (eql (predicate t1) (predicate t2))
-       (funcall (comparator *graph*) (object t1) (object t2))))
+(define-condition prolog-error (error)
+  ((reason :initarg :reason))
+  (:report (lambda (error stream)
+             (with-slots (reason) error
+               (format stream "Prolog error: ~A." reason)))))
 
 (defstruct (var (:constructor ? ())
                 (:print-function print-var))
@@ -77,9 +38,9 @@
   (:method ((x number) (y number)) (= x y))
   (:method ((x string) (y string)) (string= x y))
   (:method ((x character) (y character)) (char= x y))
-  (:method ((x timestamp) (y timestamp)) (timestamp= x y))
-  (:method ((x timestamp) (y integer)) (= (timestamp-to-universal x) y))
-  (:method ((x integer) (y timestamp)) (= (timestamp-to-universal y) x))
+  ;;(:method ((x timestamp) (y timestamp)) (timestamp= x y))
+  ;;(:method ((x timestamp) (y integer)) (= (timestamp-to-universal x) y))
+  ;;(:method ((x integer) (y timestamp)) (= (timestamp-to-universal y) x))
   (:method ((x triple) (y triple)) (triple-equal x y))
   ;;(:method ((x uuid:uuid) (y uuid:uuid)) (uuid:uuid-eql x y))
   (:method (x y) (equal x y)))
@@ -106,6 +67,9 @@
   "Undo all bindings back to a given point in the trail."
   (loop until (= (fill-pointer *trail*) old-trail)
      do (setf (var-binding (vector-pop *trail*)) +unbound+)))
+
+(defun prolog-predicate (lst)
+  (first lst))
 
 (defmethod clause-head ((triple triple))
   (list (predicate triple) (subject triple) (object triple) (graph triple)))
@@ -479,6 +443,8 @@
 
 (defun compile-body (body cont bindings)
   "Compile the body of a clause."
+  (when *prolog-trace*
+    (format t "TRACE: compile-body (~A ~A ~A)~%" body cont bindings))
   (cond
     ((null body)
      `(funcall ,cont))
@@ -486,23 +452,26 @@
          (equalp (first body) "cut"))
      `(progn ,(compile-body (rest body) cont bindings)
              (return-from ,*functor* nil)))
-    (t (let* ((goal (first body))
-              (macro (prolog-compiler-macro (predicate goal)))
-              (macro-val (if macro
-			     (funcall macro goal (rest body) cont bindings))))
-	 (if (and macro (not (eq macro-val :pass)))
-	     macro-val
-	     (compile-call
-              (predicate goal) (relation-arity goal)
-              (mapcar #'(lambda (arg)
-                          (compile-arg arg bindings))
-                      (args goal))
-              (if (null (rest body))
-                  cont
-                  `#'(lambda ()
-                       ,(compile-body
-                         (rest body) cont
-                         (bind-new-variables bindings goal))))))))))
+    (t
+     (when *prolog-trace*
+       (format t "TRACE: GOAL: ~A~%" (first body)))
+     (let* ((goal (first body))
+            (macro (prolog-compiler-macro (prolog-predicate goal)))
+            (macro-val (if macro
+                           (funcall macro goal (rest body) cont bindings))))
+       (if (and macro (not (eq macro-val :pass)))
+           macro-val
+           (compile-call
+            (prolog-predicate goal) (relation-arity goal)
+            (mapcar #'(lambda (arg)
+                        (compile-arg arg bindings))
+                    (args goal))
+            (if (null (rest body))
+                cont
+                `#'(lambda ()
+                     ,(compile-body
+                       (rest body) cont
+                       (bind-new-variables bindings goal))))))))))
 
 (defun replace-?-vars (exp)
   "Replace any ? within exp with a var of the form ?123."
