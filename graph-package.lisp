@@ -60,11 +60,16 @@
 
            ;; Prolog
            #:def-global-prolog-functor
+           #:def-prolog-compiler-macro
+           #:compile-body
+           #:args
            #:*prolog-global-functors*
            #:deref-exp
            #:unify
            #:select
            #:?-
+           #:q-
+           #:get-triples
            #:add-triple
            #:make-triple
            #:lookup-triple
