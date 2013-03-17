@@ -175,7 +175,7 @@ query."
 
 (def-global-prolog-functor bagof/3 (exp goal result cont)
   (let ((answers nil))
-    (call/1 goal #'(lambda () (push (deref-copy exp) answers)))
+    (call/1 goal #'(lambda () (push (deref-exp exp) answers)))
     (if (and (not (null answers))
 	     (unify result (nreverse answers)))
 	(funcall cont))))
@@ -186,10 +186,13 @@ query."
   ;; Ex: Assume (p 1) (p 2) (p 3).  Then:
   ;;     (setof ?x (p ?x) ?l) ==> ?l = (1 2 3)
   (let ((answers nil))
-    (call/1 goal #'(lambda () (push (deref-copy exp) answers)))
+    (call/1 goal #'(lambda ()
+                     (push (deref-exp exp) answers)))
     (if (and (not (null answers))
-	     (unify result (delete-duplicates answers :test #'deref-equal)))
-	(funcall cont))))
+             (unify result (delete-duplicates
+                            answers
+                            :test #'deref-equal)))
+        (funcall cont))))
 
 (def-global-prolog-functor show-prolog-vars/2 (var-names vars cont)
   (if (null vars)
@@ -401,11 +404,11 @@ query."
     (when (triple? triple)
       (funcall cont))))
 
-(defun numberp/1 (x cont)
+(def-global-prolog-functor numberp/1 (x cont)
   (when (numberp (var-deref x))
     (funcall cont)))
 
-(defun atom/1 (x cont)
+(def-global-prolog-functor atom/1 (x cont)
   (when (atom (var-deref x))
     (funcall cont)))
 

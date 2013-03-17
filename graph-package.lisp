@@ -59,10 +59,20 @@
 	   #:parse-gml
 
            ;; Prolog
+           #:def-global-prolog-functor
+           #:*prolog-global-functors*
+           #:deref-exp
+           #:unify
            #:select
            #:?-
            #:add-triple
            #:make-triple
+           #:lookup-triple
+           #:subject
+           #:predicate
+           #:object
+           #:weight
+           #:var-deref
            #:replace-?-vars
            #:variables-in
            #:make-functor-symbol
