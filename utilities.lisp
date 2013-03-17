@@ -13,6 +13,13 @@
 (defparameter *prolog-trace* nil)
 (defconstant +unbound+ :unbound)
 (defconstant +no-bindings+ '((t . t)))
+(defconstant +fail+ nil)
+
+(defmacro with-gensyms (syms &body body)
+  `(let ,(mapcar #'(lambda (s)
+                     `(,s (gensym)))
+                 syms)
+     ,@body))
 
 (defun dbg (control &rest args)
   "Debug output function"
@@ -57,6 +64,16 @@
   "Is x a proper (non-dotted) list?"
   (or (null x)
       (and (consp x) (proper-listp (rest x)))))
+
+(defun find-all (item sequence &rest keyword-args
+                 &key (test #'eql) test-not &allow-other-keys)
+  "Find all those elements of sequence that match item,
+  according to the keywords.  Doesn't alter sequence."
+  (if test-not
+      (apply #'remove item sequence
+             :test-not (complement test-not) keyword-args)
+      (apply #'remove item sequence
+             :test (complement test) keyword-args)))
 
 (defun find-anywhere (item tree)
   "Does item occur anywhere in tree?  If so, return it."

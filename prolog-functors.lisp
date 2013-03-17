@@ -181,6 +181,10 @@ query."
 	(funcall cont))))
 
 (def-global-prolog-functor setof/3 (exp goal result cont)
+  "Find all unique solutions to GOAL, and for each solution,
+  collect the value of EXP into the list RESULT."
+  ;; Ex: Assume (p 1) (p 2) (p 3).  Then:
+  ;;     (setof ?x (p ?x) ?l) ==> ?l = (1 2 3)
   (let ((answers nil))
     (call/1 goal #'(lambda () (push (deref-copy exp) answers)))
     (if (and (not (null answers))
@@ -368,12 +372,11 @@ query."
 (def-global-prolog-functor is-valid/1 (item cont)
   "Mark a triple as VALID and remove an INVALID marker."
   (var-deref item)
-  (with-graph-transaction (*store*)
-    (let ((triple (lookup-triple item :has-property "invalid")))
-      (when (triple? triple)
-	(delete-triple triple)))
-    (and (add-triple item :has-property "valid")
-	 (funcall cont))))
+  (let ((triple (lookup-triple item :has-property "invalid")))
+    (when (triple? triple)
+      (delete-triple triple)))
+  (and (add-triple item :has-property "valid")
+       (funcall cont)))
 
 (def-global-prolog-functor is-valid?/1 (item cont)
   "Ask if a triple is valid."
@@ -385,12 +388,11 @@ query."
 (def-global-prolog-functor is-invalid/1 (item cont)
   "Mark a triple as INVALID and remove a VALID marker."
   (var-deref item)
-  (with-graph-transaction (*store*)
-    (let ((triple (lookup-triple item :has-property "valid")))
-      (when (triple? triple)
-	(delete-triple triple)))
-    (and (add-triple item :has-property "invalid")
-	 (funcall cont))))
+  (let ((triple (lookup-triple item :has-property "valid")))
+    (when (triple? triple)
+      (delete-triple triple)))
+  (and (add-triple item :has-property "invalid")
+       (funcall cont)))
 
 (def-global-prolog-functor is-invalid?/1 (item cont)
   "Ask if a triple is invalid."
@@ -398,6 +400,14 @@ query."
   (let ((triple (lookup-triple item :has-property "invalid")))
     (when (triple? triple)
       (funcall cont))))
+
+(defun numberp/1 (x cont)
+  (when (numberp (var-deref x))
+    (funcall cont)))
+
+(defun atom/1 (x cont)
+  (when (atom (var-deref x))
+    (funcall cont)))
 
 #|
 (defmethod reify (node)
