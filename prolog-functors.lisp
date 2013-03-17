@@ -42,36 +42,28 @@
 
 (def-global-prolog-functor >/2 (?arg1 ?arg2 cont)
   "Prolog greater than functor."
-  (if (or (and (numberp (var-deref ?arg1)) (numberp (var-deref ?arg2))
-	       (> ?arg1 ?arg2))
-	  (and (timestamp? (var-deref ?arg1)) (timestamp? (var-deref ?arg2))
-	       (timestamp> ?arg1 ?arg2)))
+  (if (and (numberp (var-deref ?arg1)) (numberp (var-deref ?arg2))
+           (> ?arg1 ?arg2))
       (funcall cont)))
 
 (def-global-prolog-functor </2 (?arg1 ?arg2 cont)
   "Prolog less than functor."
-  (if (or (and (numberp (var-deref ?arg1)) (numberp (var-deref ?arg2))
-	       (< ?arg1 ?arg2))
-	  (and (timestamp? (var-deref ?arg1)) (timestamp? (var-deref ?arg2))
-	       (timestamp< ?arg1 ?arg2)))
+  (if (and (numberp (var-deref ?arg1)) (numberp (var-deref ?arg2))
+           (< ?arg1 ?arg2))
       (funcall cont)))
 
 (def-global-prolog-functor >=/2 (?arg1 ?arg2 cont)
   "Prolog greater than or equal to functor."
-  (if (or (and (numberp (var-deref ?arg1))
-	       (numberp (var-deref ?arg2))
-	       (>= ?arg1 ?arg2))
-	  (and (timestamp? (var-deref ?arg1)) (timestamp? (var-deref ?arg2))
-	       (timestamp>= ?arg1 ?arg2)))
+  (if (and (numberp (var-deref ?arg1))
+           (numberp (var-deref ?arg2))
+           (>= ?arg1 ?arg2))
       (funcall cont)))
 
 (def-global-prolog-functor <=/2 (?arg1 ?arg2 cont)
   "Prolog less than or equal to functor."
-  (if (or (and (numberp (var-deref ?arg1))
-	       (numberp (var-deref ?arg2))
-	       (<= ?arg1 ?arg2))
-	  (and (timestamp? (var-deref ?arg1)) (timestamp? (var-deref ?arg2))
-	       (timestamp<= ?arg1 ?arg2)))
+  (if (and (numberp (var-deref ?arg1))
+           (numberp (var-deref ?arg2))
+           (<= ?arg1 ?arg2))
       (funcall cont)))
 
 ;(def-global-prolog-functor member/2 (?item list cont)
@@ -161,11 +153,9 @@
     "Date validation functor. FIXME: This needs to be fleshed out with a
  more comprehensive regex."
     (var-deref date)
-    (if (timestamp? date)
-	(funcall cont)
-	(if (and (stringp date)
-		 (cl-ppcre:scan date-regex date))
-	    (funcall cont)))))
+    (if (and (stringp date)
+             (cl-ppcre:scan date-regex date))
+        (funcall cont))))
 
 (def-global-prolog-functor trigger/1 (exp cont)
   "Call out to lisp ignoring the return value."

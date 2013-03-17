@@ -28,6 +28,13 @@
   "Square a number"
   (* x x))
 
+(defun flatten (x)
+  (labels ((rec (x acc)
+             (cond ((null x) acc)
+                   ((atom x) (cons x acc))
+                   (t (rec (car x) (rec (cdr x) acc))))))
+    (rec x nil)))
+
 (defun reuse-cons (x y x-y)
   "Return (cons x y), or reuse x-y if it is equal to (cons x y)"
   (if (and (eql x (car x-y)) (eql y (cdr x-y)))
