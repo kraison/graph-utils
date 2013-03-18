@@ -71,6 +71,7 @@
            #:q-
            #:get-triples
            #:add-triple
+           #:delete-triple
            #:make-triple
            #:lookup-triple
            #:subject

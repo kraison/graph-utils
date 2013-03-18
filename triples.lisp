@@ -61,23 +61,25 @@
         ((and s p)
          (let ((matrix (gethash p (matrix *prolog-graph*)))
                (n1 (lookup-node *prolog-graph* s)))
-           (map-sarray-row
-            #'(lambda (k v)
-                (%make-triple :subject s
-                              :predicate p
-                              :object (gethash k (ids *prolog-graph*))
-                              :weight v))
-            matrix n1)))
+           (when (and matrix n1)
+             (map-sarray-row
+              #'(lambda (k v)
+                  (%make-triple :subject s
+                                :predicate p
+                                :object (gethash k (ids *prolog-graph*))
+                                :weight v))
+              matrix n1))))
         ((and p o)
          (let ((matrix (gethash p (matrix *prolog-graph*)))
                (n2 (lookup-node *prolog-graph* o)))
-           (map-sarray-col
-            #'(lambda (k v)
-                (%make-triple :subject (gethash k (ids *prolog-graph*))
-                              :predicate p
-                              :object o
-                              :weight v))
-            matrix n2)))
+           (when (and matrix n2)
+             (map-sarray-col
+              #'(lambda (k v)
+                  (%make-triple :subject (gethash k (ids *prolog-graph*))
+                                :predicate p
+                                :object o
+                                :weight v))
+              matrix n2))))
         (s
          (mapcan #'(lambda (edge-type)
                      (get-triples :s s :p edge-type))

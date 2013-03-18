@@ -173,6 +173,10 @@ query."
     (call/1 relation #'(lambda () (return-from not/1 nil)))
     (funcall cont)))
 
+(def-global-prolog-functor or/2 (goal1 goal2 cont)
+  (call/1 goal1 #'(lambda () (funcall cont) (return-from or/2 t)))
+  (call/1 goal2 #'(lambda () (funcall cont) (return-from or/2 t))))
+
 (def-global-prolog-functor bagof/3 (exp goal result cont)
   (let ((answers nil))
     (call/1 goal #'(lambda () (push (deref-exp exp) answers)))

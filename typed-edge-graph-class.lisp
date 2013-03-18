@@ -64,7 +64,6 @@ node-comparator is a valid hash table test."
 outbound neighbors for a directed graph."
   (let ((neighbors nil))
     (flet ((find-neighbors (matrix etype)
-             (dbg "~A: ~A" etype matrix)
              (map-sarray-col #'(lambda (row-id value)
                                  (when (> value 0)
                                    (push (cons etype row-id) neighbors)))
@@ -147,9 +146,15 @@ outbound neighbors for a directed graph."
                          &key edge-type)
   "Is there an edge between n1 and n2 of type edge-type?"
   (let ((matrix (gethash edge-type (matrix graph))))
-    (when (and (sparse-array? matrix)
-               (> (saref matrix n1 n2) 0))
-      (saref matrix n1 n2))))
+    (handler-case
+        (when (and (sparse-array? matrix)
+                   (numberp (saref matrix n1 n2))
+                   (> (saref matrix n1 n2) 0))
+          (saref matrix n1 n2))
+      (error (c)
+        (ignore-errors
+          (dbg "Problem with edge (~A,~A)->~A: ~A" n1 n2 (saref matrix n1 n2) c))
+        nil))))
 
 (defmethod edge-exists? ((graph typed-graph) n1 n2 &key edge-type)
   "Is there an edge between n1 and n2 of type edge-type?"
@@ -206,12 +211,13 @@ outbound neighbors for a directed graph."
   "Apply a function to all edges (possibly only of a single type)."
   (let ((r nil))
     (flet ((map-it (matrix etype)
-             (fast-map-sarray #'(lambda (n1 n2 w)
-                                  (let ((v (funcall fn n1 n2 w etype)))
-                                    (when collect?
-                                      (push v r))))
-                                      ;;(push (list n1 n2 v etype) r))))
-                              matrix)))
+             (when matrix
+               (fast-map-sarray #'(lambda (n1 n2 w)
+                                    (let ((v (funcall fn n1 n2 w etype)))
+                                      (when collect?
+                                        (push v r))))
+                                ;;(push (list n1 n2 v etype) r))))
+                                matrix))))
       (if edge-type
           (map-it (gethash edge-type (matrix graph)) edge-type)
           (maphash #'(lambda (etype matrix)
@@ -227,15 +233,16 @@ outbound neighbors for a directed graph."
   "Return all edges as pairs of nodes."
   (let ((r nil))
     (flet ((map-it (matrix etype)
-             (fast-map-sarray #'(lambda (n1 n2 w)
-                                  (declare (ignore w))
-                                  (push (if nodes-as-ids
-                                            (list n1 n2 etype)
-                                            (list (gethash n1 (ids graph))
-                                                  (gethash n2 (ids graph))
-                                                  etype))
-                                        r))
-                              matrix)))
+             (when matrix
+               (fast-map-sarray #'(lambda (n1 n2 w)
+                                    (declare (ignore w))
+                                    (push (if nodes-as-ids
+                                              (list n1 n2 etype)
+                                              (list (gethash n1 (ids graph))
+                                                    (gethash n2 (ids graph))
+                                                    etype))
+                                          r))
+                                matrix))))
       (if edge-type
           (map-it (gethash edge-type (matrix graph)) edge-type)
           (maphash #'(lambda (etype matrix)
