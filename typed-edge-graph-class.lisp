@@ -3,7 +3,8 @@
 (declaim (optimize (speed 3) (space 2)))
 
 (defclass typed-graph (directed-graph)
-  ((matrix :accessor matrix :initarg :matrix :initform (make-hash-table))))
+  ((matrix :accessor matrix :initarg :matrix :initform (make-hash-table))
+   (indices :accessor indices :initarg :indices :initform (make-hash-table :synchronized t :test 'equalp))))
 
 (defgeneric typed-graph? (thing)
   (:documentation "typed graph predicate")
@@ -28,6 +29,29 @@
                                :adjustable t
                                :element-type 'number
                                :initial-element 0))))
+
+(defmethod add-edge-index ((graph typed-graph) edge-type index-type unique? ordered? ordering-fn)
+  (add-edge-type graph edge-type)
+  (case index-type
+    (:sp
+     (cond ((and ordered? unique?)
+            (setf (gethash (cons edge-type :weight) (indices graph))
+                  (make-index :type 'unique-ordered-index
+                              :key-equality-fn (lambda (t1 t2)
+                                                 (and (funcall (comparator graph)
+                                                               (subject t1) (subject t2))
+                                                      (eql (predicate t1) (predicate t2))))
+                              :value-equality-fn (comparator graph)
+                              :ordering-fn ordering-fn
+                              :edge-type edge-type)))
+           ((and (null ordered?) (null unique?))
+            (setf (gethash (cons edge-type :weight) (indices graph))
+                  (make-index :type 'index
+                              :key-equality-fn (comparator graph)
+                              :value-equality-fn (comparator graph)
+                              :edge-type edge-type)))))
+    (otherwise
+     (error "Only these index types are available: :sp :spw "))))
 
 (defun make-typed-graph (&key (node-comparator #'equal) (saturation-point 0)
                          initial-edge-types)
