@@ -1,7 +1,8 @@
 (in-package #:cl-user)
 
 (defpackage #:graph-utils
-  (:use #:cl #:cl-ppcre #:dso-lex #:yacc #:bordeaux-threads #:cl-skip-list)
+  (:use #:cl #:cl-ppcre #:dso-lex #:yacc #:bordeaux-threads
+        #+sbcl #:cl-skip-list)
   (:export #:make-graph
            #:make-typed-graph
            #:typed-graph?
