@@ -5,7 +5,9 @@
    (row-count :accessor row-count :initarg :row-count :initform 0)
    (col-count :accessor col-count :initarg :col-count :initform 0)
    (matrix :accessor matrix :initarg :matrix
-           :initform (make-hash-table :synchronized t))
+           :initform
+           #+sbcl (make-hash-table :synchronized t)
+           #-sbcl (make-hash-table))
    (adjustable? :accessor adjustable? :initarg :adjustable? :initform nil)
    (initial-element :accessor initial-element :initarg :initial-element
                     :initform nil)
@@ -142,7 +144,10 @@
              (unless (hash-table-p table)
                (setq table
                      (setf (gethash (nth 0 indices) (matrix array))
-                           (make-hash-table :synchronized t))))
+                           #+sbcl
+                           (make-hash-table :synchronized t)
+                           #-sbcl
+                           (make-hash-table))))
              (if (eq value (initial-element array))
                  (remhash (nth 1 indices) table)
                  (setf (gethash (nth 1 indices) table) value)))))))
@@ -185,45 +190,67 @@
 
 (defmethod sum-svector ((vector sparse-array))
   (if (= 1 (dimensions vector))
+      #+sbcl
       (sb-ext:with-locked-hash-table ((matrix vector))
         (loop for v being the hash-values in (matrix vector) summing v))
+      #-sbcl
+      (loop for v being the hash-values in (matrix vector) summing v)
       (error "Please use sum-sarray-row for 2D sparse arrays.")))
 
 (defmethod sum-square-svector ((vector sparse-array))
   (if (= 1 (dimensions vector))
+      #+sbcl
       (sb-ext:with-locked-hash-table ((matrix vector))
         (loop for v being the hash-values in (matrix vector) summing (square v)))
+      #-sbcl
+      (loop for v being the hash-values in (matrix vector) summing (square v))
       (error "Please use sum-sarray-row for 2D sparse arrays.")))
 
 (defmethod sum-sarray-row ((array sparse-array) row)
   (if (= 2 (dimensions array))
       (let ((table (gethash row (matrix array))))
         (if (hash-table-p table)
+            #+sbcl
             (sb-ext:with-locked-hash-table (table)
               (loop for v being the hash-values in table summing v))
+            #-sbcl
+            (loop for v being the hash-values in table summing v)
             0))
       (error "Please use sum-svector for 1D sparse arrays.")))
 
 (defmethod sum-sarray-col ((array sparse-array) col)
   (if (= 2 (dimensions array))
       (let ((total 0))
+        #+sbcl
         (sb-ext:with-locked-hash-table ((matrix array))
           (maphash #'(lambda (row table)
                        (declare (ignore row))
                        (incf total (gethash col table (initial-element array))))
                    (matrix array)))
+        #-sbcl
+        (maphash #'(lambda (row table)
+                     (declare (ignore row))
+                     (incf total (gethash col table (initial-element array))))
+                 (matrix array))
         total)
       (error "Please use sum-svector for 1D sparse arrays.")))
 
 (defmethod boolean-sum-sarray-col ((array sparse-array) col)
   (if (= 2 (dimensions array))
       (let ((total 0))
+        #+sbcl
         (sb-ext:with-locked-hash-table ((matrix array))
           (maphash #'(lambda (row table)
                        (declare (ignore row))
                        (when (> (gethash col table (initial-element array)) 0)
                          (incf total)))
                    (matrix array)))
+        #-sbcl
+        (maphash #'(lambda (row table)
+                     (declare (ignore row))
+                     (when (> (gethash col table (initial-element array)) 0)
+                       (incf total)))
+                 (matrix array))
         total)
       (error "Please use sum-svector for 1D sparse arrays.")))
 
@@ -231,8 +258,11 @@
   (if (= 2 (dimensions array))
       (let ((table (gethash row (matrix array))))
         (if (hash-table-p table)
+            #+sbcl
             (sb-ext:with-locked-hash-table (table)
               (loop for v being the hash-values in table summing (square v)))
+            #-sbcl
+            (loop for v being the hash-values in table summing (square v))
             0))
       (error "Please use sum-svector for 1D sparse arrays.")))
 
@@ -250,14 +280,19 @@
   (if (= 2 (dimensions array))
       (let ((table (gethash row (matrix array))))
         (when (hash-table-p table)
+          #+sbcl
           (sb-ext:with-locked-hash-table (table)
             (loop for v being the hash-values in table using (hash-key k)
-                 collecting (funcall fn k v)))))
+                 collecting (funcall fn k v)))
+          #-sbcl
+          (loop for v being the hash-values in table using (hash-key k)
+             collecting (funcall fn k v))))
       (error "Cannot map rows of a single dimensional array.")))
 
 (defmethod map-sarray-col ((fn function) (array sparse-array) col)
   (if (= 2 (dimensions array))
       (let ((result nil))
+        #+sbcl
         (sb-ext:with-locked-hash-table ((matrix array))
           (maphash #'(lambda (row table)
                        (multiple-value-bind (v p?)
@@ -265,6 +300,13 @@
                          (when p?
                            (push (funcall fn row v) result))))
                    (matrix array)))
+        #-sbcl
+        (maphash #'(lambda (row table)
+                     (multiple-value-bind (v p?)
+                         (gethash col table (initial-element array))
+                       (when p?
+                         (push (funcall fn row v) result))))
+                 (matrix array))
         (nreverse result))
       (error "Cannot map columns of single dimensional arrays.")))
 

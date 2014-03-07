@@ -8,8 +8,14 @@
 (defvar *functor* nil "The Prolog functor currently being compiled.")
 (defvar *select-list* nil "Accumulator for prolog selects.")
 (defvar *cont* nil "Continuation container for step-wise queries.")
+#+sbcl
 (defvar *prolog-global-functors* (make-hash-table :synchronized t))
+#-sbcl
+(defvar *prolog-global-functors* (make-hash-table))
+#+sbcl
 (defvar *user-functors* (make-hash-table :synchronized t :test 'eql))
+#-sbcl
+(defvar *user-functors* (make-hash-table :test 'eql))
 (defparameter *prolog-trace* nil)
 (defconstant +unbound+ :unbound)
 (defconstant +no-bindings+ '((t . t)))
