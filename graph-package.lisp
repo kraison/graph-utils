@@ -18,6 +18,8 @@
 	   #:lookup-node
 	   #:map-nodes
 	   #:list-nodes
+           #:random-node-id
+           #:random-node
 	   #:rename-node
 	   #:node-count
 	   #:leaves
@@ -41,6 +43,7 @@
 	   #:in-degree-distribution
 	   #:find-shortest-path
 	   #:calculate-shortest-paths
+           #:spanning-tree
 	   #:distance-map
 	   #:find-components
 	   #:score-edges

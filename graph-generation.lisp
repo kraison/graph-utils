@@ -10,16 +10,16 @@
 
 (defmethod generate-random-graph ((model (eql :viger-latapy)) (size integer)
 				  &key degree (name-fn #'princ-to-string)
-				  (swaps 20) &allow-other-keys)
+				  (swaps 20) (node-comparator 'equal)
+                                  &allow-other-keys)
   "Generate a random, connected graph of SIZE nodes with average degree as
 close to DEGREE as possible. Method based on
 http://www-rp.lip6.fr/~latapy/Publis/random.pdf"
   (assert (and (integerp degree) (plusp degree)))
-  (let* ((graph (make-graph)) (queue nil))
+  (let* ((graph (make-graph :node-comparator node-comparator)) (queue nil))
     (dotimes (i size)
       (push i queue)
       (add-node graph (funcall name-fn i)))
-    (adjust-adjacency-matrix graph)
     (labels ((choose-node ()
 	       (setq queue (sort queue #'< :key #'(lambda (id)
 						    (degree graph id))))

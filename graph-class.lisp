@@ -153,23 +153,45 @@ node-comparator is a valid hash table test."
 (defmethod map-nodes ((fn function) (graph graph) &key collect? remove-nulls?)
   "Apply a function to all nodes."
   (let ((r nil))
-    (maphash #'(lambda (node-name node-id)
-		 (if collect?
-		     (push (funcall fn node-name node-id) r)
-		     (funcall fn node-name node-id)))
+    (maphash (lambda (node-name node-id)
+               (if collect?
+                   (push (funcall fn node-name node-id) r)
+                  (funcall fn node-name node-id)))
 	     (nodes graph))
     (when collect?
       (nreverse (if remove-nulls? (remove-if #'null r) r)))))
 
 (defmethod list-nodes ((graph graph))
   "List all node values."
-  (map-nodes #'(lambda (name id) (declare (ignore id)) name)
+  (map-nodes (lambda (name id)
+               (declare (ignore id))
+               name)
              graph :collect? t))
 
 (defmethod node-ids ((graph graph))
-  "List al lnode ids."
-  (map-nodes #'(lambda (name id) (declare (ignore name)) id)
+  "List all node ids."
+  (map-nodes (lambda (name id)
+               (declare (ignore name))
+               id)
              graph :collect? t))
+
+(defmethod random-node-id ((graph graph))
+  (let ((counter 0) (rand (random (node-count graph))))
+    (map-nodes (lambda (name id)
+                 (declare (ignore name))
+                 (when (= counter rand)
+                   (return-from random-node-id id))
+                 (incf counter))
+               graph :collect? nil)))
+
+(defmethod random-node ((graph graph))
+  (let ((counter 0) (rand (random (node-count graph))))
+    (map-nodes (lambda (name id)
+                 (declare (ignore id))
+                 (when (= counter rand)
+                   (return-from random-node name))
+                 (incf counter))
+               graph :collect? nil)))
 
 (defmethod node-count ((graph graph))
   "Return the node count."
@@ -275,7 +297,9 @@ outbound neighbors for a directed graph."
 
 (defmethod add-edge ((graph graph) n1 n2 &key (weight 1) &allow-other-keys)
   "Add an edge between n1 and n2."
-  (add-edge graph (gethash n1 (nodes graph)) (gethash n2 (nodes graph))
+  (add-edge graph
+            (gethash n1 (nodes graph))
+            (gethash n2 (nodes graph))
             :weight weight))
 
 (defmethod add-edge ((graph directed-graph) n1 n2 &key (weight 1)
