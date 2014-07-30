@@ -30,15 +30,15 @@ http://www-rp.lip6.fr/~latapy/Publis/random.pdf"
 			 (pop queue)
 			 (choose-node))
 		       node)))))
-      (map-nodes #'(lambda (name id)
-		     (declare (ignore name))
-		     (let ((difference (- degree (degree graph id))))
-		       (if (> difference 0)
-			   (dotimes (i difference)
-			     (let ((end-point (choose-node)))
-			       (when end-point
-				 (add-edge graph id end-point))
-			       (setq queue (remove id queue)))))))
+      (map-nodes (lambda (name id)
+                   (declare (ignore name))
+                   (let ((difference (- degree (degree graph id))))
+                     (if (> difference 0)
+                         (dotimes (i difference)
+                           (let ((end-point (choose-node)))
+                             (when end-point
+                               (add-edge graph id end-point))
+                             (setq queue (remove id queue)))))))
 		 graph)
       (unless (and (>= (edge-count graph) (1- (node-count graph)))
 		   (null (zero-degree-nodes graph)))
@@ -49,9 +49,12 @@ http://www-rp.lip6.fr/~latapy/Publis/random.pdf"
       (dotimes (swap swaps)
 	(let ((edge1 (random-edge graph)) (edge2 (random-edge graph)))
 	  (swap-edges graph edge1 edge2)
+	  ;;(unless (= 1 (length (find-components graph)))
+	  ;;  (error "Edge swap of ~A and ~A disconnected the graph"
+          ;;	   edge1 edge2))
+          ))
 	  (unless (= 1 (length (find-components graph)))
-	    (error "Edge swap of ~A and ~A disconnected the graph"
-		   edge1 edge2))))
+	    (error "Edge swaps disconnected the graph!"))
       graph)))
 
 (defmethod generate-random-graph ((model (eql :erdos-renyi)) (size integer)
@@ -59,7 +62,6 @@ http://www-rp.lip6.fr/~latapy/Publis/random.pdf"
   (let ((graph (make-graph)))
     (dotimes (i size)
       (add-node graph (funcall name-fn i)))
-    (adjust-adjacency-matrix graph)
     (dotimes (i size)
       (loop for j from (1+ i) to (1- size) do
 	   (when (<= (random 1.0) p)
@@ -86,7 +88,6 @@ http://www-rp.lip6.fr/~latapy/Publis/random.pdf"
 	   (add-edge graph i j)))
     (loop for i from 3 to (1- size) do
 	 (add-node graph (funcall name-fn i)))
-    (adjust-adjacency-matrix graph)
     (loop for i from 3 to (1- size) do
 	 (loop for j from 0 to (1- i) do
 	      (when (/= i j)

@@ -90,14 +90,13 @@ returns it as a list of edges as pairs of nodes."
 (defmethod find-shortest-path ((graph graph) (n1 integer) (n2 integer))
   "Dijkstra's algorithm for finding the shortest path between two nodes."
   (let ((nodes (node-ids graph)))
-    (let ((distances (mapcar
-                      #'(lambda (n) (cons n most-positive-fixnum)) nodes))
-	  (previous (mapcar #'(lambda (n) (cons n nil)) nodes)))
+    (let ((distances (mapcar (lambda (n) (cons n most-positive-fixnum)) nodes))
+	  (previous (mapcar (lambda (n) (cons n nil)) nodes)))
       (setf (cdr (assoc n1 distances)) 0)
       (loop until (null nodes) do
-	   (setf distances (sort distances #'< :key #'cdr))
-	   (let ((next (first (remove-if-not #'(lambda (d)
-						 (member (car d) nodes))
+	   (setf distances (sort distances '< :key 'cdr))
+	   (let ((next (first (remove-if-not (lambda (d)
+                                               (member (car d) nodes))
 					     distances))))
 	     (when (= (cdr next) most-positive-fixnum)
 	       (return nil))
@@ -135,12 +134,12 @@ returns it as a list of edges as pairs of nodes."
 		 (push pair map)
 		 (setq queue (nconc queue (list pair))))))))
     (if expand-ids?
-	(mapcar #'(lambda (pair)
-		    (cons (gethash (car pair) (ids graph)) (cdr pair)))
+	(mapcar (lambda (pair)
+                  (cons (gethash (car pair) (ids graph)) (cdr pair)))
 		(sort map #'< :key #'cdr))
 	(sort map #'< :key #'cdr))))
 
-(defmethod distance-map ((graph graph) (value string) &key expand-ids?)
+(defmethod distance-map ((graph graph) value &key expand-ids?)
   (distance-map graph (gethash value (nodes graph)) :expand-ids? expand-ids?))
 
 (defmethod find-components ((graph graph) &key (return-ids? t))
