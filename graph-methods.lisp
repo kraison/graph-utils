@@ -374,9 +374,9 @@ edges and clusters based on span."
 				    (cdr (first sorted-max-paths))))
 			     sorted-max-paths)))))
 
-(defmethod spanning-tree ((graph graph))
+(defmethod spanning-tree ((graph graph) &key root)
   (let* ((stack nil)
-         (root (random-node graph))
+         (root (or root (random-node graph)))
          (tree (make-graph :directed? t
                            :node-comparator (comparator graph)))
          (seen (make-hash-table :test 'equal)))
