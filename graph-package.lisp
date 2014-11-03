@@ -66,7 +66,7 @@
            #:def-global-prolog-functor
            #:def-prolog-compiler-macro
            #:compile-body
-           #:args
+           #:args-of
            #:*prolog-global-functors*
            #:deref-exp
            #:unify
