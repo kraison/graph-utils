@@ -96,9 +96,9 @@
 (defun relation-arity (relation)
   "The number of arguments to a relation.
   Example: (relation-arity '(p a b c)) => 3"
-  (length (args relation)))
+  (length (args-of relation)))
 
-(defun args (x) "The arguments of a relation" (rest x))
+(defun args-of (x) "The arguments of a relation" (rest x))
 
 (defun make-parameters (arity)
   "Return the list (?arg1 ?arg2 ... ?arg-arity)"
@@ -313,7 +313,7 @@
 
 (def-prolog-compiler-macro = (goal body cont bindings)
   "Compile a goal which is a call to =."
-  (let ((args (args goal)))
+  (let ((args (args-of goal)))
     (if (/= (length args) 2)
         :pass ;; decline to handle this goal
         (multiple-value-bind (code1 bindings1)
@@ -331,10 +331,10 @@
   nil)
 
 (def-prolog-compiler-macro and (goal body cont bindings)
-  (compile-body (append (args goal) body) cont bindings))
+  (compile-body (append (args-of goal) body) cont bindings))
 
 (def-prolog-compiler-macro or (goal body cont bindings)
-  (let ((disjuncts (args goal)))
+  (let ((disjuncts (args-of goal)))
     (case (length disjuncts)
       (0 +fail+)
       (1 (compile-body (cons (first disjuncts) body) cont bindings))
@@ -357,7 +357,7 @@
 	  parms
 	  (compile-body
 	   (nconc
-	    (mapcar #'make-= parms (args (clause-head clause)))
+	    (mapcar #'make-= parms (args-of (clause-head clause)))
 	    (clause-body clause))
 	   cont
 	   (mapcar #'self-cons parms)))))
@@ -465,7 +465,7 @@
             (prolog-predicate goal) (relation-arity goal)
             (mapcar #'(lambda (arg)
                         (compile-arg arg bindings))
-                    (args goal))
+                    (args-of goal))
             (if (null (rest body))
                 cont
                 `#'(lambda ()

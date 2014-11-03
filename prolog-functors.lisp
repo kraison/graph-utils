@@ -126,11 +126,11 @@
 (def-global-prolog-functor call/1 (goal cont)
   "Call a prolog form."
   (var-deref goal)
-  (let* ((functor (make-functor-symbol (first goal) (length (args goal)))))
+  (let* ((functor (make-functor-symbol (first goal) (length (args-of goal)))))
     (let ((fn (or (gethash functor *user-functors*)
 		  (gethash functor *prolog-global-functors*))))
       (if (functionp fn)
-	  (apply fn (append (args goal) (list cont)))
+	  (apply fn (append (args-of goal) (list cont)))
 	  (error 'prolog-error
 		 :reason
 		 (format nil "Unknown Prolog functor in call/1 ~A"

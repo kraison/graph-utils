@@ -3,8 +3,12 @@
 (declaim (optimize (speed 3) (space 2)))
 
 (defclass typed-graph (directed-graph)
-  ((matrix :accessor matrix :initarg :matrix :initform (make-hash-table))
-   (indices :accessor indices :initarg :indices :initform (make-hash-table :synchronized t :test 'equalp))))
+  ((matrix :accessor matrix :initarg :matrix
+           :initform (make-hash-table :test 'eql))
+   (edge-type-comparator :accessor edge-type-comparator
+                         :initarg :edge-type-comparator :initform 'eql)
+   (indices :accessor indices :initarg :indices
+            :initform (make-hash-table :test 'equalp))))
 
 (defgeneric typed-graph? (thing)
   (:documentation "typed graph predicate")
@@ -53,13 +57,15 @@
     (otherwise
      (error "Only these index types are available: :sp :spw "))))
 
-(defun make-typed-graph (&key (node-comparator #'equal) (saturation-point 0)
-                         initial-edge-types)
+(defun make-typed-graph (&key (node-comparator 'equal) (saturation-point 0)
+                         (edge-type-comparator 'eql) initial-edge-types)
   "Create a new typed-graph object. You are responsible for making sure that
 node-comparator is a valid hash table test."
   (let ((g (make-instance 'typed-graph
                           :comparator node-comparator
+                          :edge-type-comparator edge-type-comparator
                           :s-point saturation-point
+                          :matrix (make-hash-table :test edge-type-comparator)
                           :nodes (make-hash-table :test node-comparator))))
     (dolist (e initial-edge-types)
       (add-edge-type g e))
@@ -69,9 +75,9 @@ node-comparator is a valid hash table test."
   "Add a node to the graph."
   (or (gethash value (nodes graph))
       (let ((id (incf (last-id graph))))
-        (maphash #'(lambda (etype matrix)
-                     (declare (ignore etype))
-                     (incf-sarray-dimensions matrix))
+        (maphash (lambda (etype matrix)
+                   (declare (ignore etype))
+                   (incf-sarray-dimensions matrix))
                  (matrix graph))
         (when capacity
           (setf (gethash id (node-caps graph)) capacity))
@@ -88,23 +94,23 @@ node-comparator is a valid hash table test."
 outbound neighbors for a directed graph."
   (let ((neighbors nil))
     (flet ((find-neighbors (matrix etype)
-             (map-sarray-col #'(lambda (row-id value)
-                                 (when (> value 0)
-                                   (push (cons etype row-id) neighbors)))
+             (map-sarray-col (lambda (row-id value)
+                               (when (> value 0)
+                                 (push (cons etype row-id) neighbors)))
                              matrix node)
-             (map-sarray-row #'(lambda (col-id value)
-                                 (when (> value 0)
-                                   (push (cons etype col-id) neighbors)))
+             (map-sarray-row (lambda (col-id value)
+                               (when (> value 0)
+                                 (push (cons etype col-id) neighbors)))
                              matrix node)))
       (if edge-type
           (find-neighbors (gethash edge-type (matrix graph)) edge-type)
-          (maphash #'(lambda (etype matrix)
-                       (find-neighbors matrix etype))
+          (maphash (lambda (etype matrix)
+                     (find-neighbors matrix etype))
                    (matrix graph)))
       (if return-ids?
           (nreverse neighbors)
-          (mapcar #'(lambda (pair)
-                      (lookup-node graph (cdr pair)))
+          (mapcar (lambda (pair)
+                    (lookup-node graph (cdr pair)))
                   (nreverse neighbors))))))
 
 (defmethod neighbors ((graph typed-graph) node &key edge-type (return-ids? t))
@@ -125,19 +131,19 @@ outbound neighbors for a directed graph."
                               (return-ids? t))
   (let ((neighbors nil))
     (flet ((find-neighbors (matrix etype)
-             (map-sarray-col #'(lambda (row-id value)
-                                 (when (> value 0)
-                                   (push (cons etype row-id) neighbors)))
+             (map-sarray-col (lambda (row-id value)
+                               (when (> value 0)
+                                 (push (cons etype row-id) neighbors)))
                              matrix node)))
       (if edge-type
           (find-neighbors (gethash edge-type (matrix graph)) edge-type)
-          (maphash #'(lambda (etype matrix)
-                       (find-neighbors matrix etype))
+          (maphash (lambda (etype matrix)
+                     (find-neighbors matrix etype))
                    (matrix graph)))
       (if return-ids?
           (nreverse neighbors)
-          (mapcar #'(lambda (pair)
-                      (lookup-node graph (cdr pair)))
+          (mapcar (lambda (pair)
+                    (lookup-node graph (cdr pair)))
                   (nreverse neighbors))))))
 
 (defmethod outbound-neighbors ((graph typed-graph) node &key edge-type
