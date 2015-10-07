@@ -38,9 +38,11 @@
                (:file "maximum-flow" :depends-on ("graph-methods"))
                (:file "bipartite" :depends-on ("maximum-flow"))
                (:file "cut" :depends-on ("maximum-flow"))
+	       (:file "edit-distance" :depends-on ("graph-methods"))
 	       (:file "graph-generation" :depends-on ("graph-methods"))
 	       (:file "graph-visualization" :depends-on ("graph-methods"))
 	       (:file "parsers" :depends-on ("graph-methods"))
                (:file "tests" :depends-on
                       ("parsers" "graph-visualization" "graph-generation"
-                                 "maximum-flow" "bipartite" "cut"))))
+                                 "maximum-flow" "bipartite" "cut"
+                                 "edit-distance"))))
