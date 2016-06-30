@@ -17,9 +17,9 @@
 #-sbcl
 (defvar *user-functors* (make-hash-table :test 'eql))
 (defparameter *prolog-trace* nil)
-(defconstant +unbound+ :unbound)
-(defconstant +no-bindings+ '((t . t)))
-(defconstant +fail+ nil)
+(alexandria:define-constant +unbound+ :unbound)
+(alexandria:define-constant +no-bindings+ '((t . t)) :test 'equalp)
+(alexandria:define-constant +fail+ nil)
 
 (defmacro with-gensyms (syms &body body)
   `(let ,(mapcar #'(lambda (s)

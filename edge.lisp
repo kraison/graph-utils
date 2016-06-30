@@ -45,4 +45,3 @@
   (let ((table (gethash node1 (table index))))
     (when (hash-table-p table)
       (gethash node2 table))))
-

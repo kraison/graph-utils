@@ -5,6 +5,7 @@
 (defmethod in-degree ((graph typed-graph) (node integer) &key edge-type)
   (let ((degree 0) (matrix (gethash edge-type (matrix graph))))
     (map-sarray-col #'(lambda (i w)
+                        (declare (ignore i))
                         (when (> w 0)
                           (incf degree)))
                     matrix node)
@@ -16,6 +17,7 @@
 (defmethod out-degree ((graph typed-graph) (node integer) &key edge-type)
   (let ((degree 0) (matrix (gethash edge-type (matrix graph))))
     (map-sarray-row #'(lambda (i w)
+                        (declare (ignore i))
                         (when (> w 0)
                           (incf degree)))
                     matrix node)
@@ -59,4 +61,5 @@
     (sort dist #'< :key 'car)))
 
 (defmethod sim-rank ((graph typed-graph) n1 n2 &key edge-type)
+  (declare (ignore n1 n2 edge-type))
   )

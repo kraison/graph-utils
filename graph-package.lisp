@@ -13,6 +13,7 @@
 	   #:graph?
 	   #:directed?
 	   #:undirected?
+           #:node-ids
 	   #:add-node
 	   #:adjust-adjacency-matrix
 	   #:lookup-node
@@ -27,6 +28,7 @@
 	   #:neighbors
 	   #:inbound-neighbors
 	   #:outbound-neighbors
+           #:do-outbound-neighbors
 	   #:edges
 	   #:edge-exists?
 	   #:add-edge

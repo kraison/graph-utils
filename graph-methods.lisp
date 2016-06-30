@@ -87,6 +87,7 @@ returns it as a list of edges as pairs of nodes."
     (cons (list (cdr (assoc end prev)) end)
 	  (reconstruct-path prev (cdr (assoc end prev))))))
 
+#|
 (defmethod find-shortest-path ((graph graph) (n1 integer) (n2 integer))
   "Dijkstra's algorithm for finding the shortest path between two nodes."
   (let ((nodes (node-ids graph)))
@@ -94,6 +95,7 @@ returns it as a list of edges as pairs of nodes."
 	  (previous (mapcar (lambda (n) (cons n nil)) nodes)))
       (setf (cdr (assoc n1 distances)) 0)
       (loop until (null nodes) do
+           ;; FIXME: this should be a priority queue
 	   (setf distances (sort distances '< :key 'cdr))
 	   (let ((next (first (remove-if-not (lambda (d)
                                                (member (car d) nodes))
@@ -107,10 +109,43 @@ returns it as a list of edges as pairs of nodes."
 	     (dolist (neighbor (if (directed? graph)
 				   (outbound-neighbors graph (car next))
 				   (neighbors graph (car next))))
+               (when (consp neighbor) ;; typed graph
+                 (setq neighbor (cdr neighbor)))
 	       (let ((distance (1+ (cdr (assoc (car next) distances)))))
 		 (when (< distance (cdr (assoc neighbor distances)))
 		   (setf (cdr (assoc neighbor distances)) distance
 			 (cdr (assoc neighbor previous)) (car next))))))))))
+|#
+
+(defmethod find-shortest-path ((graph graph) (n1 integer) (n2 integer))
+  "Dijkstra's algorithm for finding the shortest path between two nodes."
+  (let ((nodes (node-ids graph)))
+    (let ((distances (make-instance 'fib-heap:fib-heap))
+          (previous (mapcar (lambda (n) (cons n nil)) nodes)))
+      (map nil (lambda (node)
+                 (fib-heap:insert distances most-positive-fixnum node))
+           nodes)
+      (fib-heap:decrease-key distances n1 0)
+      (loop until (null nodes) do
+           (multiple-value-bind (next d)
+               (fib-heap:extract-min distances)
+             (when (= d most-positive-fixnum)
+               (return nil))
+             (when (= next n2)
+               (return-from find-shortest-path
+                 (nreverse (reconstruct-path previous n2))))
+             (setq nodes (delete next nodes))
+	     (dolist (neighbor (if (directed? graph)
+				   (outbound-neighbors graph next)
+				   (neighbors graph next)))
+               (when (consp neighbor) ;; typed graph
+                 (setq neighbor (cdr neighbor)))
+               (when (fib-heap:lookup-node distances neighbor)
+                 (let ((distance (1+ d)))
+                   (when (< distance (fib-heap:lookup-node distances neighbor))
+                     (fib-heap:decrease-key distances neighbor distance)
+                     (setf (cdr (assoc neighbor previous)) next)))))
+             next)))))
 
 (defmethod find-shortest-path ((graph graph) n1 n2)
   (find-shortest-path graph
@@ -358,6 +393,28 @@ edges and clusters based on span."
 	      (sort a #'> :key #'cdr)))))
 
 (defmethod compute-center-nodes ((graph graph))
+  "Return the center nodes of the graph."
+  (let* ((max-paths nil) (nodes (list-nodes graph)) (node-count (length nodes)))
+    (dotimes (i node-count)
+      (let ((v1 (elt nodes i)))
+        (push (cons v1 most-negative-fixnum) max-paths)
+        (loop for j from (1+ i) below node-count do
+             (let ((v2 (elt nodes j)))
+               (unless (eql v1 v2)
+                 (log:debug "Checking ~A <-> ~A"
+                            (graph-utils:lookup-node graph v1)
+                            (graph-utils:lookup-node graph v2))
+                 (let ((path-length (length (find-shortest-path graph v1 v2))))
+                   (when (> path-length (cdr (assoc v1 max-paths)))
+                     (setf (cdr (assoc v1 max-paths)) path-length))))))))
+    (let ((sorted-max-paths (sort max-paths #'< :key #'cdr)))
+      (mapcar #'car
+	      (remove-if-not #'(lambda (n)
+				 (= (cdr n)
+				    (cdr (first sorted-max-paths))))
+			     sorted-max-paths)))))
+
+(defmethod compute-center-nodes ((graph directed-graph))
   "Return the center nodes of the graph."
   (let ((max-paths nil))
     (dolist (v1 (list-nodes graph))

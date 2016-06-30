@@ -14,9 +14,11 @@
 	       :yacc
 	       :trivial-shell
 	       :parse-number
+               :alexandria
                #+sbcl :cl-skip-list
                :bordeaux-threads)
   :components ((:file "graph-package")
+               (:file "fib-heap")
                (:file "queue" :depends-on ("graph-package"))
                (:file "utilities" :depends-on ("queue"))
                (:file "node" :depends-on ("utilities"))
@@ -24,7 +26,7 @@
                (:file "sparse-arrays" :depends-on ("utilities"))
 	       (:file "graph-class" :depends-on ("sparse-arrays" "node"))
 	       (:file "typed-edge-graph-class" :depends-on ("graph-class"))
-	       (:file "graph-methods" :depends-on ("queue" "graph-class"))
+	       (:file "graph-methods" :depends-on ("queue" "graph-class" "fib-heap"))
 	       (:file "typed-edge-graph-methods"
                       :depends-on ("typed-edge-graph-class" "graph-methods"))
                #+sbcl

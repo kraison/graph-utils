@@ -93,6 +93,7 @@
   (skip-list-delete (index idx) key value))
 
 (defmethod idx-get ((idx ordered-index) key &key limit)
+  (declare (ignore limit))
   (skip-list-fetch-all (index idx) key))
 
 (defmethod idx-get ((idx unique-ordered-index) key &key limit)

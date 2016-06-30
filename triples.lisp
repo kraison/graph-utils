@@ -103,6 +103,7 @@
                                       :weight w))
                     *prolog-graph* :collect? t))))
 
+#|
 (defun test-prolog ()
   (init-prolog)
   (add-triple "Kevin" :likes "cats")
@@ -111,3 +112,4 @@
   (add-triple "Dustie" :hates "dogs")
   (add-triple "Dustie" :likes "Kevin")
   (select (?x ?y) (q- ?x :likes ?y)))
+|#

@@ -359,7 +359,7 @@ query."
                                            (second clause)
 					   (third clause))))
 		(if (triple? triple)
-		    (delete-triple triple)
+		    (delete-triple (first clause) (second clause) (third clause))
 		    (error 'prolog-error
 			   :reason
 			   (format nil "clause ~A does not represent a fact"
@@ -381,7 +381,7 @@ query."
   (var-deref item)
   (let ((triple (lookup-triple item :has-property "invalid")))
     (when (triple? triple)
-      (delete-triple triple)))
+      (delete-triple (subject triple) (predicate triple) (object triple))))
   (and (add-triple item :has-property "valid")
        (funcall cont)))
 
@@ -397,7 +397,7 @@ query."
   (var-deref item)
   (let ((triple (lookup-triple item :has-property "valid")))
     (when (triple? triple)
-      (delete-triple triple)))
+      (delete-triple (subject triple) (predicate triple) (object triple))))
   (and (add-triple item :has-property "invalid")
        (funcall cont)))
 

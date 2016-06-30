@@ -157,20 +157,44 @@ outbound neighbors for a directed graph."
                                edge-type (return-ids? t))
   (let ((neighbors nil))
     (flet ((find-neighbors (matrix etype)
-             (map-sarray-row #'(lambda (col-id value)
+             (when matrix
+               (map-sarray-row (lambda (col-id value)
                                  (when (> value 0)
                                    (push (cons etype col-id) neighbors)))
-                             matrix node)))
+                               matrix node))))
       (if edge-type
           (find-neighbors (gethash edge-type (matrix graph)) edge-type)
-          (maphash #'(lambda (etype matrix)
-                       (find-neighbors matrix etype))
+          (maphash (lambda (etype matrix)
+                     (find-neighbors matrix etype))
                    (matrix graph)))
       (if return-ids?
           (nreverse neighbors)
-          (mapcar #'(lambda (pair)
-                      (lookup-node graph (cdr pair)))
+          (mapcar (lambda (pair)
+                    (lookup-node graph (cdr pair)))
                   (nreverse neighbors))))))
+
+(defmacro do-outbound-neighbors ((neighbor (graph node edge-type)) &body body)
+  (let ((n (gensym))
+        (g (gensym))
+        (e (gensym)))
+    `(let ((,n ,node)
+           (,g ,graph)
+           (,e ,edge-type))
+       (unless (integerp ,n)
+         (setq ,n (lookup-node ,g ,n)))
+       (flet ((map-neighbors (matrix)
+                (when matrix
+                  (map-sarray-row (lambda (col-id value)
+                                    (when (> value 0)
+                                      (let ((,neighbor (lookup-node ,g col-id)))
+                                        ,@body)))
+                                  matrix ,n))))
+     (if ,e
+         (map-neighbors (gethash ,e (matrix ,g)))
+         (maphash (lambda (etype matrix)
+                    (declare (ignore etype))
+                    (map-neighbors matrix))
+                  (matrix ,g)))))))
 
 (defmethod edge-exists? ((graph typed-graph) (n1 integer) (n2 integer)
                          &key edge-type)
@@ -352,4 +376,3 @@ outbound neighbors for a directed graph."
                 :weight weight
                 :edge-type (third edge))))
   graph)
-

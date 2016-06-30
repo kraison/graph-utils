@@ -72,7 +72,7 @@
   (first lst))
 
 (defmethod clause-head ((triple triple))
-  (list (predicate triple) (subject triple) (object triple) (graph triple)))
+  (list (predicate triple) (subject triple) (object triple)))
 
 (defmethod clause-head ((list list))
   (first list))
@@ -162,11 +162,6 @@
 (defun has-variable-p (x)
   "Is there a variable anywhere in the expression x?"
   (find-if-anywhere #'variable-p x))
-
-(defun proper-listp (x)
-  "Is x a proper (non-dotted) list?"
-  (or (null x)
-      (and (consp x) (proper-listp (rest x)))))
 
 (defun maybe-add-undo-bindings (compiled-exps)
   "Undo any bindings that need undoing.

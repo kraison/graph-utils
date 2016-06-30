@@ -3,6 +3,7 @@
 ;; The following queueing code was borrowed and adapted from Russell & Norvig's
 ;; "Introduction to AI"
 (defun print-queue (q stream depth)
+  (declare (ignore depth))
   (format stream "~a" (queue-elements q)))
 
 (defstruct (queue
