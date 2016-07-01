@@ -44,6 +44,8 @@
 	   #:degree-distribution
 	   #:in-degree-distribution
 	   #:find-shortest-path
+           #:all-pairs-shortest-paths
+           #:reconstruct-path-all-pairs
 	   #:calculate-shortest-paths
            #:spanning-tree
 	   #:distance-map

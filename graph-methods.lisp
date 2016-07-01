@@ -152,6 +152,56 @@ returns it as a list of edges as pairs of nodes."
 		      (gethash n1 (nodes graph))
 		      (gethash n2 (nodes graph))))
 
+(defmethod reconstruct-path-all-pairs ((graph graph) paths node-idx n1 n2)
+  (let ((idx1 (gethash n1 node-idx))
+        (idx2 (gethash n2 node-idx)))
+    (if (null (aref paths idx1 idx2))
+        nil
+        (let ((path nil) (prev n1))
+          (let ((next (aref paths idx1 idx2)))
+            (loop until (eql n2 next) do
+                 (push (list prev next) path)
+                 (setq prev next)
+                 (setq next (aref paths (gethash next node-idx) idx2))))
+          (push (list prev n2) path)
+          (nreverse path)))))
+
+(defmethod all-pairs-shortest-paths ((graph graph) &key (use-weights-p t)
+                                                     reconstruct-paths-p)
+  "Floyd-Warshall approach to find all pairs shortest paths"
+  (let* ((nodes (node-ids graph))
+         (node-idx (make-hash-table :test 'eq))
+         (node-count (length nodes))
+         (distances (make-array (list node-count node-count)
+                                :element-type 'number
+                                :initial-element most-positive-fixnum))
+         (paths nil))
+    (when reconstruct-paths-p
+      (setq paths (make-array (list node-count node-count)
+                              :initial-element nil)))
+    (dotimes (i node-count)
+      (setf (gethash (elt nodes i) node-idx) i)
+      (setf (aref distances i i) 0))
+    (map-edges (lambda (n1 n2 w)
+                 (let ((idx1 (gethash n1 node-idx))
+                       (idx2 (gethash n2 node-idx)))
+                   (when reconstruct-paths-p
+                     (setf (aref paths idx1 idx2) n2))
+                   (if use-weights-p
+                       (setf (aref distances idx1 idx2) w)
+                       (setf (aref distances idx1 idx2) 1))))
+               graph)
+    (dotimes (k node-count)
+      (dotimes (i node-count)
+        (dotimes (j node-count)
+          (let ((new-distance (+ (aref distances i k) (aref distances k j))))
+            (when (> (aref distances i j) new-distance)
+              (when reconstruct-paths-p
+                ;; next[i][j] ← next[i][k]
+                (setf (aref paths i j) (aref paths i k)))
+              (setf (aref distances i j) new-distance))))))
+    (values distances node-idx paths)))
+
 (defmethod distance-map ((graph graph) (id integer) &key expand-ids?)
   "Generate a sorted distance map for the given node."
   (let ((map (list (cons id 0))) (queue nil))
@@ -197,14 +247,22 @@ returns it as a list of edges as pairs of nodes."
         (sort components #'> :key #'length))))
 
 (defmethod calculate-shortest-paths ((graph graph))
-  (let ((paths nil))
-    (dotimes (i (row-count (matrix graph)))
-      (loop
-         for j from (if (directed? graph) 0 i) to (1- (col-count (matrix graph)))
-         do
-           (unless (= i j)
-             (push (list i j (find-shortest-path graph i j)) paths))))
-    (nreverse paths)))
+  (multiple-value-bind (distances node-idx path-matrix)
+      (all-pairs-shortest-paths graph :reconstruct-paths-p t)
+    (declare (ignore distances))
+    (let ((paths nil))
+      (dotimes (i (row-count (matrix graph)))
+        (loop
+           for j from (if (directed? graph) 0 i) to (1- (col-count (matrix graph)))
+           do
+             (unless (= i j)
+               (push (list i j (reconstruct-path-all-pairs graph
+                                                           path-matrix
+                                                           node-idx
+                                                           i j))
+                               ;;(find-shortest-path graph i j))
+                     paths))))
+      (nreverse paths))))
 
 (defmethod cluster ((graph graph) (method (eql :edge-betweenness))
 		    &key (edge-removal-count 0))
@@ -213,42 +271,42 @@ betweenness'. It counts how many shortest paths in the network include a
 given edge. An edge with high betweenness is one that is likely to separate
 dense areas of the graph."
   (let* ((shortest-paths (calculate-shortest-paths graph))
-	 (between-table (sort
-			 (map-edges
-			  #'(lambda (i j w)
-                              (declare (ignore w))
-			      (let ((coord (list i j)))
-				(list coord
-				      (reduce #'+ (mapcar
-						   #'(lambda (p)
-						       (count coord
-							      (rest (third p))
-							      :test 'equal))
-						   shortest-paths)))))
-			  graph :collect? t)
-			 #'> :key #'second))
-	 (removed-edges nil))
+         (between-table (sort
+                         (map-edges
+                          (lambda (i j w)
+                            (declare (ignore w))
+                            (let ((coord (list i j)))
+                              (list coord
+                                    (reduce '+ (mapcar
+                                                (lambda (p)
+                                                  (count coord
+                                                         (third p)
+                                                         :test 'equalp))
+                                                shortest-paths)))))
+                          graph :collect? t)
+                         '> :key 'second))
+         (removed-edges nil))
     (dotimes (i edge-removal-count)
       (let ((edge (pop between-table)))
-	(push edge removed-edges)
-	(delete-edge graph (first (first edge)) (second (first edge)))))
+        (push edge removed-edges)
+        (delete-edge graph (first (first edge)) (second (first edge)))))
     (nreverse (mapcar #'(lambda (edge)
-			  (list (first (first edge))
-				(second (first edge))
-				(second edge)))
-		      removed-edges))))
+                          (list (first (first edge))
+                                (second (first edge))
+                                (second edge)))
+                      removed-edges))))
 
 (defmethod score-edges ((graph graph) &key sort?)
   (let ((span-map nil))
-    (map-edges #'(lambda (n1 n2 w)
-                   (delete-edge graph n1 n2)
-                   (push (list (list n1 n2)
-                               (length (find-shortest-path graph n1 n2)))
-                         span-map)
-                   (add-edge graph n1 n2 :weight w))
+    (map-edges (lambda (n1 n2 w)
+                 (delete-edge graph n1 n2)
+                 (push (list (list n1 n2)
+                             (length (find-shortest-path graph n1 n2)))
+                       span-map)
+                 (add-edge graph n1 n2 :weight w))
 	       graph)
     (if sort?
-	(sort span-map #'> :key #'second)
+	(sort span-map '> :key 'second)
 	span-map)))
 
 (defmethod cluster ((graph graph) (method (eql :edge-span))
@@ -394,25 +452,29 @@ edges and clusters based on span."
 
 (defmethod compute-center-nodes ((graph graph))
   "Return the center nodes of the graph."
-  (let* ((max-paths nil) (nodes (list-nodes graph)) (node-count (length nodes)))
-    (dotimes (i node-count)
-      (let ((v1 (elt nodes i)))
-        (push (cons v1 most-negative-fixnum) max-paths)
-        (loop for j from (1+ i) below node-count do
-             (let ((v2 (elt nodes j)))
-               (unless (eql v1 v2)
-                 (log:debug "Checking ~A <-> ~A"
-                            (graph-utils:lookup-node graph v1)
-                            (graph-utils:lookup-node graph v2))
-                 (let ((path-length (length (find-shortest-path graph v1 v2))))
-                   (when (> path-length (cdr (assoc v1 max-paths)))
-                     (setf (cdr (assoc v1 max-paths)) path-length))))))))
-    (let ((sorted-max-paths (sort max-paths #'< :key #'cdr)))
-      (mapcar #'car
-	      (remove-if-not #'(lambda (n)
-				 (= (cdr n)
-				    (cdr (first sorted-max-paths))))
-			     sorted-max-paths)))))
+  (let* ((max-paths nil)
+         (nodes (list-nodes graph))
+         (node-count (length nodes)))
+    (multiple-value-bind (distances node-idx)
+        (all-pairs-shortest-paths graph :use-weights-p nil)
+      (dotimes (i node-count)
+        (let ((v1 (elt nodes i)))
+          (push (cons v1 most-negative-fixnum) max-paths)
+          (loop for j from (1+ i) below node-count do
+               (let ((v2 (elt nodes j)))
+                 (unless (eql v1 v2)
+                   (log:debug "Checking ~A <-> ~A" v1 v2)
+                   (let ((node1-idx (gethash (lookup-node graph v1) node-idx))
+                         (node2-idx (gethash (lookup-node graph v2) node-idx)))
+                     (let ((path-length (aref distances node1-idx node2-idx)))
+                       (when (> path-length (cdr (assoc v1 max-paths)))
+                         (setf (cdr (assoc v1 max-paths)) path-length)))))))))
+      (let ((sorted-max-paths (sort max-paths #'< :key #'cdr)))
+        (mapcar #'car
+                (remove-if-not #'(lambda (n)
+                                   (= (cdr n)
+                                      (cdr (first sorted-max-paths))))
+                               sorted-max-paths))))))
 
 (defmethod compute-center-nodes ((graph directed-graph))
   "Return the center nodes of the graph."

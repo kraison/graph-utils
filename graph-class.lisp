@@ -343,14 +343,15 @@ outbound neighbors for a directed graph."
 (defmethod map-edges ((fn function) (graph graph) &key collect? remove-nulls?)
   "Apply a function to all edges."
   (let ((r nil))
-    (fast-map-sarray #'(lambda (n1 n2 w)
-                         (let ((v (funcall fn n1 n2 w)))
-                           (when collect?
-                             (push (list n1 n2 v) r))))
+    (fast-map-sarray (lambda (n1 n2 w)
+                       (let ((v (funcall fn n1 n2 w)))
+                         (when collect?
+                           ;;(push (list n1 n2 v) r))))
+                           (push v r))))
                      (matrix graph))
     (nreverse (if remove-nulls?
-                  (remove-if #'(lambda (triple)
-                                 (null (third triple)))
+                  (remove-if (lambda (triple)
+                               (null (third triple)))
                              r)
                   r))))
 
@@ -429,7 +430,7 @@ outbound neighbors for a directed graph."
 
 (defmethod slow-edge-count ((graph graph))
   (let ((count 0))
-    (map-edges #'(lambda (n1 n2 w) (declare (ignore n1 n2 w)) (incf count)) graph)
+    (map-edges (lambda (n1 n2 w) (declare (ignore n1 n2 w)) (incf count)) graph)
     count))
 
 (defgeneric random-edge (graph &optional edge-type))
@@ -484,4 +485,3 @@ outbound neighbors for a directed graph."
 		 (when (leaf? graph id)
 		   id))
 	     graph :collect? t :remove-nulls? t))
-
