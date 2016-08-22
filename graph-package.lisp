@@ -15,6 +15,7 @@
 	   #:undirected?
            #:node-ids
 	   #:add-node
+           #:delete-node
 	   #:adjust-adjacency-matrix
 	   #:lookup-node
 	   #:map-nodes

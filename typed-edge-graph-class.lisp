@@ -115,17 +115,21 @@ outbound neighbors for a directed graph."
 
 (defmethod neighbors ((graph typed-graph) node &key edge-type (return-ids? t))
   "Return a list of ids for this node's neighbors."
-  (neighbors graph
-             (gethash node (nodes graph))
-             :edge-type edge-type
-             :return-ids? return-ids?))
+  (let ((id (gethash node (nodes graph))))
+    (when id
+      (neighbors graph
+                 id
+                 :edge-type edge-type
+                 :return-ids? return-ids?))))
 
 (defmethod inbound-neighbors ((graph typed-graph) node &key edge-type
                               (return-ids? t))
-  (inbound-neighbors graph
-                     (gethash node (nodes graph))
-                     :edge-type edge-type
-                     :return-ids? return-ids?))
+  (let ((id (gethash node (nodes graph))))
+    (when id
+      (inbound-neighbors graph
+                         id
+                         :edge-type edge-type
+                         :return-ids? return-ids?))))
 
 (defmethod inbound-neighbors ((graph typed-graph) (node integer) &key edge-type
                               (return-ids? t))
@@ -148,10 +152,12 @@ outbound neighbors for a directed graph."
 
 (defmethod outbound-neighbors ((graph typed-graph) node &key edge-type
                                (return-ids? t))
-  (outbound-neighbors graph
-                      (gethash node (nodes graph))
-                      :edge-type edge-type
-                      :return-ids? return-ids?))
+  (let ((id (gethash node (nodes graph))))
+    (when id
+      (outbound-neighbors graph
+                          id
+                          :edge-type edge-type
+                          :return-ids? return-ids?))))
 
 (defmethod outbound-neighbors ((graph typed-graph) (node integer) &key
                                edge-type (return-ids? t))
@@ -315,10 +321,13 @@ outbound neighbors for a directed graph."
     (saref matrix n1 n2)))
 
 (defmethod edge-weight ((graph typed-graph) n1 n2 &optional edge-type)
-  (edge-weight graph
-               (lookup-node graph n1)
-               (lookup-node graph n2)
-               edge-type))
+  (let ((id1 (lookup-node graph n1))
+        (id2 (lookup-node graph n2)))
+    (when (and id1 id2)
+      (edge-weight graph
+                   id1
+                   id2
+                   edge-type))))
 
 (defmethod incf-edge-weight ((graph typed-graph) (n1 integer) (n2 integer)
                              &key edge-type (delta 1))
@@ -326,11 +335,14 @@ outbound neighbors for a directed graph."
     (incf-sarray matrix (list n1 n2) delta)))
 
 (defmethod incf-edge-weight ((graph typed-graph) n1 n2 &key edge-type delta)
-  (incf-edge-weight graph
-                    (gethash n1 (nodes graph))
-                    (gethash n2 (nodes graph))
-                    :edge-type edge-type
-                    :delta delta))
+  (let ((id1 (lookup-node graph n1))
+        (id2 (lookup-node graph n2)))
+    (when (and id1 id2)
+      (incf-edge-weight graph
+                        id1
+                        id2
+                        :edge-type edge-type
+                        :delta delta))))
 
 (defmethod decf-edge-weight ((graph typed-graph) (n1 integer) (n2 integer)
                              &key edge-type (delta 1))

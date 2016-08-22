@@ -6,17 +6,17 @@ representation."
   (let ((p-edge (if (> n2 n1) (list n1 n2) (list n2 n1))))
     (let ((p (position p-edge
                        edge-list
-                       :test #'(lambda (e1 e2)
-                                 (and (eql (first e1) (first e2))
-                                      (eql (second e1) (second e2)))))))
+                       :test (lambda (e1 e2)
+                               (and (eql (first e1) (first e2))
+                                    (eql (second e1) (second e2)))))))
       (values p p-edge))))
 
 (defmethod push-flow-via-edges ((graph graph) path edges-in-flow)
   "Push the maximum amount of flow through edges in path."
-  (let ((min-cap (apply #'min (mapcar
-                               #'(lambda (e)
-                                   (capacity graph (nth 0 e) (nth 1 e)))
-                               path))))
+  (let ((min-cap (apply 'min (mapcar
+                              (lambda (e)
+                                (capacity graph (nth 0 e) (nth 1 e)))
+                              path))))
     (dolist (edge path)
       (destructuring-bind (n1 n2) edge
         (multiple-value-bind (p p-edge)
@@ -47,7 +47,7 @@ representation."
                     (pushnew (list v w) edges :test 'equalp))
                    ((= (gethash w distances) (1+ (gethash v distances)))
                     (pushnew (list v w) edges :test 'equalp))))))
-    (let ((reversed-net (mapcar #'reverse edges)))
+    (let ((reversed-net (mapcar 'reverse edges)))
       (let ((touched-nodes nil) (queue (make-empty-queue)))
         (enqueue queue sink)
         (loop until (empty-queue? queue) do

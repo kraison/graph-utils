@@ -220,14 +220,16 @@ outbound neighbors for a directed graph."
 
 (defmethod neighbors ((graph graph) node &key (return-ids? t) &allow-other-keys)
   "Return a list of ids for this node's neighbors."
-  (neighbors graph (gethash node (nodes graph)) :return-ids? return-ids?))
+  (let ((id (gethash node (nodes graph))))
+    (when id
+      (neighbors graph id :return-ids? return-ids?))))
 
 (defgeneric inbound-neighbors (graph node &key return-ids? edge-type))
 (defmethod inbound-neighbors ((graph directed-graph) node &key
                               (return-ids? t) &allow-other-keys)
-  (inbound-neighbors graph
-                     (gethash node (nodes graph))
-                     :return-ids? return-ids?))
+  (let ((id (gethash node (nodes graph))))
+    (when id
+      (inbound-neighbors graph id :return-ids? return-ids?))))
 
 (defmethod inbound-neighbors ((graph directed-graph) (node integer) &key
                               (return-ids? t) &allow-other-keys)
@@ -245,9 +247,9 @@ outbound neighbors for a directed graph."
 (defgeneric outbound-neighbors (graph node &key return-ids? edge-type))
 (defmethod outbound-neighbors ((graph directed-graph) node &key
                                (return-ids? t) &allow-other-keys)
-  (outbound-neighbors graph
-                      (gethash node (nodes graph))
-                      :return-ids? return-ids?))
+  (let ((id (gethash node (nodes graph))))
+    (when id
+      (outbound-neighbors graph id :return-ids? return-ids?))))
 
 (defmethod outbound-neighbors ((graph directed-graph) (node integer) &key
                                (return-ids? t) &allow-other-keys)
@@ -270,7 +272,10 @@ outbound neighbors for a directed graph."
 
 (defmethod edge-exists? ((graph graph) n1 n2 &key &allow-other-keys)
   "Is there an edge between n1 and n2?"
-  (edge-exists? graph (lookup-node graph n1) (lookup-node graph n2)))
+  (let ((id1 (lookup-node graph n1))
+        (id2 (lookup-node graph n2)))
+    (when (and id1 id2)
+      (edge-exists? graph id1 id2))))
 
 (defgeneric add-edge (graph n1 n2 &key weight edge-type))
 (defmethod add-edge ((graph graph) (n1 integer) (n2 integer) &key (weight 1)
@@ -297,10 +302,11 @@ outbound neighbors for a directed graph."
 
 (defmethod add-edge ((graph graph) n1 n2 &key (weight 1) &allow-other-keys)
   "Add an edge between n1 and n2."
-  (add-edge graph
-            (gethash n1 (nodes graph))
-            (gethash n2 (nodes graph))
-            :weight weight))
+  (let ((id1 (gethash n1 (nodes graph)))
+        (id2 (gethash n2 (nodes graph))))
+    (if (and id1 id2)
+        (add-edge graph id1 id2 :weight weight)
+        (error "Unknown nodes: ~A / ~A" n1 n2))))
 
 (defmethod add-edge ((graph directed-graph) n1 n2 &key (weight 1)
                      &allow-other-keys)
@@ -338,7 +344,10 @@ outbound neighbors for a directed graph."
 
 (defmethod delete-edge ((graph graph) n1 n2 &optional et)
   (declare (ignore et))
-  (delete-edge graph (gethash n1 (nodes graph)) (gethash n2 (nodes graph))))
+  (let ((id1 (gethash n1 (nodes graph)))
+        (id2 (gethash n2 (nodes graph))))
+    (when (and id1 id2)
+      (delete-edge graph (gethash n1 (nodes graph)) (gethash n2 (nodes graph))))))
 
 (defmethod map-edges ((fn function) (graph graph) &key collect? remove-nulls?)
   "Apply a function to all edges."
@@ -380,7 +389,11 @@ outbound neighbors for a directed graph."
 
 (defmethod edge-weight ((graph graph) n1 n2 &optional et)
   (declare (ignore et))
-  (edge-weight graph (gethash n1 (nodes graph)) (gethash n2 (nodes graph))))
+  (let ((id1 (gethash n1 (nodes graph)))
+        (id2 (gethash n2 (nodes graph))))
+    (if (and id1 id2)
+        (edge-weight graph id1 id2)
+        0)))
 
 (defgeneric incf-edge-weight (graph n1 n2 &key edge-type delta))
 (defmethod incf-edge-weight ((graph graph) (n1 integer) (n2 integer)
@@ -388,10 +401,11 @@ outbound neighbors for a directed graph."
   (incf-sarray (matrix graph) (list n1 n2) delta))
 
 (defmethod incf-edge-weight ((graph graph) n1 n2 &key delta &allow-other-keys)
-  (incf-edge-weight graph
-                    (lookup-node graph n1)
-                    (lookup-node graph n2)
-                    :delta delta))
+  (let ((id1 (gethash n1 (nodes graph)))
+        (id2 (gethash n2 (nodes graph))))
+    (if (and id1 id2)
+        (incf-edge-weight graph id1 id2 :delta delta)
+        (error "Unknown nodes: ~A / ~A" n1 n2))))
 
 (defgeneric decf-edge-weight (graph n1 n2 &key edge-type delta))
 (defmethod decf-edge-weight ((graph graph) (n1 integer) (n2 integer)
@@ -399,10 +413,11 @@ outbound neighbors for a directed graph."
   (decf-sarray (matrix graph) (list n1 n2) delta))
 
 (defmethod decf-edge-weight ((graph graph) n1 n2 &key delta &allow-other-keys)
-  (decf-edge-weight graph
-                    (gethash n1 (nodes graph))
-                    (gethash n2 (nodes graph))
-                    :delta delta))
+  (let ((id1 (gethash n1 (nodes graph)))
+        (id2 (gethash n2 (nodes graph))))
+    (if (and id1 id2)
+        (decf-edge-weight graph id1 id2 :delta delta)
+        (error "Unknown nodes: ~A / ~A" n1 n2))))
 
 (defmethod capacity ((graph graph) n1 n2)
   (or (edge-weight graph n1 n2) 0))
@@ -464,7 +479,10 @@ outbound neighbors for a directed graph."
   graph)
 
 (defmethod degree ((graph graph) node)
-  (degree graph (gethash node (nodes graph))))
+  (let ((id (gethash node (nodes graph))))
+    (if id
+        (degree graph id)
+        0)))
 
 (defmethod degree ((graph graph) (node integer))
   "Calculate the degree of a node."
@@ -480,8 +498,27 @@ outbound neighbors for a directed graph."
   (leaf? graph (lookup-node graph node)))
 
 (defmethod leaves ((graph directed-graph))
-  (map-nodes #'(lambda (name id)
-		 (declare (ignore name))
-		 (when (leaf? graph id)
-		   id))
+  (map-nodes (lambda (name id)
+               (declare (ignore name))
+               (when (leaf? graph id)
+                 id))
 	     graph :collect? t :remove-nulls? t))
+
+(defmethod delete-node ((graph graph) (id integer))
+  (let ((value (lookup-node graph id)))
+    (if (directed? graph)
+        (progn
+          (dolist (neighbor (inbound-neighbors graph id))
+            (delete-edge graph neighbor id))
+          (dolist (neighbor (outbound-neighbors graph id))
+            (delete-edge graph id neighbor)))
+        (dolist (neighbor (neighbors graph id))
+          (delete-edge graph id neighbor)))
+    (remhash id (node-caps graph))
+    (when (directed? graph)
+      (remhash id (in-degree-table graph))
+      (remhash id (out-degree-table graph)))
+    (remhash id (degree-table graph))
+    (remhash value (nodes graph))
+    (remhash id (ids graph))
+    nil))
