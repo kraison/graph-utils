@@ -643,7 +643,6 @@ edges and clusters based on span."
           (loop for j from (1+ i) below node-count do
                (let ((v2 (elt nodes j)))
                  (unless (eql v1 v2)
-                   (log:debug "Checking ~A <-> ~A" v1 v2)
                    (let ((node1-idx (gethash (lookup-node graph v1) node-idx))
                          (node2-idx (gethash (lookup-node graph v2) node-idx)))
                      (let ((path-length (aref distances node1-idx node2-idx)))
