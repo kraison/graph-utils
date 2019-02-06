@@ -5,7 +5,7 @@ dependencies: cl-ppcre, dso-lex, cl-yacc, trivial-shell, parse-number, bordeaux-
 Implements the following functionality:
 
     1.  Create directed and undirected graphs with typed or untyped edges
-    2.  Compare graphs using graph= method
+    2.  Compare graphs using graph-equal method
     3.  Sparse 2D array representation of adjacency matrix
     4.  Neighbors, outbound-edges and inbound-edges methods for listing a node's neighbors in directed and undirected graphs
     5.  Edge deletion and creation methods
@@ -25,4 +25,3 @@ Implements the following functionality:
     19. Maximum matching for bipartite graphs using the max-flow method
     20. GML and Pajek .net graph file format parsers
     21. A prolog implementation for searching graphs based on PAIP
-

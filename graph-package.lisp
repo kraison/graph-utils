@@ -9,7 +9,7 @@
            #:add-edge-type
 	   #:graph
 	   #:copy-graph
-	   #:graph=
+	   #:graph-equal
 	   #:graph?
 	   #:directed?
 	   #:undirected?
