@@ -1,6 +1,6 @@
 graph-utils:  a graph analysis library for Common Lisp
 by: Kevin Raison
-dependencies: cl-ppcre, dso-lex, cl-yacc, trivial-shell, parse-number, bordeaux-threads
+dependencies: cl-ppcre, dso-lex, cl-yacc, trivial-shell, parse-number, bordeaux-threads, cl-skip-list
 
 Implements the following functionality:
 
