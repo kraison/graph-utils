@@ -117,7 +117,7 @@ returns it as a list of edges as pairs of nodes."
 			 (cdr (assoc neighbor previous)) (car next))))))))))
 |#
 
-(defmethod find-shortest-path ((graph graph) (n1 integer) (n2 integer))
+(defmethod find-shortest-path ((graph graph) (n1 integer) (n2 integer) &key use-weights-p)
   "Dijkstra's algorithm for finding the shortest path between two nodes."
   (let ((nodes (node-ids graph)))
     (let ((distances (make-instance 'fib-heap:fib-heap))
@@ -133,7 +133,7 @@ returns it as a list of edges as pairs of nodes."
                (return nil))
              (when (= next n2)
                (return-from find-shortest-path
-                 (nreverse (reconstruct-path previous n2))))
+                 (values (nreverse (reconstruct-path previous n2)) d)))
              (setq nodes (delete next nodes))
 	     (dolist (neighbor (if (directed? graph)
 				   (outbound-neighbors graph next)
@@ -141,16 +141,19 @@ returns it as a list of edges as pairs of nodes."
                (when (consp neighbor) ;; typed graph
                  (setq neighbor (cdr neighbor)))
                (when (fib-heap:lookup-node distances neighbor)
-                 (let ((distance (1+ d)))
+                 (let ((distance (if use-weights-p
+                                     (+ d (edge-weight graph next neighbor))
+                                     (1+ d))))
                    (when (< distance (fib-heap:lookup-node distances neighbor))
                      (fib-heap:decrease-key distances neighbor distance)
                      (setf (cdr (assoc neighbor previous)) next)))))
              next)))))
 
-(defmethod find-shortest-path ((graph graph) n1 n2)
+(defmethod find-shortest-path ((graph graph) n1 n2 &key use-weights-p)
   (find-shortest-path graph
 		      (gethash n1 (nodes graph))
-		      (gethash n2 (nodes graph))))
+		      (gethash n2 (nodes graph))
+              :use-weights-p use-weights-p))
 
 (defmethod old-reconstruct-path-all-pairs ((graph graph) paths node-idx n1 n2)
   (let ((idx1 (gethash n1 node-idx))
