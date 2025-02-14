@@ -43,6 +43,41 @@
             (cons "Person" (outbound-neighbors graph "Person")))))
 |#
 
+(defun shortest-path-test ()
+  (let ((graph (make-graph :directed? t)))
+    (dolist (node '(:a :b :c :d :e))
+      (add-node graph node))
+    (loop for (start end weight) in '((:a :b 9)
+                                      (:a :d 4)
+                                      (:a :e 1)
+                                      (:e :d 2)
+                                      (:e :c 6)
+                                      (:d :c 3)
+                                      (:b :d 4)
+                                      (:c :b 2))
+          do (add-edge graph start end :weight weight))
+    (assert (equal (multiple-value-list (find-shortest-path graph :a :b))
+                   '(((0 1)) 1)))
+    (assert (equal (multiple-value-list
+                    (find-shortest-path graph :a :b :use-weights-p t))
+                   '(((0 4) (4 3) (3 2) (2 1)) 8)))
+    (assert (equal (multiple-value-list
+                    (find-shortest-path graph :e :c))
+                   '(((4 2)) 1)))
+    (assert (equal (multiple-value-list
+                    (find-shortest-path graph :e :c :use-weights-p t))
+                   '(((4 3) (3 2)) 5)))
+    (assert (or (equal (multiple-value-list
+                        (find-shortest-path graph :a :c))
+                       '(((0 3) (3 2)) 2))
+                (equal (multiple-value-list
+                        (find-shortest-path graph :a :c))
+                       '(((0 4) (4 2)) 2))))
+    (assert (equal (multiple-value-list
+                    (find-shortest-path graph :a :c :use-weights-p t))
+                   '(((0 4) (4 3) (3 2)) 6)))
+    (assert (null (find-shortest-path graph :c :a)))))
+
 (defun run-tests ()
   (let ((flow1 (parse-pajek "data/flow1.net"))
         (flow2 (parse-pajek "data/flow.net"))
@@ -70,4 +105,3 @@
           (dbg "graph bipartite1: ~A says matching is~% ~A" alg matching)
           (push (list alg :matching matching) results))))
     results))
-
